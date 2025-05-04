@@ -47,27 +47,27 @@ If you have a suggestion for improving the project, we'd love to hear it. Please
 
 ### Prerequisites
 
-Before getting started with REPLACE-ME, ensure your runtime environment meets the following requirements:
+Before getting started with pi-hole, ensure your runtime environment meets the following requirements:
 
 - **Programming Language:** TypeScript
 - **Package Manager:** Npm
 
 ### Installation
 
-Install REPLACE-ME using one of the following methods:
+Install pi-hole using one of the following methods:
 
 **Build from source:**
 
-1. Clone the REPLACE-ME repository:
+1. Clone the pi-hole repository:
 
 ```sh
-❯ git clone https://github.com/homeassistant-extras/REPLACE-ME
+❯ git clone https://github.com/homeassistant-extras/pi-hole
 ```
 
 2. Navigate to the project directory:
 
 ```sh
-❯ cd REPLACE-ME
+❯ cd pi-hole
 ```
 
 3. Install the project dependencies:
