@@ -224,6 +224,10 @@ export const styles = css`
     --mdc-theme-primary: var(--warning-color);
   }
 
+  mwc-button ha-icon {
+    margin-right: 2px;
+  }
+
   /* Version information styles */
   .version-info {
     display: flex;

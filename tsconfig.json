@@ -25,6 +25,7 @@
       "@common/*": ["./src/common/*"],
       "@util/*": ["./src/util/*"],
       "@test/*": ["./test/*"],
+      "@html/*": ["./src/html/*"],
       "@delegates/*": ["./src/delegates/*"],
       "@/*": ["./src/*"]
     }

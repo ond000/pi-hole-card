@@ -10,13 +10,12 @@ const equal = require('fast-deep-equal');
 
 /**
  * Todo list
- * - Add configuration options for Pi-hole URL
  * - README.md
  * - tests
- * - use button that ppl used to for on/off
  * - links don't work
  * - remove unneeded styles
  * - remove unnecessary code
+ * - use more HA stuff for call service, etc. (fireEvent?)
  */
 
 /**

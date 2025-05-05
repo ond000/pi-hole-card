@@ -70,7 +70,6 @@ export class PiHoleCardEditor extends LitElement {
   private _valueChanged(ev: CustomEvent) {
     const config = ev.detail.value as Config;
 
-    // @ts-ignore
     fireEvent(this, 'config-changed', {
       config,
     });
