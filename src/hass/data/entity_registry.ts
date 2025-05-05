@@ -7,4 +7,5 @@ export type EntityCategory = 'config' | 'diagnostic';
 export interface EntityRegistryDisplayEntry {
   entity_id: string;
   device_id: string;
+  translation_key?: string;
 }

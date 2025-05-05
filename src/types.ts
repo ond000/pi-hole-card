@@ -9,19 +9,72 @@ export interface Config {
 export interface PiHoleDevice {
   /** Unique identifier for the device */
   device_id: string;
-  /** Name of the device */
-  name: string;
-  /** IP address of the device */
-  ip_address: string;
-  /** MAC address of the device */
-  mac_address: string;
-  /** Status of the device (e.g., online, offline) */
-  status: string;
-  /** Type of the device (e.g., router, switch) */
-  type: string;
+
+  /**
+   * Sensors for Pi-hole
+   */
+  /** Total DNS Queries */
+  dns_queries_today?: EntityInformation;
+
+  /** Total Domains Blocked */
+  domains_blocked?: EntityInformation;
+
+  /** Percentage of Ads Blocked Today */
+  ads_percentage_blocked_today?: EntityInformation;
+
+  /** Total Ads Blocked Today */
+  ads_blocked_today?: EntityInformation;
+
+  /** Total Seen Clients */
+  seen_clients?: EntityInformation;
+
+  /** Total Unique Domains Queried */
+  dns_unique_domains?: EntityInformation;
+
+  /** Total DNS Queries Cached */
+  dns_queries_cached?: EntityInformation;
+
+  /** Total DNS Queries Forwarded */
+  dns_queries_forwarded?: EntityInformation;
+
+  /** Total Unique Clients Queried */
+  dns_unique_clients?: EntityInformation;
+
+  /** Remaining Time Until Blocking Mode */
+  remaining_until_blocking_mode?: EntityInformation;
+
+  /**
+   * Button for Pi-hole
+   */
+  /** Button to flush arp */
+  action_flush_arp?: EntityInformation;
+
+  /** Button to Flush Logs */
+  action_flush_logs?: EntityInformation;
+
+  /** Button to Update Gravity */
+  action_gravity?: EntityInformation;
+
+  /** Button to Refresh DNS */
+  action_restartdns?: EntityInformation;
+
+  /** Button to Refresh data */
+  action_refresh_data?: EntityInformation;
+
+  /**
+   * Switches for Pi-hole
+   */
+  /** Switch for group default */
+  group_default?: EntityInformation;
+
+  /** Switch for Pi-hole blocking */
+  switch_pi_hole?: EntityInformation;
 }
 
-export interface EntityInformation extends EntityState {}
+export interface EntityInformation extends EntityState {
+  /** Translation key */
+  translation_key: string | undefined;
+}
 
 export interface EntityState {
   /** ID of the entity this state belongs to */
