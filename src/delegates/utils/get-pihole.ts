@@ -77,11 +77,34 @@ export const getPiHole = (
         device.action_refresh_data = entity;
         break;
 
+      // updates
+      case 'core_update_available':
+        device.core_update_available = entity;
+        break;
+      case 'web_update_available':
+        device.web_update_available = entity;
+        break;
+      case 'ftl_update_available':
+        device.ftl_update_available = entity;
+        break;
+
       // switches
       case 'group':
         device.group_default = entity;
         break;
+
+      // binary sensors
+      case 'status':
+        device.status = entity;
+        break;
+
+      // edge cases
       default:
+        if (entity.entity_id === 'update.pi_hole_v6_integration_update') {
+          // this is a bit brittle, but it works for now
+          device.integration_update_available = entity;
+        }
+
         const domain = computeDomain(entity.entity_id);
         if (domain === 'switch') {
           // going to assume the second switch is the main switch..
@@ -95,12 +118,6 @@ export const getPiHole = (
   /**
    * [
         "binary_sensor.pi_hole_status",
-        "switch.pi_hole",
-        "switch.pi_hole_group_default",
-        "update.pi_hole_core_update_available",
-        "update.pi_hole_web_update_available",
-        "update.pi_hole_ftl_update_available",
-        "update.pi_hole_v6_integration_update"
       ]
    */
 

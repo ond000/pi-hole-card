@@ -1,8 +1,8 @@
 import { css } from 'lit';
 
 /**
- * Static CSS styles for the Device Card
- * Defines the grid layout and styling for all card elements
+ * Static CSS styles for the Pi-hole Card
+ * Modified to support grouped pairs of elements
  */
 export const styles = css`
   ha-card {
@@ -45,23 +45,25 @@ export const styles = css`
     padding: 16px;
   }
 
-  /* Dashboard-style layout */
-  /* Using container queries for card-based responsiveness */
-  :host {
-    container-type: inline-size;
-  }
-
+  /* Dashboard-style layout with grouped stat boxes */
   .dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-bottom: 16px;
   }
 
-  /* Use 4 columns when card is wide enough */
-  @container (min-width: 600px) {
+  /* Stat groups - will appear side by side on larger screens */
+  .stat-group {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+  }
+
+  /* On smaller screens, groups stack but pairs stay together */
+  @media (min-width: 900px) {
     .dashboard-stats {
-      grid-template-columns: repeat(4, 1fr);
+      flex-direction: row;
     }
   }
 
@@ -74,6 +76,8 @@ export const styles = css`
     cursor: pointer;
     transition: transform 0.2s;
     min-height: 120px;
+    min-width: 120px;
+    flex: 1;
   }
 
   .stat-box:hover {
@@ -101,7 +105,6 @@ export const styles = css`
 
   /* Dashboard boxes - muted versions of Pi-hole colors */
   .queries-box {
-    background-color: #1e88e5; /* Muted blue */
     background-color: rgba(0, 115, 179, 0.85); /* Muted Pi-hole blue */
   }
 
@@ -117,17 +120,34 @@ export const styles = css`
     background-color: rgba(38, 164, 43, 0.85); /* Muted Pi-hole green */
   }
 
-  /* Additional stats styling */
+  /* Additional stats styling - specialized responsive grid */
   .additional-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 8px;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+    /* Start with 1 column at small widths */
+    grid-template-columns: minmax(120px, 1fr);
   }
 
-  /* Use 4 columns when card is wide enough */
-  @container (min-width: 600px) {
+  /* Switch to 2 columns at slightly wider screens */
+  @media (min-width: 480px) {
     .additional-stats {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+  }
+
+  /* Medium screens - 3 columns */
+  @media (min-width: 600px) {
+    .additional-stats {
+      grid-template-columns: repeat(3, minmax(120px, 170px));
+    }
+  }
+
+  /* Wide screens - 6 columns */
+  @media (min-width: 1100px) {
+    .additional-stats {
+      grid-template-columns: repeat(6, minmax(120px, 160px));
     }
   }
 
@@ -139,6 +159,10 @@ export const styles = css`
     background-color: var(--card-background-color, #f0f0f0);
     padding: 8px;
     border-radius: 4px;
+    min-width: 120px;
+    /* Allow text to wrap if needed */
+    white-space: normal;
+    overflow: hidden;
   }
 
   .additional-stat ha-icon {
@@ -164,5 +188,41 @@ export const styles = css`
 
   mwc-button.warning {
     --mdc-theme-primary: var(--warning-color);
+  }
+
+  /* Version information styles */
+  .version-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 8px 16px 16px;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+    border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+    background-color: var(--card-background-color);
+    margin-top: 8px;
+    gap: 12px;
+  }
+
+  .version-item {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .version-label {
+    margin-right: 4px;
+  }
+
+  .version-value {
+    font-weight: 500;
+    color: var(--primary-text-color);
+  }
+
+  /* Very small screen adjustments */
+  @media (max-width: 400px) {
+    .stat-group {
+      flex-direction: column;
+    }
   }
 `;

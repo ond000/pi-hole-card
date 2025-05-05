@@ -1,3 +1,4 @@
+import { getConfigDevice } from '@delegates/utils/get-config-device';
 import { getPiHole } from '@delegates/utils/get-pihole';
 import type { HomeAssistant } from '@hass/types';
 import { CSSResult, LitElement, html } from 'lit';
@@ -72,12 +73,13 @@ export class PiHoleCard extends LitElement {
   }
 
   public static async getStubConfig(hass: HomeAssistant): Promise<Config> {
+    const device = await getConfigDevice(hass);
+
     return {
-      device_id: '',
+      device_id: device?.id ?? '',
     };
   }
 
-  // nothing below line is cleaned up yet
   override render() {
     if (!this._hass || !this._config) {
       return html`<ha-card>
@@ -117,64 +119,70 @@ export class PiHoleCard extends LitElement {
         <div class="card-content">
           <!-- Main dashboard-style stats row -->
           <div class="dashboard-stats">
-            <!-- Total Queries - Blue background -->
-            <div
-              class="stat-box queries-box"
-              @click=${() => this._openPihole('/admin/queries.php')}
-            >
-              <div class="stat-header">Total queries</div>
-              <div class="stat-value">
-                ${this._device.dns_queries_today?.state || '0'}
+            <!-- First Group: Queries and Blocked -->
+            <div class="stat-group">
+              <!-- Total Queries - Blue background -->
+              <div
+                class="stat-box queries-box"
+                @click=${() => this._openPihole('/admin/queries.php')}
+              >
+                <div class="stat-header">Total queries</div>
+                <div class="stat-value">
+                  ${this._device.dns_queries_today?.state || '0'}
+                </div>
+                <div class="stat-footer">
+                  <span
+                    >${this._device.seen_clients?.state || '0'} active
+                    clients</span
+                  >
+                  <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+                </div>
               </div>
-              <div class="stat-footer">
-                <span
-                  >${this._device.seen_clients?.state || '0'} active
-                  clients</span
-                >
-                <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+
+              <!-- Queries Blocked - Red background -->
+              <div
+                class="stat-box blocked-box"
+                @click=${() => this._openPihole('/admin/queries.php?blocked')}
+              >
+                <div class="stat-header">Queries Blocked</div>
+                <div class="stat-value">
+                  ${this._device.ads_blocked_today?.state || '0'}
+                </div>
+                <div class="stat-footer">
+                  <span>List blocked queries</span>
+                  <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+                </div>
               </div>
             </div>
 
-            <!-- Queries Blocked - Red background -->
-            <div
-              class="stat-box blocked-box"
-              @click=${() => this._openPihole('/admin/queries.php?blocked')}
-            >
-              <div class="stat-header">Queries Blocked</div>
-              <div class="stat-value">
-                ${this._device.ads_blocked_today?.state || '0'}
+            <!-- Second Group: Percentage and Domains -->
+            <div class="stat-group">
+              <!-- Percentage Blocked - Orange/Amber background -->
+              <div
+                class="stat-box percentage-box"
+                @click=${() => this._openPihole('/admin/queries.php')}
+              >
+                <div class="stat-header">Percentage Blocked</div>
+                <div class="stat-value">${percentageBlocked}</div>
+                <div class="stat-footer">
+                  <span>List all queries</span>
+                  <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+                </div>
               </div>
-              <div class="stat-footer">
-                <span>List blocked queries</span>
-                <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
-              </div>
-            </div>
 
-            <!-- Percentage Blocked - Orange/Amber background -->
-            <div
-              class="stat-box percentage-box"
-              @click=${() => this._openPihole('/admin/queries.php')}
-            >
-              <div class="stat-header">Percentage Blocked</div>
-              <div class="stat-value">${percentageBlocked}</div>
-              <div class="stat-footer">
-                <span>List all queries</span>
-                <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
-              </div>
-            </div>
-
-            <!-- Domains on Lists - Green background -->
-            <div
-              class="stat-box domains-box"
-              @click=${() => this._openPihole('/admin/groups-domains.php')}
-            >
-              <div class="stat-header">Domains on Lists</div>
-              <div class="stat-value">
-                ${this._device.domains_blocked?.state || '0'}
-              </div>
-              <div class="stat-footer">
-                <span>Manage lists</span>
-                <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+              <!-- Domains on Lists - Green background -->
+              <div
+                class="stat-box domains-box"
+                @click=${() => this._openPihole('/admin/groups-domains.php')}
+              >
+                <div class="stat-header">Domains on Lists</div>
+                <div class="stat-value">
+                  ${this._device.domains_blocked?.state || '0'}
+                </div>
+                <div class="stat-footer">
+                  <span>Manage lists</span>
+                  <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
+                </div>
               </div>
             </div>
           </div>
@@ -206,14 +214,14 @@ export class PiHoleCard extends LitElement {
               >
             </div>
             <div class="additional-stat">
-              <ha-icon icon="mdi:dns"></ha-icon>
+              <ha-icon icon="mdi:account"></ha-icon>
               <span
                 >${this._device.dns_unique_clients?.state || '0'} unique
                 clients</span
               >
             </div>
             <div class="additional-stat">
-              <ha-icon icon="mdi:dns"></ha-icon>
+              <ha-icon icon="mdi:timer-outline"></ha-icon>
               <span
                 >${this._device.remaining_until_blocking_mode?.state || '0'}
                 time remaining</span
@@ -256,11 +264,44 @@ export class PiHoleCard extends LitElement {
             Update Gravity
           </mwc-button>
         </div>
+
+        <!-- Version Information Bar -->
+        <div class="version-info">
+          <div class="version-item">
+            <span class="version-label">Core</span>
+            <span class="version-value"
+              >${this._device.core_update_available?.attributes
+                ?.installed_version}</span
+            >
+          </div>
+          <div class="version-item">
+            <span class="version-label">FTL</span>
+            <span class="version-value"
+              >${this._device.ftl_update_available?.attributes
+                ?.installed_version}</span
+            >
+          </div>
+          <div class="version-item">
+            <span class="version-label">Web interface</span>
+            <span class="version-value"
+              >${this._device.web_update_available?.attributes
+                ?.installed_version}</span
+            >
+          </div>
+          <div class="version-item">
+            <span class="version-label">HA integration</span>
+            <span class="version-value"
+              >${this._device.integration_update_available?.attributes
+                ?.installed_version}</span
+            >
+          </div>
+        </div>
       </ha-card>
     `;
   }
 
   _toggleEntity(entityId?: string) {
+    if (!entityId) return;
     const currentState = this._hass.states[entityId].state;
     const service = currentState === 'on' ? 'turn_off' : 'turn_on';
     const [domain] = entityId.split('.');

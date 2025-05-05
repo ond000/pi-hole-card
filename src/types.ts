@@ -62,6 +62,21 @@ export interface PiHoleDevice {
   action_refresh_data?: EntityInformation;
 
   /**
+   * Updates for Pi-hole
+   */
+  /** Core Update Available */
+  core_update_available?: EntityInformation;
+
+  /** Web Update Available */
+  web_update_available?: EntityInformation;
+
+  /** Pi-hole FTL Update Available */
+  ftl_update_available?: EntityInformation;
+
+  /** Integration Update Available */
+  integration_update_available?: EntityInformation;
+
+  /**
    * Switches for Pi-hole
    */
   /** Switch for group default */
@@ -69,6 +84,12 @@ export interface PiHoleDevice {
 
   /** Switch for Pi-hole blocking */
   switch_pi_hole?: EntityInformation;
+
+  /**
+   * Binary Sensors for Pi-hole
+   */
+  /** Status of Pi-hole */
+  status?: EntityInformation;
 }
 
 export interface EntityInformation extends EntityState {

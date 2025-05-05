@@ -6,4 +6,5 @@ import type { RegistryEntry } from './registry';
 
 export interface DeviceRegistryEntry extends RegistryEntry {
   id: string;
+  config_entries: string[];
 }
