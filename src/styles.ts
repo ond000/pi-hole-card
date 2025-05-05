@@ -2,7 +2,7 @@ import { css } from 'lit';
 
 /**
  * Static CSS styles for the Pi-hole Card
- * Modified to support grouped pairs of elements
+ * Modified to support grouped pairs of elements and background icons
  */
 export const styles = css`
   ha-card {
@@ -69,7 +69,6 @@ export const styles = css`
 
   .stat-box {
     border-radius: 8px;
-    padding: 12px;
     display: flex;
     flex-direction: column;
     color: white;
@@ -78,46 +77,81 @@ export const styles = css`
     min-height: 120px;
     min-width: 120px;
     flex: 1;
+    position: relative;
+    overflow: hidden;
   }
 
   .stat-box:hover {
     transform: scale(1.02);
   }
 
+  /* New: Stat Icon (Background) */
+  .stat-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.2;
+    z-index: 1;
+  }
+
+  .stat-icon ha-icon {
+    --mdc-icon-size: 80px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* Content container to position above the icon */
+  .stat-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
   .stat-header {
     font-size: 1rem;
-    margin-bottom: 8px;
+    padding: 12px 12px 0px 12px;
   }
 
   .stat-value {
     font-size: 2rem;
     font-weight: bold;
-    margin: auto 0;
+    padding: 8px 12px 0;
+    flex: 1;
   }
 
   .stat-footer {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
     font-size: 0.8rem;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 12px;
+    margin-top: auto; /* Push to the bottom */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
   }
 
   /* Dashboard boxes - muted versions of Pi-hole colors */
   .queries-box {
-    background-color: rgba(0, 115, 179, 0.85); /* Muted Pi-hole blue */
+    background-color: rgba(0, 192, 239, 0.85); /* Muted Pi-hole blue */
   }
 
   .blocked-box {
-    background-color: rgba(196, 60, 60, 0.85); /* Muted Pi-hole red */
+    background-color: rgba(221, 75, 57, 0.85);
   }
 
   .percentage-box {
-    background-color: rgba(249, 177, 57, 0.85); /* Muted Pi-hole amber/orange */
+    background-color: rgba(243, 156, 18, 0.85);
   }
 
   .domains-box {
-    background-color: rgba(38, 164, 43, 0.85); /* Muted Pi-hole green */
+    background-color: rgba(0, 166, 90, 0.85);
   }
 
   /* Additional stats styling - specialized responsive grid */
@@ -212,11 +246,7 @@ export const styles = css`
 
   .version-label {
     margin-right: 4px;
-  }
-
-  .version-value {
-    font-weight: 500;
-    color: var(--primary-text-color);
+    font-weight: 700;
   }
 
   /* Very small screen adjustments */

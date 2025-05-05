@@ -16,6 +16,14 @@ const SCHEMA: HaFormSchema[] = [
     required: true,
     label: `Device`,
   },
+  {
+    name: 'url',
+    selector: {
+      text: {},
+    },
+    required: false,
+    label: `Instance URL`,
+  },
 ];
 
 export class PiHoleCardEditor extends LitElement {

@@ -4,6 +4,9 @@
 export interface Config {
   /** Unique identifier for the device */
   device_id: string;
+
+  /** URL of the instance */
+  url?: string;
 }
 
 export interface PiHoleDevice {
