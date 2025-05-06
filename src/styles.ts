@@ -6,23 +6,18 @@ import { css } from 'lit';
  */
 export const styles = css`
   ha-card {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    position: relative;
     overflow: hidden;
   }
 
+  /* Card header styles */
   .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 16px 16px 0;
   }
 
   .name {
     display: flex;
-    align-items: center;
     font-size: 1.2rem;
     font-weight: 500;
   }
@@ -33,7 +28,6 @@ export const styles = css`
 
   .status {
     display: flex;
-    align-items: center;
     font-weight: 500;
   }
 
@@ -72,7 +66,6 @@ export const styles = css`
     display: flex;
     flex-direction: column;
     color: white;
-    cursor: pointer;
     transition: transform 0.2s;
     min-height: 120px;
     min-width: 120px;
@@ -121,6 +114,12 @@ export const styles = css`
     flex: 1;
   }
 
+  .stat-link {
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
   .stat-footer {
     width: 100%;
     display: flex;
@@ -139,7 +138,7 @@ export const styles = css`
 
   /* Dashboard boxes - muted versions of Pi-hole colors */
   .queries-box {
-    background-color: rgba(0, 192, 239, 0.85); /* Muted Pi-hole blue */
+    background-color: rgba(0, 192, 239, 0.85);
   }
 
   .blocked-box {
@@ -158,7 +157,6 @@ export const styles = css`
   .additional-stats {
     display: grid;
     gap: 8px;
-    margin-bottom: 16px;
     justify-content: center;
     /* Start with 1 column at small widths */
     grid-template-columns: minmax(120px, 1fr);
@@ -212,22 +210,6 @@ export const styles = css`
     border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
   }
 
-  mwc-button {
-    margin: 4px;
-  }
-
-  mwc-button.primary {
-    --mdc-theme-primary: var(--success-color);
-  }
-
-  mwc-button.warning {
-    --mdc-theme-primary: var(--warning-color);
-  }
-
-  mwc-button ha-icon {
-    margin-right: 2px;
-  }
-
   /* Version information styles */
   .version-info {
     display: flex;
@@ -258,5 +240,22 @@ export const styles = css`
     .stat-group {
       flex-direction: column;
     }
+  }
+
+  /* Click action button styles */
+  mwc-button {
+    margin: 4px;
+  }
+
+  mwc-button.primary {
+    --mdc-theme-primary: var(--success-color);
+  }
+
+  mwc-button.warning {
+    --mdc-theme-primary: var(--warning-color);
+  }
+
+  mwc-button ha-icon {
+    margin-right: 3px;
   }
 `;

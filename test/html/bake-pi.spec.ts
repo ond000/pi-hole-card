@@ -1,8 +1,14 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
+import * as createAdditionalStatModule from '@html/additional-stat';
 import { renderPiHoleCard } from '@html/bake-pi';
+import * as piFlavorsModule from '@html/pi-flavors';
+import * as createStatBoxModule from '@html/stat-box';
+import * as stateDisplayModule from '@html/state-display';
+import * as createVersionItemModule from '@html/version-item';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
+import { html } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -11,14 +17,52 @@ export default () => {
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let openStub: sinon.SinonStub;
+    let createCardActionsStub: sinon.SinonStub;
+    let stateDisplayStub: sinon.SinonStub;
+    let createAdditionalStatStub: sinon.SinonStub;
+    let createStatBoxStub: sinon.SinonStub;
+    let createVersionItemStub: sinon.SinonStub;
+    let element: HTMLElement;
 
     beforeEach(() => {
-      // Create a stub for window.open
+      element = document.createElement('div');
+
+      // Create stubs for all imported functions
       openStub = stub(window, 'open');
+
+      createCardActionsStub = stub(piFlavorsModule, 'createCardActions');
+      createCardActionsStub.returns(
+        html`<div class="mocked-card-actions">Mocked Card Actions</div>`,
+      );
+
+      stateDisplayStub = stub(stateDisplayModule, 'stateDisplay');
+      stateDisplayStub.returns(
+        html`<div class="mocked-state-display">On</div>`,
+      );
+
+      createAdditionalStatStub = stub(
+        createAdditionalStatModule,
+        'createAdditionalStat',
+      );
+      createAdditionalStatStub.returns(
+        html`<div class="mocked-additional-stat">Additional Stat</div>`,
+      );
+
+      createStatBoxStub = stub(createStatBoxModule, 'createStatBox');
+      createStatBoxStub.returns(
+        html`<div class="mocked-stat-box">Stat Box</div>`,
+      );
+
+      createVersionItemStub = stub(
+        createVersionItemModule,
+        'createVersionItem',
+      );
+      createVersionItemStub.returns(
+        html`<div class="mocked-version-item">Version Item</div>`,
+      );
 
       // Mock HomeAssistant instance
       mockHass = {
-        callService: stub(),
         states: {
           'binary_sensor.pi_hole_status': {
             state: 'on',
@@ -116,101 +160,91 @@ export default () => {
     });
 
     afterEach(() => {
-      // Restore stubs
+      // Restore all stubs
       openStub.restore();
+      createCardActionsStub.restore();
+      stateDisplayStub.restore();
+      createAdditionalStatStub.restore();
+      createStatBoxStub.restore();
+      createVersionItemStub.restore();
     });
 
-    it('should render a Pi-hole card with all sections', async () => {
+    it('should render a Pi-hole card with all main sections', async () => {
       // Render the Pi-hole card
-      const result = renderPiHoleCard(mockDevice, mockHass, mockConfig);
+      const result = renderPiHoleCard(
+        element,
+        mockDevice,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result);
 
       // Test main sections exist
       expect(el.querySelector('.card-header')).to.exist;
       expect(el.querySelector('.card-content')).to.exist;
-      expect(el.querySelector('.card-actions')).to.exist;
+      expect(el.querySelector('.mocked-card-actions')).to.exist; // Using mocked class
       expect(el.querySelector('.version-info')).to.exist;
     });
 
-    it('should format percentage correctly', async () => {
+    it('should call createCardActions with the correct parameters', async () => {
       // Render the Pi-hole card
-      const result = renderPiHoleCard(mockDevice, mockHass, mockConfig);
-      const el = await fixture(result);
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
 
-      // Find the percentage stat box
-      const percentageBox = el.querySelector('.percentage-box .stat-value');
-      expect(percentageBox).to.exist;
-      expect(percentageBox?.textContent?.trim()).to.equal('45.6%');
+      // Verify createCardActions was called with the correct parameters
+      expect(createCardActionsStub.calledOnce).to.be.true;
+      expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
+      expect(createCardActionsStub.firstCall.args[1]).to.equal(mockDevice);
     });
 
-    it('should handle zero percentage values', async () => {
-      // Create a device with zero percentage
-      const deviceWithZeroPercentage = {
-        ...mockDevice,
-        ads_percentage_blocked_today: {
-          ...mockDevice.ads_percentage_blocked_today!,
-          state: '0',
-        },
-      };
-
+    it('should call stateDisplay with status entity', async () => {
       // Render the Pi-hole card
-      const result = renderPiHoleCard(
-        deviceWithZeroPercentage,
-        mockHass,
-        mockConfig,
-      );
-      const el = await fixture(result);
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
 
-      // Find the percentage stat box
-      const percentageBox = el.querySelector('.percentage-box .stat-value');
-      expect(percentageBox).to.exist;
-      expect(percentageBox?.textContent?.trim()).to.equal('0.0%');
+      // Verify stateDisplay was called with the correct parameters
+      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
+        .true;
     });
 
-    it('should handle missing percentage values', async () => {
-      // Create a device without percentage
-      const deviceWithoutPercentage = { ...mockDevice };
-      deviceWithoutPercentage.ads_percentage_blocked_today = undefined;
-
+    it('should call createVersionItem for all version entities', async () => {
       // Render the Pi-hole card
-      const result = renderPiHoleCard(
-        deviceWithoutPercentage,
-        mockHass,
-        mockConfig,
-      );
-      const el = await fixture(result);
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
 
-      // Find the percentage stat box
-      const percentageBox = el.querySelector('.percentage-box .stat-value');
-      expect(percentageBox).to.exist;
-      expect(percentageBox?.textContent?.trim()).to.equal('0%');
-    });
+      // Verify createVersionItem was called the correct number of times
+      expect(createVersionItemStub.callCount).to.equal(4); // Core, FTL, Web, Integration
 
-    it('should display version information correctly', async () => {
-      // Render the Pi-hole card
-      const result = renderPiHoleCard(mockDevice, mockHass, mockConfig);
-      const el = await fixture(result);
+      // Verify specific calls
+      expect(
+        createVersionItemStub.calledWith(
+          'Core',
+          mockDevice.core_update_available?.attributes?.installed_version,
+          'pi-hole/pi-hole',
+        ),
+      ).to.be.true;
 
-      // Find all version items
-      const versionItems = el.querySelectorAll('.version-item');
-      expect(versionItems.length).to.equal(4); // Core, FTL, Web, Integration
+      expect(
+        createVersionItemStub.calledWith(
+          'FTL',
+          mockDevice.ftl_update_available?.attributes?.installed_version,
+          'pi-hole/FTL',
+        ),
+      ).to.be.true;
 
-      // Check version labels and values
-      const expectedVersions = [
-        { label: 'Core', value: 'v5.14.2' },
-        { label: 'FTL', value: 'v5.21' },
-        { label: 'Web interface', value: 'v5.17' },
-        { label: 'HA integration', value: 'v2.0.0' },
-      ];
+      expect(
+        createVersionItemStub.calledWith(
+          'Web interface',
+          mockDevice.web_update_available?.attributes?.installed_version,
+          'pi-hole/web',
+        ),
+      ).to.be.true;
 
-      for (let i = 0; i < versionItems.length; i++) {
-        const item = versionItems[i];
-        const label = item.querySelector('.version-label');
-        const value = item.querySelector('a span');
-
-        expect(label?.textContent).to.equal(expectedVersions[i].label);
-        expect(value?.textContent).to.equal(expectedVersions[i].value);
-      }
+      expect(
+        createVersionItemStub.calledWith(
+          'HA integration',
+          mockDevice.integration_update_available?.attributes
+            ?.installed_version,
+          'bastgau/ha-pi-hole-v6',
+        ),
+      ).to.be.true;
     });
 
     it('should handle different status states correctly', async () => {
@@ -225,6 +259,7 @@ export default () => {
 
       // Render with offline status
       const offlineResult = renderPiHoleCard(
+        element,
         offlineDevice,
         mockHass,
         mockConfig,

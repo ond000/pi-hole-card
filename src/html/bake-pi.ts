@@ -1,5 +1,6 @@
 import type { Config, PiHoleDevice } from '@/types';
 import { stateActive } from '@hass/common/entity/state_active';
+import { formatNumber } from '@hass/common/number/format_number';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
 import { createAdditionalStat } from './additional-stat';
@@ -10,29 +11,19 @@ import { createVersionItem } from './version-item';
 
 /**
  * Renders the Pi-hole card content
+ * @param element - The HTML element to render the card into
  * @param device - The Pi-hole device
  * @param hass - The Home Assistant instance
  * @param config - The card configuration
  * @returns TemplateResult
  */
-
 export const renderPiHoleCard = (
+  element: HTMLElement,
   device: PiHoleDevice,
   hass: HomeAssistant,
   config: Config,
 ): TemplateResult => {
   const isActive = stateActive(device.status!, device.status?.state);
-
-  // Format percentage with one decimal place
-  const percentageBlocked = device.ads_percentage_blocked_today?.state
-    ? parseFloat(device.ads_percentage_blocked_today?.state).toFixed(1) + '%'
-    : '0%';
-
-  // Helper function for opening Pi-hole URLs
-  const openPihole = (path: string) => {
-    const piholeUrl = config.url?.replace(/\/$/, '');
-    window.open(`${piholeUrl}/${path}`, '_blank');
-  };
 
   return html`
     <ha-card>
@@ -60,40 +51,48 @@ export const renderPiHoleCard = (
           <!-- First Group: Queries and Blocked -->
           <div class="stat-group">
             ${createStatBox(
+              config,
               'Total queries',
-              device.dns_queries_today?.state || '0',
-              `${device.seen_clients?.state || '0'} active clients`,
+              formatNumber(device.dns_queries_today?.state || '0'),
+              `${formatNumber(device.dns_unique_clients?.state || '0')} active clients`,
               'queries-box',
               'mdi:earth',
-              () => openPihole('admin/network'),
+              'admin/network',
             )}
             ${createStatBox(
+              config,
               'Queries Blocked',
-              device.ads_blocked_today?.state || '0',
+              formatNumber(device.ads_blocked_today?.state || '0'),
               'List blocked queries',
               'blocked-box',
               'mdi:hand-back-right',
-              () => openPihole('admin/queries?upstream=blocklist'),
+              'admin/queries?upstream=blocklist',
             )}
           </div>
 
           <!-- Second Group: Percentage and Domains -->
           <div class="stat-group">
             ${createStatBox(
+              config,
               'Percentage Blocked',
-              percentageBlocked,
+              `${formatNumber(
+                device.ads_percentage_blocked_today?.state || '0',
+                undefined,
+                { maximumFractionDigits: 1 },
+              )}%`,
               'List all queries',
               'percentage-box',
               'mdi:chart-pie',
-              () => openPihole('admin/queries'),
+              'admin/queries',
             )}
             ${createStatBox(
+              config,
               'Domains on Lists',
-              device.domains_blocked?.state || '0',
+              formatNumber(device.domains_blocked?.state || '0'),
               'Manage lists',
               'domains-box',
               'mdi:format-list-bulleted',
-              () => openPihole('admin/groups-lists'),
+              'admin/groups-lists',
             )}
           </div>
         </div>
@@ -128,7 +127,7 @@ export const renderPiHoleCard = (
       </div>
 
       <!-- Card Actions -->
-      ${createCardActions(hass, device)}
+      ${createCardActions(element, device)}
 
       <!-- Version Information Bar -->
       <div class="version-info">

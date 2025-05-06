@@ -9,16 +9,6 @@ import type { Config, PiHoleDevice } from '../types';
 const equal = require('fast-deep-equal');
 
 /**
- * Todo list
- * - README.md
- * - tests
- * - links don't work
- * - remove unneeded styles
- * - remove unnecessary code
- * - use more HA stuff for call service, etc. (fireEvent?)
- */
-
-/**
  * Pi-hole card class
  * @extends {LitElement}
  */
@@ -94,6 +84,6 @@ export class PiHoleCard extends LitElement {
       </ha-card>`;
     }
 
-    return renderPiHoleCard(this._device, this._hass, this._config);
+    return renderPiHoleCard(this, this._device, this._hass, this._config);
   }
 }

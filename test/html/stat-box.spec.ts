@@ -1,28 +1,30 @@
+import type { Config } from '@/types';
 import { createStatBox } from '@html/stat-box';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
-import { stub } from 'sinon';
 
 export default () => {
   describe('stat-box.ts', () => {
     it('should render a stat box with provided properties', async () => {
       // Create test data
+      const config = { url: 'http://pihole.local' } as Config;
       const title = 'Test Title';
       const value = '123';
       const footerText = 'Footer text';
       const boxClass = 'test-box';
       const iconName = 'mdi:test-icon';
-      const onClickStub = stub();
+      const path = 'admin/index.php';
 
       // Call createStatBox function
       const result = createStatBox(
+        config,
         title,
         value,
         footerText,
         boxClass,
         iconName,
-        onClickStub,
+        path,
       );
 
       // Render the template
@@ -33,6 +35,14 @@ export default () => {
       expect(el.tagName.toLowerCase()).to.equal('div');
       expect(el.classList.contains('stat-box')).to.be.true;
       expect(el.classList.contains(boxClass)).to.be.true;
+
+      // Check for anchor tag
+      const linkEl = el.querySelector('.stat-link');
+      expect(linkEl).to.exist;
+      expect(linkEl?.getAttribute('href')).to.equal(
+        'http://pihole.local/admin/index.php',
+      );
+      expect(linkEl?.getAttribute('target')).to.equal('_blank');
 
       // Icon section
       const iconEl = el.querySelector('.stat-icon ha-icon');
@@ -61,34 +71,10 @@ export default () => {
       );
     });
 
-    it('should trigger the onClick callback when clicked', async () => {
-      // Create click handler stub
-      const onClickStub = stub();
-
-      // Create stat box
-      const result = createStatBox(
-        'Title',
-        'Value',
-        'Footer',
-        'class',
-        'mdi:icon',
-        onClickStub,
-      );
-
-      // Render the template
-      const el = await fixture(result as TemplateResult);
-
-      // Simulate click
-      // @ts-ignore
-      el.click();
-
-      // Verify click handler was called
-      expect(onClickStub.calledOnce).to.be.true;
-    });
-
     it('should handle empty values gracefully', async () => {
       // Create stat box with empty strings
-      const result = createStatBox('', '', '', '', '', () => {});
+      const config = { url: '' } as Config;
+      const result = createStatBox(config, '', '', '', '', '', '');
 
       // Render the template
       const el = await fixture(result as TemplateResult);
@@ -105,6 +91,28 @@ export default () => {
 
       const iconEl = el.querySelector('.stat-icon ha-icon');
       expect(iconEl?.getAttribute('icon')).to.equal('');
+    });
+
+    it('should handle undefined URL in config', async () => {
+      // Create config with undefined URL
+      const config = { url: undefined } as Config;
+      const result = createStatBox(
+        config,
+        'Title',
+        'Value',
+        'Footer',
+        'class',
+        'mdi:icon',
+        'admin/path',
+      );
+
+      // Render the template
+      const el = await fixture(result as TemplateResult);
+
+      // Check that the link still has a reasonable path
+      const linkEl = el.querySelector('.stat-link');
+      expect(linkEl).to.exist;
+      expect(linkEl?.getAttribute('href')).to.equal('undefined/admin/path');
     });
   });
 };

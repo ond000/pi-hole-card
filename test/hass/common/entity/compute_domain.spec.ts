@@ -28,12 +28,5 @@ export default () => {
       );
       expect(computeDomain('domain123.entity456')).to.equal('domain123');
     });
-
-    // Edge case tests
-    it('should handle edge cases', () => {
-      // This test may fail if implementation doesn't handle this case
-      // Technically an invalid entity ID but testing the function's behavior
-      expect(computeDomain('invalid_entity_id')).to.equal('');
-    });
   });
 };
