@@ -1,23 +1,25 @@
+# Pi-hole Card
+
 <p align="center">
-    <img src="assets/room-cards.png" align="center" width="50%">
+    <img src="assets/pihole-card.png" align="center" width="50%">
 </p>
-<p align="center"><h1 align="center">Room Summary Card</h1></p>
+<p align="center"><h1 align="center">Pi-hole Card</h1></p>
 <p align="center">
-	<em>Room Data at Your Fingertips</em>
+	<em>Complete Pi-hole monitoring and control for Home Assistant</em>
 </p>
 
 ![Home Assistant](https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-![GitHub Release](https://img.shields.io/github/v/release/homeassistant-extras/pi-hole?style=for-the-badge&logo=github)
-![GitHub Pre-Release](https://img.shields.io/github/v/release/homeassistant-extras/pi-hole?include_prereleases&style=for-the-badge&logo=github&label=PRERELEASE)
-![GitHub Tag](https://img.shields.io/github/v/tag/homeassistant-extras/pi-hole?style=for-the-badge&color=yellow)
-![GitHub branch status](https://img.shields.io/github/checks-status/homeassistant-extras/pi-hole/main?style=for-the-badge)
+![GitHub Release](https://img.shields.io/github/v/release/homeassistant-extras/pi-hole-card?style=for-the-badge&logo=github)
+![GitHub Pre-Release](https://img.shields.io/github/v/release/homeassistant-extras/pi-hole-card?include_prereleases&style=for-the-badge&logo=github&label=PRERELEASE)
+![GitHub Tag](https://img.shields.io/github/v/tag/homeassistant-extras/pi-hole-card?style=for-the-badge&color=yellow)
+![GitHub branch status](https://img.shields.io/github/checks-status/homeassistant-extras/pi-hole-card/main?style=for-the-badge)
 
-![stars](https://img.shields.io/github/stars/homeassistant-extras/pi-hole.svg?style=for-the-badge)
-![home](https://img.shields.io/github/last-commit/homeassistant-extras/pi-hole.svg?style=for-the-badge)
-![commits](https://img.shields.io/github/commit-activity/y/homeassistant-extras/pi-hole?style=for-the-badge)
-![license](https://img.shields.io/github/license/homeassistant-extras/pi-hole?style=for-the-badge&logo=opensourceinitiative&logoColor=white&color=0080ff)
+![stars](https://img.shields.io/github/stars/homeassistant-extras/pi-hole-card.svg?style=for-the-badge)
+![home](https://img.shields.io/github/last-commit/homeassistant-extras/pi-hole-card.svg?style=for-the-badge)
+![commits](https://img.shields.io/github/commit-activity/y/homeassistant-extras/pi-hole-card?style=for-the-badge)
+![license](https://img.shields.io/github/license/homeassistant-extras/pi-hole-card?style=for-the-badge&logo=opensourceinitiative&logoColor=white&color=0080ff)
 
 <p align="center">Built with the tools and technologies:</p>
 <p align="center">
@@ -31,10 +33,71 @@
 
 ## Overview
 
-A custom card for Home Assistant that provides a comprehensive room overview, including climate information, device states, and problem indicators. The card displays room temperature, humidity, connected devices, and entity states in an organized grid layout.
+A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad blocker directly from Home Assistant. The card provides real-time statistics and controls in an intuitive, dashboard-style interface that matches the Pi-hole visual identity.
 
 ## Features
 
+### Dashboard Statistics
+
+- **Main Statistics Dashboard** - Four color-coded tiles showing your most important Pi-hole metrics:
+  - Total DNS Queries
+  - Queries Blocked
+  - Block Percentage
+  - Domains on Blocklists
+
+![Dashboard Statistics](assets/dashboard-stats.png)
+
+### Additional Metrics
+
+- **Client Statistics** - See active clients, unique domains, unique clients, and time remaining
+- **Performance Data** - View cached queries and forwarded DNS requests
+- **Quick Access** - Hotlinks directly to Pi-hole admin pages for each statistic
+
+![Additional Metrics](assets/additional-metrics.png)
+
+### Direct Controls
+
+- **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click
+- **Action Buttons** - Quick access buttons for common maintenance tasks:
+  - Refresh Data
+  - Restart DNS
+  - Update Gravity
+  - Flush ARP
+  - Flush Logs
+
+![Control Buttons](assets/control-buttons.png)
+
+### Version Information
+
+- **Component Versions** - Display installed versions for all Pi-hole components:
+  - Core
+  - FTL
+  - Web Interface
+  - Home Assistant Integration
+
+![Version Information](assets/version-info.png)
+
+### Status Monitoring
+
+- **Real-time Status** - Visual indication of Pi-hole's current state
+- **Error Detection** - Automatic highlighting when issues are detected
+- **Update Indicators** - Clear notification when updates are available
+
+### Interactive Dashboard
+
+- **Clickable Links** - Direct links to the Pi-hole admin interface
+- **Visual Indicators** - Color-coded statistics to understand status at a glance
+
+> [!NOTE]
+> This links to admin page only at the moment..
+
+### Responsive Design
+
+- **Mobile-friendly** - Optimized layout for both desktop and mobile viewing
+- **Fluid Layout** - Responsive design adapts to available space
+
+![Responsive Design](assets/responsive-design.png)
+![Responsive Design](assets/responsive-design-mobile.png)
 
 ## Installation
 
@@ -45,7 +108,7 @@ A custom card for Home Assistant that provides a comprehensive room overview, in
 1. Open HACS in your Home Assistant instance
 2. Click the menu icon in the top right and select "Custom repositories"
 3. Add this repository URL and select "Dashboard" as the category
-   - `https://github.com/homeassistant-extras/pi-hole`
+   - `https://github.com/homeassistant-extras/pi-hole-card`
 4. Click "Install"
 
 ### Manual Installation
@@ -63,27 +126,46 @@ lovelace:
 
 ## Usage
 
-![WIP](https://img.shields.io/badge/Work%20In%20Progress-gold?style=for-the-badge&logo=internetcomputer)
-
 Add the card to your dashboard using the UI editor or YAML:
 
 ### Card Editor
 
-Slowly I'm enabling all the features in the card editor. Note that as things get converted to there some yaml settings may move / rename.
+The card is fully configurable through the card editor:
 
 ![editor](assets/editor.png)
 
 ### YAML
 
-This is the most minimal configuarion needed to get started. See below for advanced usage.
+This is the most minimal configuration needed to get started:
 
 ```yaml
 type: custom:pi-hole
-area: living_room
+device_id: your_pihole_device_id
 ```
 
 The card will automatically:
 
+- Detect all Pi-hole entities associated with the device
+- Organize statistics in the dashboard layout
+- Display control buttons for common actions
+- Show version information for all components
+
+## Configuration Options
+
+| Name      | Type   | Default      | Description                                          |
+| --------- | ------ | ------------ | ---------------------------------------------------- |
+| device_id | string | **Required** | The ID of your Pi-hole device in Home Assistant      |
+| url       | string | _optional_   | URL to your Pi-hole admin interface for direct links |
+
+### Auto-discovery
+
+The card automatically discovers and identifies all Pi-hole entities based on:
+
+- Entity naming patterns
+- Translation keys
+- Entity relationships to the device
+
+This includes sensors, buttons, switches, binary sensors, and update entities.
 
 ## Example Configurations
 
@@ -91,39 +173,41 @@ The card will automatically:
 
 ```yaml
 type: custom:pi-hole
-area: living_room
+device_id: pi_hole_device_1
 ```
 
-### Full Configuration
+### With Custom URL
 
 ```yaml
 type: custom:pi-hole
-area: living_room
-...
+device_id: pi_hole_device_1
+url: http://pi.hole
 ```
-
-For examples, see my HA configuration for my dashboard home page: [01-home.yaml](https://github.com/warmfire540/home-assistant-config-public/blob/home/ui_lovelace_minimalist/dashboard/views/01-home.yaml)
-
-
 
 ## Project Roadmap
 
 - [x] **`Initial design`**: create initial card design
+- [x] **`Auto-discovery`**: automatic detection of Pi-hole entities
+- [x] **`Dashboard statistics`**: visual representation of key metrics
+- [x] **`Control buttons`**: quick actions for common Pi-hole tasks
+- [x] **`Version info`**: display component versions
+- [ ] **`Links directly to sub pages`**: can't get links to sub pages to work yet..
 
 ## Contributing
 
-- **💬 [Join the Discussions](https://github.com/homeassistant-extras/pi-hole/discussions)**: Share your insights, provide feedback, or ask questions.
-- **🐛 [Report Issues](https://github.com/homeassistant-extras/pi-hole/issues)**: Submit bugs found or log feature requests for the `pi-hole` project.
-- **💡 [Submit Pull Requests](https://github.com/homeassistant-extras/pi-hole/blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
+- **💬 [Join the Discussions](https://github.com/homeassistant-extras/pi-hole-card/discussions)**: Share your insights, provide feedback, or ask questions.
+- **🐛 [Report Issues](https://github.com/homeassistant-extras/pi-hole-card/issues)**: Submit bugs found or log feature requests for the `pi-hole` project.
+- **💡 [Submit Pull Requests](https://github.com/homeassistant-extras/pi-hole-card/blob/main/CONTRIBUTING.md)**: Review open PRs, and submit your own PRs.
 - **📣 [Check out discord](https://discord.gg/F28wupKC)**: Need further help, have ideas, want to chat?
+- **🃏 [Check out my other cards!](https://github.com/orgs/homeassistant-extras/repositories)** Maybe you have an integration that I made cards for.
 
 <details closed>
 <summary>Contributing Guidelines</summary>
 
-1. **Fork the Repository**: Start by forking the project repository to your github account.
+1. **Fork the Repository**: Start by forking the project repository to your GitHub account.
 2. **Clone Locally**: Clone the forked repository to your local machine using a git client.
    ```sh
-   git clone https://github.com/homeassistant-extras/pi-hole
+   git clone https://github.com/homeassistant-extras/pi-hole-card
    ```
 3. **Create a New Branch**: Always work on a new branch, giving it a descriptive name.
    ```sh
@@ -134,7 +218,7 @@ For examples, see my HA configuration for my dashboard home page: [01-home.yaml]
    ```sh
    git commit -m 'Implemented new feature x.'
    ```
-6. **Push to github**: Push the changes to your forked repository.
+6. **Push to GitHub**: Push the changes to your forked repository.
    ```sh
    git push origin new-feature-x
    ```
@@ -149,43 +233,40 @@ This project is protected under the MIT License. For more details, refer to the 
 ## Acknowledgments
 
 - Built using [LitElement](https://lit.dev/)
-- Inspired by Home Assistant's chip design
-- Button-Card was a huge inspo
+- Inspired by Pi-hole's own dashboard design
 - Thanks to all contributors!
 
-[![contributors](https://contrib.rocks/image?repo=homeassistant-extras/pi-hole)](https://github.com{/homeassistant-extras/pi-hole/}graphs/contributors)
+[![contributors](https://contrib.rocks/image?repo=homeassistant-extras/pi-hole-card)](https://github.com/homeassistant-extras/pi-hole-card/graphs/contributors)
 
 [![ko-fi](https://img.shields.io/badge/buy%20me%20a%20coffee-72A5F2?style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/N4N71AQZQG)
 
 ## Code Quality
 
-Forgive me and my badges..
-
 Stats
 
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=bugs)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=coverage)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=bugs)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=coverage)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
 
 Ratings
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=homeassistant-extras_pi-hole-card&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=homeassistant-extras_pi-hole-card)
 
 ## Build Status
 
 ### Main
 
-[![Bump & Tag](https://github.com/homeassistant-extras/pi-hole/actions/workflows/push.yml/badge.svg?branch=main)](https://github.com/homeassistant-extras/pi-hole/actions/workflows/push.yml)
-[![Fast Forward Check](https://github.com/homeassistant-extras/pi-hole/actions/workflows/pull_request.yaml/badge.svg?branch=main)](https://github.com/homeassistant-extras/pi-hole/actions/workflows/pull_request.yaml)
+[![Bump & Tag](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/push.yml/badge.svg?branch=main)](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/push.yml)
+[![Fast Forward Check](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/pull_request.yaml/badge.svg?branch=main)](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/pull_request.yaml)
 
 ### Release
 
-[![Bump & Tag](https://github.com/homeassistant-extras/pi-hole/actions/workflows/push.yml/badge.svg?branch=release)](https://github.com/homeassistant-extras/pi-hole/actions/workflows/push.yml)
-[![Merge](https://github.com/homeassistant-extras/pi-hole/actions/workflows/merge.yaml/badge.svg)](https://github.com/homeassistant-extras/pi-hole/actions/workflows/merge.yaml)
+[![Bump & Tag](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/push.yml/badge.svg?branch=release)](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/push.yml)
+[![Merge](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/merge.yaml/badge.svg)](https://github.com/homeassistant-extras/pi-hole-card/actions/workflows/merge.yaml)

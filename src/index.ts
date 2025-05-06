@@ -24,7 +24,7 @@ window.customCards.push({
   preview: true,
 
   // URL for the card's documentation
-  documentationURL: 'https://github.com/homeassistant-extras/pi-hole',
+  documentationURL: 'https://github.com/homeassistant-extras/pi-hole-card',
 });
 
 console.info(`%c🐱 Poat's Tools: pi-hole-card - ${version}`, 'color: #CFC493;');

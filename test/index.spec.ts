@@ -56,7 +56,7 @@ describe('index.ts', () => {
       name: 'Pi-hole Card',
       description: 'A card to summarize and control your Pi-hole instance.',
       preview: true,
-      documentationURL: 'https://github.com/homeassistant-extras/pi-hole',
+      documentationURL: 'https://github.com/homeassistant-extras/pi-hole-card',
     });
   });
 

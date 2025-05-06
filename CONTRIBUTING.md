@@ -61,7 +61,7 @@ Install pi-hole using one of the following methods:
 1. Clone the pi-hole repository:
 
 ```sh
-❯ git clone https://github.com/homeassistant-extras/pi-hole
+❯ git clone https://github.com/homeassistant-extras/pi-hole-card
 ```
 
 2. Navigate to the project directory:
