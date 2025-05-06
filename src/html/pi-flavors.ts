@@ -53,6 +53,7 @@ export const createCardActions = (
     const service = currentState === 'on' ? 'turn_off' : 'turn_on';
     const [domain] = entityId.split('.');
 
+    // @ts-ignore
     hass.callService(domain, service, {
       entity_id: entityId,
     });
@@ -62,6 +63,7 @@ export const createCardActions = (
   const callService = (entityId?: string) => {
     if (!entityId) return;
     const [domain, service] = entityId.split('.');
+    // @ts-ignore
     hass.callService('button', 'press', {
       entity_id: entityId,
     });
