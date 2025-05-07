@@ -92,16 +92,6 @@ export default () => {
             label: `Pi-hole Device`,
           },
           {
-            name: 'url',
-            selector: {
-              text: {
-                type: 'url',
-              },
-            },
-            required: false,
-            label: `Instance URL`,
-          },
-          {
             name: 'content',
             label: 'Content',
             type: 'expandable',
@@ -203,27 +193,21 @@ export default () => {
                     name: 'tap_action',
                     label: 'Tap Action',
                     selector: {
-                      ui_action: {
-                        default_action: 'toggle' as const,
-                      },
+                      ui_action: {},
                     },
                   },
                   {
                     name: 'hold_action',
                     label: 'Hold Action',
                     selector: {
-                      ui_action: {
-                        default_action: 'more-info' as const,
-                      },
+                      ui_action: {},
                     },
                   },
                   {
                     name: 'double_tap_action',
                     label: 'Double Tap Action',
                     selector: {
-                      ui_action: {
-                        default_action: 'more-info' as const,
-                      },
+                      ui_action: {},
                     },
                   },
                 ],

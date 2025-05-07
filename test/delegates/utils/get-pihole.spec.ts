@@ -31,7 +31,6 @@ export default () => {
       // Create mock config
       mockConfig = {
         device_id: 'pi_hole_device_1',
-        url: 'http://pi.hole',
       };
 
       // Mock Home Assistant instance

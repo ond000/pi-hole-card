@@ -1,11 +1,10 @@
 import type { Config, PiHoleDevice } from '@/types';
-import { formatNumber } from '@hass/common/number/format_number';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
-import { createAdditionalStat } from './additional-stat';
+import { createAdditionalStat } from './components/additional-stat';
 import { createCardHeader } from './pi-crust';
+import { createDashboardStats } from './pi-fillings';
 import { createCardActions } from './pi-flavors';
-import { createStatBox } from './stat-box';
 import { createVersionItem } from './version-item';
 
 /**
@@ -27,56 +26,7 @@ export const renderPiHoleCard = (
       ${createCardHeader(device, hass, config)}
 
       <div class="card-content">
-        <!-- Main dashboard-style stats row -->
-        <div class="dashboard-stats">
-          <!-- First Group: Queries and Blocked -->
-          <div class="stat-group">
-            ${createStatBox(
-              config,
-              'Total queries',
-              formatNumber(device.dns_queries_today?.state || '0'),
-              `${formatNumber(device.dns_unique_clients?.state || '0')} active clients`,
-              'queries-box',
-              'mdi:earth',
-              'admin/network',
-            )}
-            ${createStatBox(
-              config,
-              'Queries Blocked',
-              formatNumber(device.ads_blocked_today?.state || '0'),
-              'List blocked queries',
-              'blocked-box',
-              'mdi:hand-back-right',
-              'admin/queries?upstream=blocklist',
-            )}
-          </div>
-
-          <!-- Second Group: Percentage and Domains -->
-          <div class="stat-group">
-            ${createStatBox(
-              config,
-              'Percentage Blocked',
-              `${formatNumber(
-                device.ads_percentage_blocked_today?.state || '0',
-                undefined,
-                { maximumFractionDigits: 1 },
-              )}%`,
-              'List all queries',
-              'percentage-box',
-              'mdi:chart-pie',
-              'admin/queries',
-            )}
-            ${createStatBox(
-              config,
-              'Domains on Lists',
-              formatNumber(device.domains_blocked?.state || '0'),
-              'Manage lists',
-              'domains-box',
-              'mdi:format-list-bulleted',
-              'admin/groups-lists',
-            )}
-          </div>
-        </div>
+        ${createDashboardStats(element, device, config)}
 
         <!-- Additional Stats Row -->
         <div class="additional-stats">

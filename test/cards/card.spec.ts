@@ -55,7 +55,6 @@ export default () => {
       // Create mock config
       mockConfig = {
         device_id: 'pi_hole_device',
-        url: 'http://pi.hole',
       };
 
       // Stub getPiHole function

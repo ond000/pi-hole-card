@@ -28,7 +28,7 @@ import type { ActionConfigParams } from '@hass/panels/lovelace/common/handle-act
  * }
  * ```
  */
-export const actionHandler = (config: SectionConfig) => {
+export const actionHandler = (config: SectionConfig | undefined) => {
   const isActionEnabled = (actionConfig?: { action?: string }) =>
     actionConfig?.action !== 'none' && actionConfig?.action !== undefined;
 
@@ -64,7 +64,7 @@ export const actionHandler = (config: SectionConfig) => {
  */
 export const handleClickAction = (
   element: HTMLElement,
-  sectionConfig: SectionConfig,
+  sectionConfig: SectionConfig | undefined,
   entity: EntityInformation,
 ): { handleEvent: (ev: ActionHandlerEvent) => void } => {
   return {
@@ -82,7 +82,7 @@ export const handleClickAction = (
       // Create configuration object for the action
       const config: ActionConfigParams = {
         entity: entity.entity_id,
-        ...sectionConfig,
+        ...(sectionConfig || {}),
       };
 
       // @ts-ignore

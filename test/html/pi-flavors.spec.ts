@@ -1,6 +1,6 @@
 import type { PiHoleDevice, SectionConfig } from '@/types';
+import * as piToppingsModule from '@html/components/pi-toppings';
 import { createCardActions } from '@html/pi-flavors';
-import * as piToppingsModule from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';

@@ -1,4 +1,4 @@
-import { createAdditionalStat } from '@html/additional-stat';
+import { createAdditionalStat } from '@html/components/additional-stat';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';

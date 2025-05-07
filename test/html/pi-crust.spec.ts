@@ -48,7 +48,6 @@ export default () => {
       // Default mock config
       mockConfig = {
         device_id: 'pi_hole_device',
-        url: 'http://pi.hole',
       };
     });
 

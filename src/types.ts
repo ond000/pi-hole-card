@@ -13,9 +13,6 @@ export interface Config {
   /** Card icon */
   icon?: string;
 
-  /** URL of the instance */
-  url?: string;
-
   /** actions for stats boxes */
   stats?: SectionConfig;
 

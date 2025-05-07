@@ -1,6 +1,6 @@
 import type { PiHoleDevice, SectionConfig } from '@/types';
 import { html, nothing, type TemplateResult } from 'lit';
-import { createActionButton } from './pi-toppings';
+import { createActionButton } from './components/pi-toppings';
 
 /**
  * Creates the card actions section

@@ -1,6 +1,6 @@
 import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
-import { createActionButton } from '@html/pi-toppings';
+import { createActionButton } from '@html/components/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';

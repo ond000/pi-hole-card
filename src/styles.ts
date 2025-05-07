@@ -65,6 +65,7 @@ export const styles = css`
     flex: 1;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
   }
 
   .stat-box:hover {
@@ -105,12 +106,6 @@ export const styles = css`
     font-weight: bold;
     padding: 8px 12px 0;
     flex: 1;
-  }
-
-  .stat-link {
-    text-decoration: none;
-    display: block;
-    color: inherit;
   }
 
   .stat-footer {
