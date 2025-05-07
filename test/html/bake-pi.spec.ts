@@ -1,11 +1,11 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { renderPiHoleCard } from '@html/bake-pi';
+import * as createVersionItemModule from '@html/components/version-item';
 import * as piCrustModule from '@html/pi-crust';
 import * as piFillingsModule from '@html/pi-fillings';
 import * as piFlavorsModule from '@html/pi-flavors';
 import * as piToppingsModule from '@html/pi-toppings';
-import * as createVersionItemModule from '@html/version-item';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { html } from 'lit';
@@ -76,33 +76,56 @@ export default () => {
         },
       } as unknown as HomeAssistant;
 
-      // Mock device - now we only need minimal data for the main test
+      // Mock device with updates array
       mockDevice = {
         device_id: 'pi_hole_device',
-        core_update_available: {
-          entity_id: 'sensor.core_update_available',
-          state: 'unknown',
-          attributes: { installed_version: 'v5.14.2' },
-          translation_key: 'core_update_available',
-        },
-        web_update_available: {
-          entity_id: 'sensor.web_update_available',
-          state: 'unknown',
-          attributes: { installed_version: 'v5.17' },
-          translation_key: 'web_update_available',
-        },
-        ftl_update_available: {
-          entity_id: 'sensor.ftl_update_available',
-          state: 'unknown',
-          attributes: { installed_version: 'v5.21' },
-          translation_key: 'ftl_update_available',
-        },
-        integration_update_available: {
-          entity_id: 'update.pi_hole_v6_integration_update',
-          state: 'unknown',
-          attributes: { installed_version: 'v2.0.0' },
-          translation_key: undefined,
-        },
+        updates: [
+          {
+            entity_id: 'update.pi_hole_core',
+            state: 'off',
+            translation_key: undefined,
+            attributes: {
+              friendly_name: 'Pi-hole Core Update',
+              title: 'Core',
+              installed_version: 'v5.14.2',
+              release_url:
+                'https://github.com/pi-hole/pi-hole/releases/tag/v5.14.2',
+            },
+          },
+          {
+            entity_id: 'update.pi_hole_ftl',
+            state: 'off',
+            translation_key: undefined,
+            attributes: {
+              friendly_name: 'Pi-hole FTL Update',
+              title: 'FTL',
+              installed_version: 'v5.21',
+              release_url: 'https://github.com/pi-hole/FTL/releases/tag/v5.21',
+            },
+          },
+          {
+            entity_id: 'update.pi_hole_web',
+            state: 'off',
+            translation_key: undefined,
+            attributes: {
+              friendly_name: 'Pi-hole Web Update',
+              title: 'Web Interface',
+              installed_version: 'v5.17',
+              release_url: 'https://github.com/pi-hole/web/releases/tag/v5.17',
+            },
+          },
+          {
+            entity_id: 'update.pi_hole_v6_integration',
+            state: 'off',
+            translation_key: undefined,
+            attributes: {
+              friendly_name: 'Pi-hole Integration Update',
+              installed_version: 'v2.0.0',
+              release_url:
+                'https://github.com/bastgau/ha-pi-hole-v6/releases/tag/v2.0.0',
+            },
+          },
+        ],
       } as PiHoleDevice;
 
       // Mock config
@@ -197,46 +220,40 @@ export default () => {
       );
     });
 
-    it('should call createVersionItem for all version entities', async () => {
+    it('should call createVersionItem for each update entity', async () => {
       // Render the Pi-hole card
       renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
 
-      // Verify createVersionItem was called the correct number of times
-      expect(createVersionItemStub.callCount).to.equal(4); // Core, FTL, Web, Integration
+      // Verify createVersionItem was called for each update entity
+      expect(createVersionItemStub.callCount).to.equal(4); // One for each update entity
 
-      // Verify specific calls
-      expect(
-        createVersionItemStub.calledWith(
-          'Core',
-          mockDevice.core_update_available?.attributes?.installed_version,
-          'pi-hole/pi-hole',
-        ),
-      ).to.be.true;
+      // Verify calls for each update entity
+      expect(createVersionItemStub.firstCall.args[0]).to.equal(
+        mockDevice.updates[0],
+      );
+      expect(createVersionItemStub.secondCall.args[0]).to.equal(
+        mockDevice.updates[1],
+      );
+      expect(createVersionItemStub.thirdCall.args[0]).to.equal(
+        mockDevice.updates[2],
+      );
+      expect(createVersionItemStub.getCall(3).args[0]).to.equal(
+        mockDevice.updates[3],
+      );
+    });
 
-      expect(
-        createVersionItemStub.calledWith(
-          'FTL',
-          mockDevice.ftl_update_available?.attributes?.installed_version,
-          'pi-hole/FTL',
-        ),
-      ).to.be.true;
+    it('should handle empty updates array gracefully', async () => {
+      // Create a device with empty updates array
+      const deviceWithEmptyUpdates = {
+        ...mockDevice,
+        updates: [],
+      };
 
-      expect(
-        createVersionItemStub.calledWith(
-          'Web interface',
-          mockDevice.web_update_available?.attributes?.installed_version,
-          'pi-hole/web',
-        ),
-      ).to.be.true;
+      // Render the Pi-hole card
+      renderPiHoleCard(element, deviceWithEmptyUpdates, mockHass, mockConfig);
 
-      expect(
-        createVersionItemStub.calledWith(
-          'HA integration',
-          mockDevice.integration_update_available?.attributes
-            ?.installed_version,
-          'bastgau/ha-pi-hole-v6',
-        ),
-      ).to.be.true;
+      // Verify createVersionItem was not called
+      expect(createVersionItemStub.callCount).to.equal(0);
     });
   });
 };

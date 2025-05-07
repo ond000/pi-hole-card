@@ -72,6 +72,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 - **Component Versions** - Display installed versions for all Pi-hole components:
   - Core
+  - Docker
   - FTL
   - Web Interface
   - Home Assistant Integration

@@ -43,6 +43,7 @@ export default () => {
           attributes: { friendly_name: 'Pi-hole Status' },
           translation_key: undefined,
         },
+        updates: [],
       } as PiHoleDevice;
 
       // Default mock config

@@ -16,6 +16,7 @@ export const getPiHole = (
 ): PiHoleDevice | undefined => {
   const device: PiHoleDevice = {
     device_id: config.device_id,
+    updates: [],
   };
 
   const hassDevice = getDevice(hass, config.device_id);
@@ -77,17 +78,6 @@ export const getPiHole = (
         device.action_refresh_data = entity;
         break;
 
-      // updates
-      case 'core_update_available':
-        device.core_update_available = entity;
-        break;
-      case 'web_update_available':
-        device.web_update_available = entity;
-        break;
-      case 'ftl_update_available':
-        device.ftl_update_available = entity;
-        break;
-
       // switches
       case 'group':
         device.group_default = entity;
@@ -98,28 +88,31 @@ export const getPiHole = (
         device.status = entity;
         break;
 
-      // edge cases
       default:
-        if (entity.entity_id === 'update.pi_hole_v6_integration_update') {
-          // this is a bit brittle, but it works for now
-          device.integration_update_available = entity;
-        }
-
         const domain = computeDomain(entity.entity_id);
-        if (domain === 'switch') {
-          // going to assume the second switch is the main switch..
-          device.switch_pi_hole = entity;
+        switch (domain) {
+          case 'switch':
+            // going to assume the second switch is the main switch..
+            device.switch_pi_hole = entity;
+            break;
+          case 'update':
+            device.updates.push(entity);
+            break;
+          default:
         }
         break;
     }
   });
 
-  // pick entities apart and add to the device...
-  /**
-   * [
-        "binary_sensor.pi_hole_status",
-      ]
-   */
+  // sort the updates by title - this is a bit of a hack, but it works
+  // we need to sort the updates by title, but the title is not always present
+  // so we need to use a default value of 'z' to sort them to the end
+  // this is not ideal, but it works for now - it matches the behavior of the Pi-hole admin console
+  device.updates.sort((a, b) => {
+    const aTitle = a.attributes.title || 'z';
+    const bTitle = b.attributes.title || 'z';
+    return aTitle.localeCompare(bTitle);
+  });
 
   return device;
 };

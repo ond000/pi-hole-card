@@ -12,11 +12,12 @@ const createEntity = (
   entity_id: string,
   translation_key: string | undefined,
   state: string = 'on',
+  attributes: Record<string, any> = { friendly_name: 'friendly name' },
 ): EntityInformation => ({
   entity_id,
   translation_key,
   state,
-  attributes: { friendly_name: 'friendly name' },
+  attributes,
 });
 
 export default () => {
@@ -134,25 +135,60 @@ export default () => {
       expect(result?.action_refresh_data).to.deep.equal(buttonEntities[4]);
     });
 
-    it('should map all update entities correctly', () => {
-      // Create entities for all update cases
+    it('should sort update entities by title with items without title at the end', () => {
+      // Create update entities with different title attributes, intentionally out of order
       const updateEntities = [
-        createEntity('update.core_update_available', 'core_update_available'),
-        createEntity('update.web_update_available', 'web_update_available'),
-        createEntity('update.ftl_update_available', 'ftl_update_available'),
+        createEntity('update.pi_hole_web', undefined, 'off', {
+          friendly_name: 'Pi-hole Web Update',
+          title: 'Web Interface',
+          installed_version: 'v5.17',
+        }),
+        createEntity('update.pi_hole_v6_integration', undefined, 'off', {
+          friendly_name: 'Pi-hole Integration Update',
+          // No title attribute
+          installed_version: 'v2.0.0',
+        }),
+        createEntity('update.pi_hole_core', undefined, 'off', {
+          friendly_name: 'Pi-hole Core Update',
+          title: 'Core',
+          installed_version: 'v5.14.2',
+        }),
+        createEntity('update.pi_hole_ftl', undefined, 'off', {
+          friendly_name: 'Pi-hole FTL Update',
+          title: 'FTL',
+          installed_version: 'v5.21',
+        }),
       ];
+
+      // Set computeDomain to return "update" for these entities
+      computeDomainStub.withArgs('update.pi_hole_core').returns('update');
+      computeDomainStub.withArgs('update.pi_hole_ftl').returns('update');
+      computeDomainStub.withArgs('update.pi_hole_web').returns('update');
+      computeDomainStub
+        .withArgs('update.pi_hole_v6_integration')
+        .returns('update');
 
       getDeviceEntitiesStub.returns(updateEntities);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify each update was mapped correctly
-      expect(result?.core_update_available).to.deep.equal(updateEntities[0]);
-      expect(result?.web_update_available).to.deep.equal(updateEntities[1]);
-      expect(result?.ftl_update_available).to.deep.equal(updateEntities[2]);
+      // Verify updates array exists and has 4 items
+      expect(result?.updates).to.exist;
+      expect(result?.updates?.length).to.equal(4);
+
+      // Verify sorting order: Core, FTL, Web Interface, then ones without title
+      expect(result?.updates?.[0]!.attributes.title).to.equal('Core');
+      expect(result?.updates?.[1]!.attributes.title).to.equal('FTL');
+      expect(result?.updates?.[2]!.attributes.title).to.equal('Web Interface');
+
+      // The last one should be the one without a title attribute
+      expect(result?.updates?.[3]!.entity_id).to.equal(
+        'update.pi_hole_v6_integration',
+      );
+      expect(result?.updates?.[3]!.attributes.title).to.be.undefined;
     });
 
-    it('should map switch and binary sensor entities correctly', () => {
+    it('should handle switch and binary sensor entities correctly', () => {
       // Create entities for switches and binary sensors
       const miscEntities = [
         createEntity('switch.group_default', 'group'),
@@ -168,24 +204,16 @@ export default () => {
       expect(result?.status).to.deep.equal(miscEntities[1]);
     });
 
-    it('should handle special cases correctly (integration update and switch)', () => {
-      // Create special case entities
-      const integrationUpdateEntity = createEntity(
-        'update.pi_hole_v6_integration_update',
-        undefined,
-        'off',
-      );
-
+    it('should handle the Pi-hole switch correctly', () => {
+      // Create a switch entity
       const switchEntity = createEntity('switch.pi_hole_main', undefined, 'on');
+      computeDomainStub.withArgs('switch.pi_hole_main').returns('switch');
 
-      getDeviceEntitiesStub.returns([integrationUpdateEntity, switchEntity]);
+      getDeviceEntitiesStub.returns([switchEntity]);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify special cases were handled correctly
-      expect(result?.integration_update_available).to.deep.equal(
-        integrationUpdateEntity,
-      );
+      // Verify the switch was mapped correctly
       expect(result?.switch_pi_hole).to.deep.equal(switchEntity);
     });
 
@@ -200,16 +228,29 @@ export default () => {
         createEntity('button.action_gravity', 'action_gravity'),
 
         // Updates
-        createEntity('update.core_update_available', 'core_update_available'),
+        createEntity('update.pi_hole_core', undefined, 'off', {
+          friendly_name: 'Pi-hole Core Update',
+          title: 'Core',
+          installed_version: 'v5.14.2',
+        }),
+        createEntity('update.pi_hole_ftl', undefined, 'off', {
+          friendly_name: 'Pi-hole FTL Update',
+          title: 'FTL',
+          installed_version: 'v5.21',
+        }),
 
         // Switches & Binary Sensors
         createEntity('switch.group_default', 'group'),
         createEntity('binary_sensor.status', 'status'),
 
-        // Special cases
-        createEntity('update.pi_hole_v6_integration_update', undefined, 'off'),
+        // Main switch
         createEntity('switch.pi_hole_main', undefined, 'on'),
       ];
+
+      // Set up computeDomain stubs for the specific tests
+      computeDomainStub.withArgs('update.pi_hole_core').returns('update');
+      computeDomainStub.withArgs('update.pi_hole_ftl').returns('update');
+      computeDomainStub.withArgs('switch.pi_hole_main').returns('switch');
 
       getDeviceEntitiesStub.returns(allEntities);
 
@@ -218,13 +259,15 @@ export default () => {
       // Verify a sample of different entity types
       expect(result?.dns_queries_today).to.deep.equal(allEntities[0]);
       expect(result?.action_gravity).to.deep.equal(allEntities[2]);
-      expect(result?.core_update_available).to.deep.equal(allEntities[3]);
-      expect(result?.group_default).to.deep.equal(allEntities[4]);
-      expect(result?.status).to.deep.equal(allEntities[5]);
-      expect(result?.integration_update_available).to.deep.equal(
-        allEntities[6],
-      );
+      expect(result?.group_default).to.deep.equal(allEntities[5]);
+      expect(result?.status).to.deep.equal(allEntities[6]);
       expect(result?.switch_pi_hole).to.deep.equal(allEntities[7]);
+
+      // Verify updates array
+      expect(result?.updates).to.exist;
+      expect(result?.updates?.length).to.equal(2);
+      expect(result?.updates?.[0]!.attributes.title).to.equal('Core');
+      expect(result?.updates?.[1]!.attributes.title).to.equal('FTL');
     });
   });
 };

@@ -1,11 +1,11 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
+import { createVersionItem } from './components/version-item';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';
 import { createCardActions } from './pi-flavors';
 import { createAdditionalStats } from './pi-toppings';
-import { createVersionItem } from './version-item';
 
 /**
  * Renders the Pi-hole card content
@@ -37,26 +37,9 @@ export const renderPiHoleCard = (
 
       <!-- Version Information Bar -->
       <div class="version-info">
-        ${createVersionItem(
-          'Core',
-          device.core_update_available?.attributes?.installed_version,
-          'pi-hole/pi-hole',
-        )}
-        ${createVersionItem(
-          'FTL',
-          device.ftl_update_available?.attributes?.installed_version,
-          'pi-hole/FTL',
-        )}
-        ${createVersionItem(
-          'Web interface',
-          device.web_update_available?.attributes?.installed_version,
-          'pi-hole/web',
-        )}
-        ${createVersionItem(
-          'HA integration',
-          device.integration_update_available?.attributes?.installed_version,
-          'bastgau/ha-pi-hole-v6',
-        )}
+        ${device.updates.map((update) => {
+          return createVersionItem(update);
+        })}
       </div>
     </ha-card>
   `;
