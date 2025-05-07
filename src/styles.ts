@@ -54,13 +54,6 @@ export const styles = css`
     flex: 1;
   }
 
-  /* On smaller screens, groups stack but pairs stay together */
-  @media (min-width: 900px) {
-    .dashboard-stats {
-      flex-direction: row;
-    }
-  }
-
   .stat-box {
     border-radius: 8px;
     display: flex;

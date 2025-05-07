@@ -1,0 +1,147 @@
+import type { Config, PiHoleDevice } from '@/types';
+import type { HomeAssistant } from '@hass/types';
+import { createCardHeader } from '@html/pi-crust';
+import * as stateDisplayModule from '@html/state-display';
+import { fixture } from '@open-wc/testing-helpers';
+import { expect } from 'chai';
+import { html, type TemplateResult } from 'lit';
+import { stub } from 'sinon';
+
+export default () => {
+  describe('pi-crust.ts', () => {
+    let mockHass: HomeAssistant;
+    let mockDevice: PiHoleDevice;
+    let mockConfig: Config;
+    let stateDisplayStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      // Create stub for stateDisplay
+      stateDisplayStub = stub(stateDisplayModule, 'stateDisplay');
+      stateDisplayStub.returns(
+        html`<div class="mocked-state-display">On</div>`,
+      );
+
+      // Mock HomeAssistant instance
+      mockHass = {
+        states: {
+          'binary_sensor.pi_hole_status': {
+            state: 'on',
+            entity_id: 'binary_sensor.pi_hole_status',
+            attributes: {
+              friendly_name: 'Pi-hole Status',
+            },
+          },
+        },
+      } as unknown as HomeAssistant;
+
+      // Mock device
+      mockDevice = {
+        device_id: 'pi_hole_device',
+        status: {
+          entity_id: 'binary_sensor.pi_hole_status',
+          state: 'on',
+          attributes: { friendly_name: 'Pi-hole Status' },
+          translation_key: undefined,
+        },
+      } as PiHoleDevice;
+
+      // Default mock config
+      mockConfig = {
+        device_id: 'pi_hole_device',
+        url: 'http://pi.hole',
+      };
+    });
+
+    afterEach(() => {
+      // Restore all stubs
+      stateDisplayStub.restore();
+    });
+
+    it('should render card header with default title and icon', async () => {
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Test header exists
+      expect(el.tagName.toLowerCase()).to.equal('div');
+      expect(el.classList.contains('card-header')).to.be.true;
+
+      // Check default title
+      const nameEl = el.querySelector('.name');
+      expect(nameEl?.textContent?.trim()).to.equal('Pi-Hole');
+
+      // Check default icon
+      const iconEl = nameEl?.querySelector('ha-icon');
+      expect(iconEl).to.exist;
+      expect(iconEl?.getAttribute('icon')).to.equal('mdi:pi-hole');
+    });
+
+    it('should render card header with custom title and icon', async () => {
+      // Set custom title and icon in config
+      mockConfig.title = 'My Custom Pi-hole';
+      mockConfig.icon = 'mdi:custom-icon';
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check custom title
+      const nameEl = el.querySelector('.name');
+      expect(nameEl?.textContent?.trim()).to.equal('My Custom Pi-hole');
+
+      // Check custom icon
+      const iconEl = nameEl?.querySelector('ha-icon');
+      expect(iconEl).to.exist;
+      expect(iconEl?.getAttribute('icon')).to.equal('mdi:custom-icon');
+    });
+
+    it('should display green status when Pi-hole is active', async () => {
+      // Ensure status is 'on'
+      mockDevice.status!.state = 'on';
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check status color is green
+      const statusEl = el.querySelector('.status');
+      expect(statusEl?.getAttribute('style')).to.contain(
+        'var(--success-color, green)',
+      );
+
+      // Check for correct icon
+      const iconEl = statusEl?.querySelector('ha-icon');
+      expect(iconEl).to.exist;
+      expect(iconEl?.getAttribute('icon')).to.equal('mdi:check-circle');
+    });
+
+    it('should display red status when Pi-hole is inactive', async () => {
+      // Set status to 'off'
+      mockDevice.status!.state = 'off';
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check status color is red
+      const statusEl = el.querySelector('.status');
+      expect(statusEl?.getAttribute('style')).to.contain(
+        'var(--error-color, red)',
+      );
+
+      // Check for correct icon
+      const iconEl = statusEl?.querySelector('ha-icon');
+      expect(iconEl).to.exist;
+      expect(iconEl?.getAttribute('icon')).to.equal('mdi:close-circle');
+    });
+
+    it('should call stateDisplay with the status entity', async () => {
+      // Render the card header
+      createCardHeader(mockDevice, mockHass, mockConfig);
+
+      // Verify stateDisplay was called with the correct parameters
+      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
+        .true;
+    });
+  });
+};
