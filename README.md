@@ -51,7 +51,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 - **Client Statistics** - See active clients, unique domains, unique clients, and time remaining
 - **Performance Data** - View cached queries and forwarded DNS requests
-- **Quick Access** - Hotlinks directly to Pi-hole admin pages for each statistic
+- **Interactive Elements** - Configurable tap, hold, and double-tap actions for all metrics
 
 ![Additional Metrics](assets/additional-metrics.png)
 
@@ -64,6 +64,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
   - Update Gravity
   - Flush ARP
   - Flush Logs
+- **Customizable Actions** - Configure custom actions for all control buttons
 
 ![Control Buttons](assets/control-buttons.png)
 
@@ -85,11 +86,9 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ### Interactive Dashboard
 
-- **Clickable Links** - Direct links to the Pi-hole admin interface
+- **Clickable Elements** - All sections can be configured with custom actions
 - **Visual Indicators** - Color-coded statistics to understand status at a glance
-
-> [!NOTE]
-> This links to admin page only at the moment..
+- **Customizable Card** - Set custom title and icon to match your dashboard style
 
 ### Responsive Design
 
@@ -135,7 +134,11 @@ Add the card to your dashboard using the UI editor or YAML:
 
 ### Card Editor
 
-The card is fully configurable through the card editor:
+The card is fully configurable through the card editor, allowing you to customize:
+
+- Pi-hole device selection
+- Card title and icon
+- Custom actions for statistics, info panels, and control buttons
 
 ![editor](assets/editor.png)
 
@@ -157,10 +160,32 @@ The card will automatically:
 
 ## Configuration Options
 
-| Name      | Type   | Default      | Description                                          |
-| --------- | ------ | ------------ | ---------------------------------------------------- |
-| device_id | string | **Required** | The ID of your Pi-hole device in Home Assistant      |
-| url       | string | _optional_   | URL to your Pi-hole admin interface for direct links |
+| Name      | Type   | Default      | Description                                     |
+| --------- | ------ | ------------ | ----------------------------------------------- |
+| device_id | string | **Required** | The ID of your Pi-hole device in Home Assistant |
+| title     | string | Pi-Hole      | Custom title for the card header                |
+| icon      | string | mdi:pi-hole  | Custom icon for the card header                 |
+| stats     | object | _optional_   | Configure actions for statistics tiles          |
+| info      | object | _optional_   | Configure actions for additional info items     |
+| controls  | object | _optional_   | Configure actions for control buttons           |
+
+### Action Configuration
+
+Each section (stats, info, controls) supports the following action types:
+
+| Name              | Type   | Default    | Description                          |
+| ----------------- | ------ | ---------- | ------------------------------------ |
+| tap_action        | object | _optional_ | Action to perform when tapped        |
+| hold_action       | object | _optional_ | Action to perform when held          |
+| double_tap_action | object | _optional_ | Action to perform when double-tapped |
+
+Actions can be configured to perform various operations such as:
+
+- Toggle entities
+- Show more info
+- Call services
+- Navigate to different views
+- And more!
 
 ### Auto-discovery
 
@@ -181,12 +206,68 @@ type: custom:pi-hole
 device_id: pi_hole_device_1
 ```
 
-### With Custom URL
+### With Custom Title and Icon
 
 ```yaml
 type: custom:pi-hole
 device_id: pi_hole_device_1
-url: http://pi.hole
+title: 'My Pi-hole Server'
+icon: 'mdi:shield-check'
+```
+
+### With Custom Actions
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+title: 'Network Protection'
+stats:
+  tap_action:
+    action: more-info
+  hold_action:
+    action: navigate
+    navigation_path: /lovelace/network
+controls:
+  tap_action:
+    action: toggle
+  hold_action:
+    action: more-info
+```
+
+### Custom Actions for All Sections
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+# Configure stat box actions
+stats:
+  tap_action:
+    action: call-service
+    perform_action: browser_mod.popup
+    data:
+      title: Pi-hole Statistics
+      content: 'Detailed view of Pi-hole stats'
+  hold_action:
+    action: navigate
+    navigation_path: /lovelace/network-monitoring
+# Configure additional info actions
+info:
+  tap_action:
+    action: more-info
+  double_tap_action:
+    action: toggle
+# Configure control button actions
+controls:
+  tap_action:
+    action: toggle
+  hold_action:
+    action: more-info
+  double_tap_action:
+    action: call-service
+    perform_action: browser_mod.popup
+    data:
+      title: Pi-hole Controls
+      content: 'Advanced Pi-hole control panel'
 ```
 
 ## Project Roadmap
@@ -196,7 +277,9 @@ url: http://pi.hole
 - [x] **`Dashboard statistics`**: visual representation of key metrics
 - [x] **`Control buttons`**: quick actions for common Pi-hole tasks
 - [x] **`Version info`**: display component versions
-- [ ] **`Links directly to sub pages`**: can't get links to sub pages to work yet..
+- [x] **`Custom actions`**: tap/hold/double-tap actions for all elements
+- [x] **`Card customization`**: custom title and icon options
+- [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
 
 ## Contributing
 
