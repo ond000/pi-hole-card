@@ -2,9 +2,9 @@ import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import * as createAdditionalStatModule from '@html/additional-stat';
 import { renderPiHoleCard } from '@html/bake-pi';
+import * as piCrustModule from '@html/pi-crust';
 import * as piFlavorsModule from '@html/pi-flavors';
 import * as createStatBoxModule from '@html/stat-box';
-import * as stateDisplayModule from '@html/state-display';
 import * as createVersionItemModule from '@html/version-item';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
@@ -17,8 +17,8 @@ export default () => {
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let openStub: sinon.SinonStub;
+    let createCardHeaderStub: sinon.SinonStub;
     let createCardActionsStub: sinon.SinonStub;
-    let stateDisplayStub: sinon.SinonStub;
     let createAdditionalStatStub: sinon.SinonStub;
     let createStatBoxStub: sinon.SinonStub;
     let createVersionItemStub: sinon.SinonStub;
@@ -30,14 +30,14 @@ export default () => {
       // Create stubs for all imported functions
       openStub = stub(window, 'open');
 
+      createCardHeaderStub = stub(piCrustModule, 'createCardHeader');
+      createCardHeaderStub.returns(
+        html`<div class="mocked-card-header">Mocked Card Header</div>`,
+      );
+
       createCardActionsStub = stub(piFlavorsModule, 'createCardActions');
       createCardActionsStub.returns(
         html`<div class="mocked-card-actions">Mocked Card Actions</div>`,
-      );
-
-      stateDisplayStub = stub(stateDisplayModule, 'stateDisplay');
-      stateDisplayStub.returns(
-        html`<div class="mocked-state-display">On</div>`,
       );
 
       createAdditionalStatStub = stub(
@@ -71,13 +71,6 @@ export default () => {
               friendly_name: 'Pi-hole Status',
             },
           },
-          'switch.pi_hole': {
-            state: 'on',
-            entity_id: 'switch.pi_hole',
-            attributes: {
-              friendly_name: 'Pi-hole',
-            },
-          },
         },
       } as unknown as HomeAssistant;
 
@@ -88,12 +81,6 @@ export default () => {
           entity_id: 'binary_sensor.pi_hole_status',
           state: 'on',
           attributes: { friendly_name: 'Pi-hole Status' },
-          translation_key: undefined,
-        },
-        switch_pi_hole: {
-          entity_id: 'switch.pi_hole',
-          state: 'on',
-          attributes: { friendly_name: 'Pi-hole' },
           translation_key: undefined,
         },
         dns_queries_today: {
@@ -162,8 +149,8 @@ export default () => {
     afterEach(() => {
       // Restore all stubs
       openStub.restore();
+      createCardHeaderStub.restore();
       createCardActionsStub.restore();
-      stateDisplayStub.restore();
       createAdditionalStatStub.restore();
       createStatBoxStub.restore();
       createVersionItemStub.restore();
@@ -180,10 +167,21 @@ export default () => {
       const el = await fixture(result);
 
       // Test main sections exist
-      expect(el.querySelector('.card-header')).to.exist;
+      expect(el.querySelector('.mocked-card-header')).to.exist;
       expect(el.querySelector('.card-content')).to.exist;
-      expect(el.querySelector('.mocked-card-actions')).to.exist; // Using mocked class
+      expect(el.querySelector('.mocked-card-actions')).to.exist;
       expect(el.querySelector('.version-info')).to.exist;
+    });
+
+    it('should call createCardHeader with the correct parameters', async () => {
+      // Render the Pi-hole card
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
+
+      // Verify createCardHeader was called with the correct parameters
+      expect(createCardHeaderStub.calledOnce).to.be.true;
+      expect(createCardHeaderStub.firstCall.args[0]).to.equal(mockDevice);
+      expect(createCardHeaderStub.firstCall.args[1]).to.equal(mockHass);
+      expect(createCardHeaderStub.firstCall.args[2]).to.equal(mockConfig);
     });
 
     it('should call createCardActions with the correct parameters', async () => {
@@ -194,15 +192,6 @@ export default () => {
       expect(createCardActionsStub.calledOnce).to.be.true;
       expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
       expect(createCardActionsStub.firstCall.args[1]).to.equal(mockDevice);
-    });
-
-    it('should call stateDisplay with status entity', async () => {
-      // Render the Pi-hole card
-      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
-
-      // Verify stateDisplay was called with the correct parameters
-      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
-        .true;
     });
 
     it('should call createVersionItem for all version entities', async () => {
@@ -245,36 +234,6 @@ export default () => {
           'bastgau/ha-pi-hole-v6',
         ),
       ).to.be.true;
-    });
-
-    it('should handle different status states correctly', async () => {
-      // Test with status off
-      const offlineDevice = {
-        ...mockDevice,
-        status: {
-          ...mockDevice.status!,
-          state: 'off',
-        },
-      };
-
-      // Render with offline status
-      const offlineResult = renderPiHoleCard(
-        element,
-        offlineDevice,
-        mockHass,
-        mockConfig,
-      );
-      const offlineEl = await fixture(offlineResult);
-
-      // Check for red status indicator
-      const statusEl = offlineEl.querySelector('.status');
-      expect(statusEl?.getAttribute('style')).to.contain(
-        'var(--error-color, red)',
-      );
-
-      // Check for correct icon
-      const iconEl = statusEl?.querySelector('ha-icon');
-      expect(iconEl?.getAttribute('icon')).to.equal('mdi:close-circle');
     });
   });
 };

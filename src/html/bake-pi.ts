@@ -1,12 +1,11 @@
 import type { Config, PiHoleDevice } from '@/types';
-import { stateActive } from '@hass/common/entity/state_active';
 import { formatNumber } from '@hass/common/number/format_number';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
 import { createAdditionalStat } from './additional-stat';
+import { createCardHeader } from './pi-crust';
 import { createCardActions } from './pi-flavors';
 import { createStatBox } from './stat-box';
-import { stateDisplay } from './state-display';
 import { createVersionItem } from './version-item';
 
 /**
@@ -23,27 +22,9 @@ export const renderPiHoleCard = (
   hass: HomeAssistant,
   config: Config,
 ): TemplateResult => {
-  const isActive = stateActive(device.status!, device.status?.state);
-
   return html`
     <ha-card>
-      <div class="card-header">
-        <div class="name">
-          <ha-icon icon="mdi:pi-hole"></ha-icon>
-          Pi-hole
-        </div>
-        <div
-          class="status"
-          style="color: ${isActive
-            ? 'var(--success-color, green)'
-            : 'var(--error-color, red)'}"
-        >
-          <ha-icon
-            icon="${isActive ? 'mdi:check-circle' : 'mdi:close-circle'}"
-          ></ha-icon>
-          ${stateDisplay(hass, device.status!)}
-        </div>
-      </div>
+      ${createCardHeader(device, hass, config)}
 
       <div class="card-content">
         <!-- Main dashboard-style stats row -->

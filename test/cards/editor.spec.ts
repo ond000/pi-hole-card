@@ -87,7 +87,7 @@ export default () => {
               },
             },
             required: true,
-            label: `Device`,
+            label: `Pi-hole Device`,
           },
           {
             name: 'url',
@@ -96,6 +96,31 @@ export default () => {
             },
             required: false,
             label: `Instance URL`,
+          },
+          {
+            name: 'content',
+            label: 'Content',
+            type: 'expandable',
+            flatten: true,
+            icon: 'mdi:text-short',
+            schema: [
+              {
+                name: 'title',
+                required: false,
+                label: 'Card Title',
+                selector: {
+                  text: {},
+                },
+              },
+              {
+                name: 'icon',
+                required: false,
+                label: 'Card Icon',
+                selector: {
+                  icon: {},
+                },
+              },
+            ],
           },
         ]);
       });

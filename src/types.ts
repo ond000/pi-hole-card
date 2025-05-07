@@ -5,6 +5,12 @@ export interface Config {
   /** Unique identifier for the device */
   device_id: string;
 
+  /** Card title */
+  title?: string;
+
+  /** Card icon */
+  icon?: string;
+
   /** URL of the instance */
   url?: string;
 }
