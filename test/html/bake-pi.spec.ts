@@ -192,6 +192,9 @@ export default () => {
       expect(createCardActionsStub.calledOnce).to.be.true;
       expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
       expect(createCardActionsStub.firstCall.args[1]).to.equal(mockDevice);
+      expect(createCardActionsStub.firstCall.args[2]).to.equal(
+        mockConfig.controls,
+      );
     });
 
     it('should call createVersionItem for all version entities', async () => {

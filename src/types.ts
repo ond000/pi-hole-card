@@ -1,3 +1,5 @@
+import type { ActionConfig } from '@hass/data/lovelace/config/action';
+
 /**
  * Configuration settings for the pi-hole card
  */
@@ -13,6 +15,26 @@ export interface Config {
 
   /** URL of the instance */
   url?: string;
+
+  /** actions for stats boxes */
+  stats?: SectionConfig;
+
+  /** actions for info section */
+  info?: SectionConfig;
+
+  /** actions for controls */
+  controls?: SectionConfig;
+}
+
+export interface SectionConfig {
+  /** Action to perform on tap */
+  tap_action?: ActionConfig;
+
+  /** Action to perform on hold */
+  hold_action?: ActionConfig;
+
+  /** Action to perform on double tap */
+  double_tap_action?: ActionConfig;
 }
 
 export interface PiHoleDevice {

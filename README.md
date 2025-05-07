@@ -101,8 +101,10 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ## Installation
 
-> [!WARNING]
-> Tthis card relies on the [v6 integration](https://github.com/bastgau/ha-pi-hole-v6)
+### Prerequisites
+
+> [!WARNING]  
+> Before using this card, please ensure you have the [Pi-hole v6 integration](https://github.com/bastgau/ha-pi-hole-v6) installed in your Home Assistant instance.
 
 ### HACS (Recommended)
 

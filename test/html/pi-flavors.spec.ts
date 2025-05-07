@@ -1,4 +1,4 @@
-import type { PiHoleDevice } from '@/types';
+import type { PiHoleDevice, SectionConfig } from '@/types';
 import { createCardActions } from '@html/pi-flavors';
 import * as piToppingsModule from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
@@ -10,11 +10,17 @@ export default () => {
   describe('pi-flavors.ts', () => {
     let mockDevice: PiHoleDevice;
     let mockElement: HTMLElement;
+    let mockConfig: SectionConfig;
     let createActionButtonStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create mock element
       mockElement = document.createElement('div');
+      mockConfig = {
+        tap_action: {
+          action: 'more-info',
+        },
+      };
 
       // Create stub for createActionButton
       createActionButtonStub = stub(piToppingsModule, 'createActionButton');
@@ -62,13 +68,14 @@ export default () => {
     });
 
     it('should call createActionButton with switch_pi_hole entity and appropriate parameters', async () => {
-      const result = createCardActions(mockElement, mockDevice);
+      const result = createCardActions(mockElement, mockDevice, mockConfig);
       await fixture(result as TemplateResult);
 
       // Verify that createActionButton was called for the switch entity
       expect(
         createActionButtonStub.calledWith(
           mockElement,
+          mockConfig,
           mockDevice.switch_pi_hole,
           'mdi:pause',
           'Disable',
@@ -81,13 +88,14 @@ export default () => {
       // Change device state to off
       mockDevice.switch_pi_hole!.state = 'off';
 
-      const result = createCardActions(mockElement, mockDevice);
+      const result = createCardActions(mockElement, mockDevice, mockConfig);
       await fixture(result as TemplateResult);
 
       // Verify that createActionButton was called with the correct parameters for "off" state
       expect(
         createActionButtonStub.calledWith(
           mockElement,
+          mockConfig,
           mockDevice.switch_pi_hole,
           'mdi:play',
           'Enable',
@@ -97,7 +105,7 @@ export default () => {
     });
 
     it('should call createActionButton for all available action entities', async () => {
-      const result = createCardActions(mockElement, mockDevice);
+      const result = createCardActions(mockElement, mockDevice, mockConfig);
       await fixture(result as TemplateResult);
 
       // Verify that createActionButton was called for each entity
@@ -107,6 +115,7 @@ export default () => {
       expect(
         createActionButtonStub.calledWith(
           mockElement,
+          mockConfig,
           mockDevice.action_refresh_data,
           'mdi:refresh',
           'Refresh',
@@ -117,6 +126,7 @@ export default () => {
       expect(
         createActionButtonStub.calledWith(
           mockElement,
+          mockConfig,
           mockDevice.action_restartdns,
           'mdi:restart',
           'Restart DNS',
@@ -127,6 +137,7 @@ export default () => {
       expect(
         createActionButtonStub.calledWith(
           mockElement,
+          mockConfig,
           mockDevice.action_gravity,
           'mdi:earth',
           'Update Gravity',
@@ -148,7 +159,7 @@ export default () => {
         // No optional buttons
       } as PiHoleDevice;
 
-      const result = createCardActions(mockElement, minimalDevice);
+      const result = createCardActions(mockElement, minimalDevice, mockConfig);
       await fixture(result as TemplateResult);
 
       // Verify that createActionButton was called only once (for the switch)
@@ -156,7 +167,7 @@ export default () => {
     });
 
     it('should render a div with class card-actions', async () => {
-      const result = createCardActions(mockElement, mockDevice);
+      const result = createCardActions(mockElement, mockDevice, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check that the card-actions container is rendered

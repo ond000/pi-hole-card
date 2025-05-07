@@ -83,7 +83,9 @@ export default () => {
             name: 'device_id',
             selector: {
               device: {
-                integration: 'pi_hole_v6',
+                filter: {
+                  integration: 'pi_hole_v6',
+                },
               },
             },
             required: true,
@@ -92,7 +94,9 @@ export default () => {
           {
             name: 'url',
             selector: {
-              text: {},
+              text: {
+                type: 'url',
+              },
             },
             required: false,
             label: `Instance URL`,
@@ -117,8 +121,112 @@ export default () => {
                 required: false,
                 label: 'Card Icon',
                 selector: {
-                  icon: {},
+                  icon: {
+                    placeholder: 'mdi:pi-hole',
+                  },
                 },
+              },
+            ],
+          },
+          {
+            name: 'interactions',
+            label: 'Interactions',
+            type: 'expandable',
+            flatten: true,
+            icon: 'mdi:gesture-tap',
+            schema: [
+              {
+                name: 'stats',
+                label: 'Statistics',
+                type: 'expandable',
+                icon: 'mdi:counter',
+                schema: [
+                  {
+                    name: 'tap_action',
+                    label: 'Tap Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                  {
+                    name: 'hold_action',
+                    label: 'Hold Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                  {
+                    name: 'double_tap_action',
+                    label: 'Double Tap Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                ],
+              },
+              {
+                name: 'info',
+                label: 'Information',
+                type: 'expandable',
+                icon: 'mdi:information-outline',
+                schema: [
+                  {
+                    name: 'tap_action',
+                    label: 'Tap Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                  {
+                    name: 'hold_action',
+                    label: 'Hold Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                  {
+                    name: 'double_tap_action',
+                    label: 'Double Tap Action',
+                    selector: {
+                      ui_action: {},
+                    },
+                  },
+                ],
+              },
+              {
+                name: 'controls',
+                label: 'Controls',
+                type: 'expandable',
+                icon: 'mdi:remote',
+                schema: [
+                  {
+                    name: 'tap_action',
+                    label: 'Tap Action',
+                    selector: {
+                      ui_action: {
+                        default_action: 'toggle' as const,
+                      },
+                    },
+                  },
+                  {
+                    name: 'hold_action',
+                    label: 'Hold Action',
+                    selector: {
+                      ui_action: {
+                        default_action: 'more-info' as const,
+                      },
+                    },
+                  },
+                  {
+                    name: 'double_tap_action',
+                    label: 'Double Tap Action',
+                    selector: {
+                      ui_action: {
+                        default_action: 'more-info' as const,
+                      },
+                    },
+                  },
+                ],
               },
             ],
           },
@@ -191,6 +299,42 @@ export default () => {
         expect(dispatchStub.firstCall.args[0].detail.config).to.deep.equal({
           device_id: 'device_1',
         });
+      });
+
+      it('should remove object properties when object is empty', () => {
+        const testConfig: Config = {
+          device_id: 'device_1',
+          stats: {},
+          info: {},
+          controls: {},
+        };
+        card.setConfig(testConfig);
+
+        // Simulate value-changed event with empty arrays
+        const detail = {
+          value: {
+            device_id: 'device_2',
+            stats: {},
+            info: {},
+            controls: {},
+          },
+        };
+
+        const event = new CustomEvent('value-changed', { detail });
+        card['_valueChanged'](event);
+
+        // Verify event was dispatched with features property removed
+        expect(dispatchStub.calledOnce).to.be.true;
+        expect(dispatchStub.firstCall.args[0].type).to.equal('config-changed');
+        expect(dispatchStub.firstCall.args[0].detail.config).to.deep.equal({
+          device_id: 'device_2',
+        });
+        expect(dispatchStub.firstCall.args[0].detail.config.stats).to.be
+          .undefined;
+        expect(dispatchStub.firstCall.args[0].detail.config.info).to.be
+          .undefined;
+        expect(dispatchStub.firstCall.args[0].detail.config.controls).to.be
+          .undefined;
       });
     });
   });

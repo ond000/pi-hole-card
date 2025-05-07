@@ -108,7 +108,7 @@ export const renderPiHoleCard = (
       </div>
 
       <!-- Card Actions -->
-      ${createCardActions(element, device)}
+      ${createCardActions(element, device, config.controls)}
 
       <!-- Version Information Bar -->
       <div class="version-info">

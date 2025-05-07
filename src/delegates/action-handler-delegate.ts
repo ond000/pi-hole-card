@@ -1,4 +1,4 @@
-import type { EntityInformation } from '@/types';
+import type { EntityInformation, SectionConfig } from '@/types';
 import { fireEvent } from '@hass/common/dom/fire_event';
 import type { ActionHandlerEvent } from '@hass/data/lovelace/action_handler';
 import { actionHandler as hassActionHandler } from '@hass/panels/lovelace/common/directives/action-handler-directive';
@@ -11,6 +11,7 @@ import type { ActionConfigParams } from '@hass/panels/lovelace/common/handle-act
  * The handler takes into account whether the entity has double-tap or hold
  * actions configured and creates an appropriate action handler directive.
  *
+ * @param {SectionConfig} config - The configuration object for the card section
  * @returns {Directive} A directive configured with the entity's action options
  *
  * @example
@@ -20,17 +21,20 @@ import type { ActionConfigParams } from '@hass/panels/lovelace/common/handle-act
  *   return html`
  *     <div class="card-content"
  *          @action=${this._handleAction}
- *          .actionHandler=${actionHandler()}>
+ *          .actionHandler=${actionHandler(this._config)}>
  *       ${this.entity.state}
  *     </div>
  *   `;
  * }
  * ```
  */
-export const actionHandler = () => {
+export const actionHandler = (config: SectionConfig) => {
+  const isActionEnabled = (actionConfig?: { action?: string }) =>
+    actionConfig?.action !== 'none' && actionConfig?.action !== undefined;
+
   return hassActionHandler({
-    hasHold: true,
-    hasDoubleClick: true,
+    hasDoubleClick: isActionEnabled(config?.double_tap_action),
+    hasHold: isActionEnabled(config?.hold_action),
   });
 };
 
@@ -43,6 +47,7 @@ export const actionHandler = () => {
  * from the event and fire a 'hass-action' event with the appropriate configuration.
  *
  * @param {HTMLElement} element - The DOM element that will receive the action
+ * @param {SectionConfig} sectionConfig - The configuration object for the card section
  * @param {EntityInformation} entity - The entity information containing configuration and state
  * @returns {Object} An object with a handleEvent method that processes actions
  *
@@ -59,6 +64,7 @@ export const actionHandler = () => {
  */
 export const handleClickAction = (
   element: HTMLElement,
+  sectionConfig: SectionConfig,
   entity: EntityInformation,
 ): { handleEvent: (ev: ActionHandlerEvent) => void } => {
   return {
@@ -76,9 +82,7 @@ export const handleClickAction = (
       // Create configuration object for the action
       const config: ActionConfigParams = {
         entity: entity.entity_id,
-        tap_action: { action: 'toggle' },
-        hold_action: { action: 'more-info' },
-        double_tap_action: { action: 'more-info' },
+        ...sectionConfig,
       };
 
       // @ts-ignore

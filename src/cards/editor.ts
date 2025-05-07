@@ -1,4 +1,4 @@
-import type { Config } from '@/types';
+import type { Config, SectionConfig } from '@/types';
 import { fireEvent } from '@hass/common/dom/fire_event';
 import type { HaFormSchema } from '@hass/components/ha-form/types';
 import type { HomeAssistant } from '@hass/types';
@@ -10,7 +10,9 @@ const SCHEMA: HaFormSchema[] = [
     name: 'device_id',
     selector: {
       device: {
-        integration: 'pi_hole_v6',
+        filter: {
+          integration: 'pi_hole_v6',
+        },
       },
     },
     required: true,
@@ -19,7 +21,9 @@ const SCHEMA: HaFormSchema[] = [
   {
     name: 'url',
     selector: {
-      text: {},
+      text: {
+        type: 'url' as const,
+      },
     },
     required: false,
     label: `Instance URL`,
@@ -44,8 +48,112 @@ const SCHEMA: HaFormSchema[] = [
         required: false,
         label: 'Card Icon',
         selector: {
-          icon: {},
+          icon: {
+            placeholder: 'mdi:pi-hole',
+          },
         },
+      },
+    ],
+  },
+  {
+    name: 'interactions',
+    label: 'Interactions',
+    type: 'expandable',
+    flatten: true,
+    icon: 'mdi:gesture-tap',
+    schema: [
+      {
+        name: 'stats',
+        label: 'Statistics',
+        type: 'expandable',
+        icon: 'mdi:counter',
+        schema: [
+          {
+            name: 'tap_action',
+            label: 'Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'hold_action',
+            label: 'Hold Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'double_tap_action',
+            label: 'Double Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+        ],
+      },
+      {
+        name: 'info',
+        label: 'Information',
+        type: 'expandable',
+        icon: 'mdi:information-outline',
+        schema: [
+          {
+            name: 'tap_action',
+            label: 'Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'hold_action',
+            label: 'Hold Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'double_tap_action',
+            label: 'Double Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+        ],
+      },
+      {
+        name: 'controls',
+        label: 'Controls',
+        type: 'expandable',
+        icon: 'mdi:remote',
+        schema: [
+          {
+            name: 'tap_action',
+            label: 'Tap Action',
+            selector: {
+              ui_action: {
+                default_action: 'toggle' as const,
+              },
+            },
+          },
+          {
+            name: 'hold_action',
+            label: 'Hold Action',
+            selector: {
+              ui_action: {
+                default_action: 'more-info' as const,
+              },
+            },
+          },
+          {
+            name: 'double_tap_action',
+            label: 'Double Tap Action',
+            selector: {
+              ui_action: {
+                default_action: 'more-info' as const,
+              },
+            },
+          },
+        ],
       },
     ],
   },
@@ -94,6 +202,20 @@ export class PiHoleCardEditor extends LitElement {
 
   private _valueChanged(ev: CustomEvent) {
     const config = ev.detail.value as Config;
+
+    const shouldDelete = (obj: SectionConfig | undefined) =>
+      obj &&
+      (Object.keys(obj).length === 0 || Object.values(obj).some((f) => !f));
+
+    if (shouldDelete(config.stats)) {
+      delete config.stats;
+    }
+    if (shouldDelete(config.info)) {
+      delete config.info;
+    }
+    if (shouldDelete(config.controls)) {
+      delete config.controls;
+    }
 
     // @ts-ignore
     fireEvent(this, 'config-changed', {

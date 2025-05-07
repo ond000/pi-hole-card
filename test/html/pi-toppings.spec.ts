@@ -1,3 +1,4 @@
+import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
 import { createActionButton } from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
@@ -10,7 +11,8 @@ export default () => {
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
     let mockElement: HTMLElement;
-    let mockEntity: any;
+    let mockEntity: EntityInformation;
+    let mockConfig: SectionConfig;
 
     beforeEach(() => {
       // Create stubs for action handler functions
@@ -27,6 +29,12 @@ export default () => {
 
       // Mock HTML element
       mockElement = document.createElement('div');
+
+      mockConfig = {
+        tap_action: {
+          action: 'toggle',
+        },
+      };
 
       // Create a mock entity for testing
       mockEntity = {
@@ -49,6 +57,7 @@ export default () => {
       it('should return nothing when entity is undefined', async () => {
         const result = createActionButton(
           mockElement,
+          mockConfig,
           undefined,
           'mdi:power',
           'Power',
@@ -62,6 +71,7 @@ export default () => {
       it('should render a button with the provided icon and label', async () => {
         const result = createActionButton(
           mockElement,
+          mockConfig,
           mockEntity,
           'mdi:power',
           'Power',
@@ -88,6 +98,7 @@ export default () => {
       it('should use default class when buttonClass is not provided', async () => {
         const result = createActionButton(
           mockElement,
+          mockConfig,
           mockEntity,
           'mdi:power',
           'Power',
@@ -102,6 +113,7 @@ export default () => {
       it('should attach action handlers to the button', async () => {
         const result = createActionButton(
           mockElement,
+          mockConfig,
           mockEntity,
           'mdi:power',
           'Power',
@@ -115,7 +127,8 @@ export default () => {
         // Check that handleClickAction was called with the correct arguments
         expect(handleClickActionStub.calledOnce).to.be.true;
         expect(handleClickActionStub.firstCall.args[0]).to.equal(mockElement);
-        expect(handleClickActionStub.firstCall.args[1]).to.equal(mockEntity);
+        expect(handleClickActionStub.firstCall.args[1]).to.equal(mockConfig);
+        expect(handleClickActionStub.firstCall.args[2]).to.equal(mockEntity);
 
         // Verify action handler was attached to the button
         expect((el as any).actionHandler).to.exist;
