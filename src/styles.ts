@@ -148,6 +148,7 @@ export const styles = css`
     justify-content: center;
     /* Start with 1 column at small widths */
     grid-template-columns: minmax(120px, 1fr);
+    cursor: pointer;
   }
 
   /* Switch to 2 columns at slightly wider screens */

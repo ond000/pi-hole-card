@@ -1,10 +1,10 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
-import { createAdditionalStat } from './components/additional-stat';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';
 import { createCardActions } from './pi-flavors';
+import { createAdditionalStats } from './pi-toppings';
 import { createVersionItem } from './version-item';
 
 /**
@@ -29,32 +29,7 @@ export const renderPiHoleCard = (
         ${createDashboardStats(element, device, config)}
 
         <!-- Additional Stats Row -->
-        <div class="additional-stats">
-          ${createAdditionalStat(
-            'mdi:account-multiple',
-            `${device.seen_clients?.state || '0'} clients`,
-          )}
-          ${createAdditionalStat(
-            'mdi:web',
-            `${device.dns_unique_domains?.state || '0'} unique domains`,
-          )}
-          ${createAdditionalStat(
-            'mdi:server-network',
-            `${device.dns_queries_cached?.state || '0'} cached`,
-          )}
-          ${createAdditionalStat(
-            'mdi:dns',
-            `${device.dns_queries_forwarded?.state || '0'} forwarded`,
-          )}
-          ${createAdditionalStat(
-            'mdi:account',
-            `${device.dns_unique_clients?.state || '0'} unique clients`,
-          )}
-          ${createAdditionalStat(
-            'mdi:timer-outline',
-            `${device.remaining_until_blocking_mode?.state || '0'} time remaining`,
-          )}
-        </div>
+        ${createAdditionalStats(element, device, config.info)}
       </div>
 
       <!-- Card Actions -->

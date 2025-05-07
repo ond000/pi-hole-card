@@ -1,10 +1,10 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { renderPiHoleCard } from '@html/bake-pi';
-import * as createAdditionalStatModule from '@html/components/additional-stat';
 import * as piCrustModule from '@html/pi-crust';
 import * as piFillingsModule from '@html/pi-fillings';
 import * as piFlavorsModule from '@html/pi-flavors';
+import * as piToppingsModule from '@html/pi-toppings';
 import * as createVersionItemModule from '@html/version-item';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
@@ -18,9 +18,9 @@ export default () => {
     let mockConfig: Config;
     let openStub: sinon.SinonStub;
     let createCardHeaderStub: sinon.SinonStub;
-    let createCardActionsStub: sinon.SinonStub;
     let createDashboardStatsStub: sinon.SinonStub;
-    let createAdditionalStatStub: sinon.SinonStub;
+    let createAdditionalStatsStub: sinon.SinonStub;
+    let createCardActionsStub: sinon.SinonStub;
     let createVersionItemStub: sinon.SinonStub;
     let element: HTMLElement;
 
@@ -35,22 +35,24 @@ export default () => {
         html`<div class="mocked-card-header">Mocked Card Header</div>`,
       );
 
-      createCardActionsStub = stub(piFlavorsModule, 'createCardActions');
-      createCardActionsStub.returns(
-        html`<div class="mocked-card-actions">Mocked Card Actions</div>`,
-      );
-
       createDashboardStatsStub = stub(piFillingsModule, 'createDashboardStats');
       createDashboardStatsStub.returns(
         html`<div class="mocked-dashboard-stats">Mocked Dashboard Stats</div>`,
       );
 
-      createAdditionalStatStub = stub(
-        createAdditionalStatModule,
-        'createAdditionalStat',
+      createAdditionalStatsStub = stub(
+        piToppingsModule,
+        'createAdditionalStats',
       );
-      createAdditionalStatStub.returns(
-        html`<div class="mocked-additional-stat">Additional Stat</div>`,
+      createAdditionalStatsStub.returns(
+        html`<div class="mocked-additional-stats">
+          Mocked Additional Stats
+        </div>`,
+      );
+
+      createCardActionsStub = stub(piFlavorsModule, 'createCardActions');
+      createCardActionsStub.returns(
+        html`<div class="mocked-card-actions">Mocked Card Actions</div>`,
       );
 
       createVersionItemStub = stub(
@@ -74,45 +76,9 @@ export default () => {
         },
       } as unknown as HomeAssistant;
 
-      // Mock device
+      // Mock device - now we only need minimal data for the main test
       mockDevice = {
         device_id: 'pi_hole_device',
-        status: {
-          entity_id: 'binary_sensor.pi_hole_status',
-          state: 'on',
-          attributes: { friendly_name: 'Pi-hole Status' },
-          translation_key: undefined,
-        },
-        dns_queries_today: {
-          entity_id: 'sensor.dns_queries_today',
-          state: '12345',
-          attributes: {},
-          translation_key: 'dns_queries_today',
-        },
-        ads_blocked_today: {
-          entity_id: 'sensor.ads_blocked_today',
-          state: '5678',
-          attributes: {},
-          translation_key: 'ads_blocked_today',
-        },
-        ads_percentage_blocked_today: {
-          entity_id: 'sensor.ads_percentage_blocked_today',
-          state: '45.6',
-          attributes: {},
-          translation_key: 'ads_percentage_blocked_today',
-        },
-        domains_blocked: {
-          entity_id: 'sensor.domains_blocked',
-          state: '987654',
-          attributes: {},
-          translation_key: 'domains_blocked',
-        },
-        seen_clients: {
-          entity_id: 'sensor.seen_clients',
-          state: '42',
-          attributes: {},
-          translation_key: 'seen_clients',
-        },
         core_update_available: {
           entity_id: 'sensor.core_update_available',
           state: 'unknown',
@@ -142,6 +108,15 @@ export default () => {
       // Mock config
       mockConfig = {
         device_id: 'pi_hole_device',
+        info: {
+          tap_action: { action: 'more-info' },
+        },
+        stats: {
+          tap_action: { action: 'none' },
+        },
+        controls: {
+          tap_action: { action: 'toggle' },
+        },
       };
     });
 
@@ -149,9 +124,9 @@ export default () => {
       // Restore all stubs
       openStub.restore();
       createCardHeaderStub.restore();
-      createCardActionsStub.restore();
       createDashboardStatsStub.restore();
-      createAdditionalStatStub.restore();
+      createAdditionalStatsStub.restore();
+      createCardActionsStub.restore();
       createVersionItemStub.restore();
     });
 
@@ -169,6 +144,7 @@ export default () => {
       expect(el.querySelector('.mocked-card-header')).to.exist;
       expect(el.querySelector('.card-content')).to.exist;
       expect(el.querySelector('.mocked-dashboard-stats')).to.exist;
+      expect(el.querySelector('.mocked-additional-stats')).to.exist;
       expect(el.querySelector('.mocked-card-actions')).to.exist;
       expect(el.querySelector('.version-info')).to.exist;
     });
@@ -193,6 +169,19 @@ export default () => {
       expect(createDashboardStatsStub.firstCall.args[0]).to.equal(element);
       expect(createDashboardStatsStub.firstCall.args[1]).to.equal(mockDevice);
       expect(createDashboardStatsStub.firstCall.args[2]).to.equal(mockConfig);
+    });
+
+    it('should call createAdditionalStats with the correct parameters', async () => {
+      // Render the Pi-hole card
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
+
+      // Verify createAdditionalStats was called with the correct parameters
+      expect(createAdditionalStatsStub.calledOnce).to.be.true;
+      expect(createAdditionalStatsStub.firstCall.args[0]).to.equal(element);
+      expect(createAdditionalStatsStub.firstCall.args[1]).to.equal(mockDevice);
+      expect(createAdditionalStatsStub.firstCall.args[2]).to.equal(
+        mockConfig.info,
+      );
     });
 
     it('should call createCardActions with the correct parameters', async () => {
