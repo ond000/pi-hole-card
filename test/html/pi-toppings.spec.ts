@@ -1,4 +1,5 @@
 import type { PiHoleDevice, SectionConfig } from '@/types';
+import type { HomeAssistant } from '@hass/types';
 import * as createAdditionalStatModule from '@html/components/additional-stat';
 import { createAdditionalStats } from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
@@ -10,16 +11,15 @@ export default () => {
   describe('pi-toppings.ts', () => {
     let mockDevice: PiHoleDevice;
     let mockElement: HTMLElement;
+    let mockHass: HomeAssistant;
     let mockConfig: SectionConfig;
     let createAdditionalStatStub: sinon.SinonStub;
 
     beforeEach(() => {
-      // Create mock element
       mockElement = document.createElement('div');
+      mockHass = {} as HomeAssistant;
       mockConfig = {
-        tap_action: {
-          action: 'more-info',
-        },
+        tap_action: { action: 'more-info' },
       };
 
       // Create stub for createAdditionalStat
@@ -27,58 +27,29 @@ export default () => {
         createAdditionalStatModule,
         'createAdditionalStat',
       );
-      // Configure the stub to return a simple div template
-      createAdditionalStatStub.callsFake(
-        (element, config, entity, icon, text) => {
-          return html`<div
-            class="mocked-additional-stat"
-            data-icon="${icon}"
-            data-text="${text}"
-          >
-            ${icon} - ${text}
-          </div>`;
-        },
-      );
 
-      // Mock device
+      // Mock return value with minimal data for testing
+      createAdditionalStatStub.callsFake((hass, element, config, sensor) => {
+        return html`<div class="mocked-additional-stat">
+          ${sensor.entity_id}
+        </div>`;
+      });
+
+      // Create mock device with minimal sensors array
+      const createSensor = (entity_id: string) => ({
+        entity_id,
+        state: '42',
+        attributes: {},
+        translation_key: 'test_key',
+      });
+
       mockDevice = {
         device_id: 'pi_hole_device',
-        seen_clients: {
-          entity_id: 'sensor.seen_clients',
-          state: '42',
-          attributes: {},
-          translation_key: 'seen_clients',
-        },
-        dns_unique_domains: {
-          entity_id: 'sensor.dns_unique_domains',
-          state: '1500',
-          attributes: {},
-          translation_key: 'dns_unique_domains',
-        },
-        dns_queries_cached: {
-          entity_id: 'sensor.dns_queries_cached',
-          state: '5000',
-          attributes: {},
-          translation_key: 'dns_queries_cached',
-        },
-        dns_queries_forwarded: {
-          entity_id: 'sensor.dns_queries_forwarded',
-          state: '7000',
-          attributes: {},
-          translation_key: 'dns_queries_forwarded',
-        },
-        dns_unique_clients: {
-          entity_id: 'sensor.dns_unique_clients',
-          state: '25',
-          attributes: {},
-          translation_key: 'dns_unique_clients',
-        },
-        remaining_until_blocking_mode: {
-          entity_id: 'sensor.remaining_until_blocking_mode',
-          state: '30',
-          attributes: {},
-          translation_key: 'remaining_until_blocking_mode',
-        },
+        sensors: [
+          createSensor('sensor.seen_clients'),
+          createSensor('sensor.dns_unique_domains'),
+          createSensor('sensor.dns_queries_cached'),
+        ],
       } as PiHoleDevice;
     });
 
@@ -86,110 +57,63 @@ export default () => {
       createAdditionalStatStub.restore();
     });
 
-    it('should call createAdditionalStat for each stat entity', async () => {
-      const result = createAdditionalStats(mockElement, mockDevice, mockConfig);
+    it('should call createAdditionalStat for each sensor in the device', async () => {
+      const result = createAdditionalStats(
+        mockHass,
+        mockElement,
+        mockDevice,
+        mockConfig,
+      );
       await fixture(result as TemplateResult);
 
-      // Verify that createAdditionalStat was called for each entity
-      expect(createAdditionalStatStub.callCount).to.equal(6); // One for each entity
-    });
+      expect(createAdditionalStatStub.callCount).to.equal(
+        mockDevice.sensors.length,
+      );
 
-    it('should render correctly with all entities', async () => {
-      const result = createAdditionalStats(mockElement, mockDevice, mockConfig);
-      const el = await fixture(result as TemplateResult);
-
-      // Check that the container is rendered
-      expect(el.tagName.toLowerCase()).to.equal('div');
-      expect(el.classList.contains('additional-stats')).to.be.true;
-
-      // Should have 6 items (one for each stat)
-      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(6);
-    });
-
-    it('should format text correctly for each stat entity', async () => {
-      const entities = [
-        {
-          entity: 'seen_clients',
-          state: '42',
-          icon: 'mdi:account-multiple',
-          expectedText: '42 clients',
-        },
-        {
-          entity: 'dns_unique_domains',
-          state: '1500',
-          icon: 'mdi:web',
-          expectedText: '1500 unique domains',
-        },
-        {
-          entity: 'dns_queries_cached',
-          state: '5000',
-          icon: 'mdi:server-network',
-          expectedText: '5000 cached',
-        },
-        {
-          entity: 'dns_queries_forwarded',
-          state: '7000',
-          icon: 'mdi:dns',
-          expectedText: '7000 forwarded',
-        },
-        {
-          entity: 'dns_unique_clients',
-          state: '25',
-          icon: 'mdi:account',
-          expectedText: '25 unique clients',
-        },
-        {
-          entity: 'remaining_until_blocking_mode',
-          state: '30',
-          icon: 'mdi:timer-outline',
-          expectedText: '30 time remaining',
-        },
-      ];
-
-      const result = createAdditionalStats(mockElement, mockDevice, mockConfig);
-      const el = await fixture(result as TemplateResult);
-
-      const stats = el.querySelectorAll('.mocked-additional-stat');
-
-      // Check each stat's format
-      entities.forEach((entity, index) => {
-        const stat = stats[index];
-        expect(stat.getAttribute('data-icon')).to.equal(entity.icon);
-        expect(stat.getAttribute('data-text')).to.equal(entity.expectedText);
+      // Verify each sensor was passed correctly
+      mockDevice.sensors.forEach((sensor, index) => {
+        const call = createAdditionalStatStub.getCall(index);
+        expect(call.args[0]).to.equal(mockHass);
+        expect(call.args[1]).to.equal(mockElement);
+        expect(call.args[2]).to.equal(mockConfig);
+        expect(call.args[3]).to.equal(sensor);
       });
     });
 
-    it('should handle missing entities gracefully', async () => {
-      // Create a device with only some entities
-      const partialDevice = {
-        device_id: 'pi_hole_device',
-        seen_clients: {
-          entity_id: 'sensor.seen_clients',
-          state: '42',
-          attributes: {},
-          translation_key: 'seen_clients',
-        },
-        // No other entities
-      } as PiHoleDevice;
-
+    it('should render container with all sensor items', async () => {
       const result = createAdditionalStats(
+        mockHass,
         mockElement,
-        partialDevice,
+        mockDevice,
         mockConfig,
       );
       const el = await fixture(result as TemplateResult);
 
-      // All stats should still render, using default values
-      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(6);
+      expect(el.tagName.toLowerCase()).to.equal('div');
+      expect(el.classList.contains('additional-stats')).to.be.true;
+      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(3);
+    });
 
-      // Check that missing entities use "0" as the default value
-      const stats = el.querySelectorAll('.mocked-additional-stat');
+    it('should handle empty sensors array', async () => {
+      mockDevice.sensors = [];
 
-      // First stat should have real data
-      expect(stats[0]!.getAttribute('data-text')).to.equal('42 clients');
+      const result = createAdditionalStats(
+        mockHass,
+        mockElement,
+        mockDevice,
+        mockConfig,
+      );
+      const el = await fixture(result as TemplateResult);
 
-      // Second stat should have default value
-      expect(stats[1]!.getAttribute('data-text')).to.equal('0 unique domains');
+      expect(createAdditionalStatStub.callCount).to.equal(0);
+      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(0);
+    });
+
+    it('should use default empty config when none provided', async () => {
+      const result = createAdditionalStats(mockHass, mockElement, mockDevice);
+      await fixture(result as TemplateResult);
+
+      expect(createAdditionalStatStub.firstCall.args[2]).to.deep.equal({});
     });
   });
 };

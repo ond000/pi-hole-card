@@ -10,9 +10,7 @@ export const createVersionItem = (
   entity: EntityInformation,
 ): TemplateResult => {
   // super hacky - but too lazy to hardcode the names
-  const label = entity.attributes.friendly_name
-    .replace('Pi-hole ', '')
-    .replace(' update', '');
+  const label = entity.attributes.friendly_name.replace(' update', '');
 
   return html`
     <div class="version-item">

@@ -2,9 +2,17 @@ import type { EntityInformation } from '@/types';
 import { getState } from '@delegates/retrievers/state';
 import type { HomeAssistant } from '@hass/types';
 
+/**
+ * Get all entities for a device
+ * @param hass - Home Assistant instance
+ * @param deviceId - The device ID
+ * @param deviceName - The device name
+ * @returns - An array of entity information objects
+ */
 export const getDeviceEntities = (
   hass: HomeAssistant,
   deviceId: string,
+  deviceName: string | null,
 ): EntityInformation[] => {
   const deviceEntities = Object.values(hass.entities)
     .filter(
@@ -18,11 +26,19 @@ export const getDeviceEntities = (
         return;
       }
 
+      // convenience
+      const name =
+        state.attributes.friendly_name === deviceName
+          ? deviceName
+          : state.attributes.friendly_name.replace(deviceName, '').trim();
       return {
         entity_id: entity.entity_id,
         translation_key: entity.translation_key,
         state: state.state,
-        attributes: state.attributes,
+        attributes: {
+          ...state.attributes,
+          friendly_name: name,
+        },
       };
     })
     .filter((e) => e !== undefined);

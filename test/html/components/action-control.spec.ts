@@ -83,7 +83,6 @@ export default () => {
       it('should use friendly_name as button label with replacements', async () => {
         // Test various friendly name patterns
         const namePatterns = [
-          { original: 'Pi-hole Refresh Data', expected: 'Refresh Data' },
           { original: 'Pihole- Update Gravity', expected: 'Update Gravity' },
           { original: 'Flush the Logs', expected: 'Flush Logs' },
           { original: 'Normal Name', expected: 'Normal Name' },
@@ -149,7 +148,10 @@ export default () => {
       it('should use default icons based on translation_key', async () => {
         const translationKeyIcons = [
           { key: 'action_flush_arp', expectedIcon: 'mdi:broom' },
-          { key: 'action_flush_logs', expectedIcon: 'mdi:book-refresh' },
+          {
+            key: 'action_flush_logs',
+            expectedIcon: 'mdi:file-refresh-outline',
+          },
           { key: 'action_gravity', expectedIcon: 'mdi:earth' },
           { key: 'action_restartdns', expectedIcon: 'mdi:restart' },
           { key: 'action_refresh_data', expectedIcon: 'mdi:refresh' },

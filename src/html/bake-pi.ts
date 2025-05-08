@@ -29,7 +29,7 @@ export const renderPiHoleCard = (
         ${createDashboardStats(element, device, config)}
 
         <!-- Additional Stats Row -->
-        ${createAdditionalStats(element, device, config.info)}
+        ${createAdditionalStats(hass, element, device, config.info)}
       </div>
 
       <!-- Card Actions -->

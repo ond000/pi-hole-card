@@ -143,33 +143,10 @@ export const styles = css`
 
   /* Additional stats styling - specialized responsive grid */
   .additional-stats {
-    display: grid;
-    gap: 8px;
-    justify-content: center;
-    /* Start with 1 column at small widths */
-    grid-template-columns: minmax(120px, 1fr);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     cursor: pointer;
-  }
-
-  /* Switch to 2 columns at slightly wider screens */
-  @media (min-width: 480px) {
-    .additional-stats {
-      grid-template-columns: repeat(2, minmax(120px, 1fr));
-    }
-  }
-
-  /* Medium screens - 3 columns */
-  @media (min-width: 600px) {
-    .additional-stats {
-      grid-template-columns: repeat(3, minmax(120px, 170px));
-    }
-  }
-
-  /* Wide screens - 6 columns */
-  @media (min-width: 1100px) {
-    .additional-stats {
-      grid-template-columns: repeat(6, minmax(120px, 160px));
-    }
   }
 
   .additional-stat {
@@ -186,21 +163,21 @@ export const styles = css`
     overflow: hidden;
   }
 
-  .additional-stat ha-icon {
+  .additional-stat ha-state-icon {
     margin-right: 8px;
     color: var(--secondary-text-color);
   }
 
   .switches {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     flex-wrap: wrap;
     border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
   }
 
   .actions {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     flex-wrap: wrap;
   }
 

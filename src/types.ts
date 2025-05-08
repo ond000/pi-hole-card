@@ -38,9 +38,6 @@ export interface PiHoleDevice {
   /** Unique identifier for the device */
   device_id: string;
 
-  /**
-   * Sensors for Pi-hole
-   */
   /** Total DNS Queries */
   dns_queries_today?: EntityInformation;
 
@@ -53,47 +50,17 @@ export interface PiHoleDevice {
   /** Total Ads Blocked Today */
   ads_blocked_today?: EntityInformation;
 
-  /** Total Seen Clients */
-  seen_clients?: EntityInformation;
-
-  /** Total Unique Domains Queried */
-  dns_unique_domains?: EntityInformation;
-
-  /** Total DNS Queries Cached */
-  dns_queries_cached?: EntityInformation;
-
-  /** Total DNS Queries Forwarded */
-  dns_queries_forwarded?: EntityInformation;
-
   /** Total Unique Clients Queried */
   dns_unique_clients?: EntityInformation;
 
   /** Remaining Time Until Blocking Mode */
   remaining_until_blocking_mode?: EntityInformation;
 
-  /**
-   * Button for Pi-hole
-   */
-  /** Button to flush arp */
-  action_flush_arp?: EntityInformation;
-
-  /** Button to Flush Logs */
-  action_flush_logs?: EntityInformation;
-
-  /** Button to Update Gravity */
-  action_gravity?: EntityInformation;
-
-  /** Button to Refresh DNS */
-  action_restartdns?: EntityInformation;
-
-  /** Button to Refresh data */
-  action_refresh_data?: EntityInformation;
-
-  /**
-   * Binary Sensors for Pi-hole
-   */
   /** Status of Pi-hole */
   status?: EntityInformation;
+
+  /** Sensors for the Pi-hole */
+  sensors: EntityInformation[];
 
   /** Switches for Pi-hole */
   switches: EntityInformation[];

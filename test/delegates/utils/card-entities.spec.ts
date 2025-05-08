@@ -8,6 +8,8 @@ export default () => {
   describe('card-entities.ts', () => {
     let mockHass: HomeAssistant;
     let getStateStub: sinon.SinonStub;
+    const DEVICE_ID = 'pi_hole_device_1';
+    const DEVICE_NAME = 'Pi-hole';
 
     beforeEach(() => {
       // Create mock Home Assistant instance
@@ -15,17 +17,17 @@ export default () => {
         entities: {
           'sensor.pi_hole_dns_queries_today': {
             entity_id: 'sensor.pi_hole_dns_queries_today',
-            device_id: 'pi_hole_device_1',
+            device_id: DEVICE_ID,
             translation_key: 'dns_queries_today',
           },
           'sensor.pi_hole_domains_blocked': {
             entity_id: 'sensor.pi_hole_domains_blocked',
-            device_id: 'pi_hole_device_1',
+            device_id: DEVICE_ID,
             translation_key: 'domains_blocked',
           },
           'binary_sensor.pi_hole_status': {
             entity_id: 'binary_sensor.pi_hole_status',
-            device_id: 'pi_hole_device_1',
+            device_id: DEVICE_ID,
             translation_key: 'status',
           },
           'update.pi_hole_v6_integration_update': {
@@ -41,130 +43,166 @@ export default () => {
         },
       } as unknown as HomeAssistant;
 
-      // Stub the getState function
+      // Stub the getState function with helper
       getStateStub = stub();
-      // Replace the imported getState with our stub
       (getState as any) = getStateStub;
 
-      // Configure the stub behavior
-      getStateStub
-        .withArgs(mockHass, 'sensor.pi_hole_dns_queries_today')
-        .returns({
+      // Configure mock responses
+      const mockStates = {
+        'sensor.pi_hole_dns_queries_today': {
           entity_id: 'sensor.pi_hole_dns_queries_today',
           state: '10000',
-          attributes: {
-            friendly_name: 'DNS Queries Today',
-          },
-        });
-
-      getStateStub
-        .withArgs(mockHass, 'sensor.pi_hole_domains_blocked')
-        .returns({
+          attributes: { friendly_name: 'Pi-hole DNS Queries Today' },
+        },
+        'sensor.pi_hole_domains_blocked': {
           entity_id: 'sensor.pi_hole_domains_blocked',
           state: '120000',
-          attributes: {
-            friendly_name: 'Domains Blocked',
-          },
-        });
-
-      getStateStub.withArgs(mockHass, 'binary_sensor.pi_hole_status').returns({
-        entity_id: 'binary_sensor.pi_hole_status',
-        state: 'on',
-        attributes: {
-          friendly_name: 'Status',
+          attributes: { friendly_name: 'Pi-hole Domains Blocked' },
         },
-      });
-
-      getStateStub
-        .withArgs(mockHass, 'update.pi_hole_v6_integration_update')
-        .returns({
+        'binary_sensor.pi_hole_status': {
+          entity_id: 'binary_sensor.pi_hole_status',
+          state: 'on',
+          attributes: { friendly_name: 'Pi-hole Status' },
+        },
+        'update.pi_hole_v6_integration_update': {
           entity_id: 'update.pi_hole_v6_integration_update',
           state: 'on',
           attributes: {
             friendly_name: 'Integration Update',
             installed_version: '1.0.0',
           },
-        });
+        },
+      };
+
+      // Configure stub responses
+      Object.entries(mockStates).forEach(([entityId, state]) => {
+        getStateStub.withArgs(mockHass, entityId).returns(state);
+      });
 
       getStateStub.withArgs(mockHass, 'sensor.other_entity').returns({
         entity_id: 'sensor.other_entity',
         state: 'value',
-        attributes: {
-          friendly_name: 'Other Entity',
-        },
+        attributes: { friendly_name: 'Other Entity' },
       });
     });
 
-    afterEach(() => {
-      // No need to restore since we're replacing the function directly
-      // If we were using sandbox, we would restore here
+    describe('entity filtering', () => {
+      it('should return correct entities for a device', () => {
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
+
+        expect(entities).to.be.an('array').with.lengthOf(4);
+
+        const entityIds = entities.map((e) => e.entity_id);
+        expect(entityIds).to.deep.equal([
+          'sensor.pi_hole_dns_queries_today',
+          'sensor.pi_hole_domains_blocked',
+          'binary_sensor.pi_hole_status',
+          'update.pi_hole_v6_integration_update',
+        ]);
+      });
+
+      it('should include hardcoded integration update entity', () => {
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
+        const updateEntity = entities.find(
+          (e) => e.entity_id === 'update.pi_hole_v6_integration_update',
+        );
+
+        expect(updateEntity).to.exist;
+        expect(updateEntity?.state).to.equal('on');
+        expect(updateEntity?.attributes.installed_version).to.equal('1.0.0');
+      });
+
+      it('should handle edge cases', () => {
+        // Test with undefined state
+        getStateStub
+          .withArgs(mockHass, 'binary_sensor.pi_hole_status')
+          .returns(undefined);
+        let entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
+        expect(entities.map((e) => e.entity_id)).to.not.include(
+          'binary_sensor.pi_hole_status',
+        );
+
+        // Test with empty entities
+        const emptyHass = { entities: {} } as unknown as HomeAssistant;
+        entities = getDeviceEntities(emptyHass, DEVICE_ID, DEVICE_NAME);
+        expect(entities).to.be.an('array').with.lengthOf(0);
+      });
     });
 
-    it('should return correctly filtered entities for a device', () => {
-      const deviceId = 'pi_hole_device_1';
-      const entities = getDeviceEntities(mockHass, deviceId);
+    describe('device name replacement logic', () => {
+      it('should strip device name from friendly names', () => {
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
 
-      // Should include entities from the device
-      expect(entities).to.be.an('array');
-      expect(entities.length).to.equal(4);
+        const expectedNameMappings: Record<string, string> = {
+          'sensor.pi_hole_dns_queries_today': 'DNS Queries Today',
+          'sensor.pi_hole_domains_blocked': 'Domains Blocked',
+          'binary_sensor.pi_hole_status': 'Status',
+          'update.pi_hole_v6_integration_update': 'Integration Update',
+        };
 
-      // Should include the correct entities
-      const entityIds = entities.map((e) => e.entity_id);
-      expect(entityIds).to.include('sensor.pi_hole_dns_queries_today');
-      expect(entityIds).to.include('sensor.pi_hole_domains_blocked');
-      expect(entityIds).to.include('binary_sensor.pi_hole_status');
-      expect(entityIds).to.include('update.pi_hole_v6_integration_update');
+        entities.forEach((entity) => {
+          expect(entity.attributes.friendly_name).to.equal(
+            expectedNameMappings[entity.entity_id],
+          );
+        });
+      });
+
+      it('should keep full name when it matches device name exactly', () => {
+        // Mock an entity with name exactly matching device name
+        getStateStub.withArgs(mockHass, 'sensor.pi_hole_exact_match').returns({
+          entity_id: 'sensor.pi_hole_exact_match',
+          state: 'value',
+          attributes: { friendly_name: DEVICE_NAME },
+        });
+
+        mockHass.entities['sensor.pi_hole_exact_match'] = {
+          entity_id: 'sensor.pi_hole_exact_match',
+          device_id: DEVICE_ID,
+          translation_key: 'exact_match',
+        } as any;
+
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
+        const exactMatchEntity = entities.find(
+          (e) => e.entity_id === 'sensor.pi_hole_exact_match',
+        );
+
+        expect(exactMatchEntity?.attributes.friendly_name).to.equal(
+          DEVICE_NAME,
+        );
+      });
+
+      it('should handle null device name', () => {
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, null);
+
+        entities.forEach((entity) => {
+          // When deviceName is null, names should not be modified
+          const originalState = getStateStub.withArgs(
+            mockHass,
+            entity.entity_id,
+          ).returnValues[0];
+          expect(entity.attributes.friendly_name).to.equal(
+            originalState?.attributes.friendly_name,
+          );
+        });
+      });
     });
 
-    it('should include the integration update entity', () => {
-      const deviceId = 'pi_hole_device_1';
-      const entities = getDeviceEntities(mockHass, deviceId);
+    describe('entity structure mapping', () => {
+      it('should map entity properties correctly', () => {
+        const entities = getDeviceEntities(mockHass, DEVICE_ID, DEVICE_NAME);
+        const dnsQueriesEntity = entities.find(
+          (e) => e.entity_id === 'sensor.pi_hole_dns_queries_today',
+        );
 
-      // Should include the integration update entity even though it has a different device_id
-      const updateEntity = entities.find(
-        (e) => e.entity_id === 'update.pi_hole_v6_integration_update',
-      );
-      expect(updateEntity).to.exist;
-      expect(updateEntity?.state).to.equal('on');
-      expect(updateEntity?.attributes.installed_version).to.equal('1.0.0');
-    });
+        expect(dnsQueriesEntity).to.deep.include({
+          entity_id: 'sensor.pi_hole_dns_queries_today',
+          translation_key: 'dns_queries_today',
+          state: '10000',
+        });
 
-    it('should filter out undefined state entities', () => {
-      // Modify one stub to return undefined
-      getStateStub
-        .withArgs(mockHass, 'binary_sensor.pi_hole_status')
-        .returns(undefined);
-
-      const deviceId = 'pi_hole_device_1';
-      const entities = getDeviceEntities(mockHass, deviceId);
-
-      // Should not include the entity with undefined state
-      const entityIds = entities.map((e) => e.entity_id);
-      expect(entityIds).to.not.include('binary_sensor.pi_hole_status');
-    });
-
-    it('should handle empty entities object', () => {
-      const emptyHass = { entities: {} } as unknown as HomeAssistant;
-      const deviceId = 'pi_hole_device_1';
-      const entities = getDeviceEntities(emptyHass, deviceId);
-
-      expect(entities).to.be.an('array');
-      expect(entities.length).to.equal(0);
-    });
-
-    it('should map entity properties correctly', () => {
-      const deviceId = 'pi_hole_device_1';
-      const entities = getDeviceEntities(mockHass, deviceId);
-
-      // Check entity structure
-      const dnsQueriesEntity = entities.find(
-        (e) => e.entity_id === 'sensor.pi_hole_dns_queries_today',
-      );
-      expect(dnsQueriesEntity).to.exist;
-      expect(dnsQueriesEntity?.translation_key).to.equal('dns_queries_today');
-      expect(dnsQueriesEntity?.state).to.equal('10000');
-      expect(dnsQueriesEntity?.attributes).to.deep.equal({
-        friendly_name: 'DNS Queries Today',
+        expect(dnsQueriesEntity?.attributes).to.deep.equal({
+          friendly_name: 'DNS Queries Today',
+        });
       });
     });
   });

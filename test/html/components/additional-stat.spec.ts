@@ -1,15 +1,19 @@
 import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
+import type { HomeAssistant } from '@hass/types';
 import { createAdditionalStat } from '@html/components/additional-stat';
+import * as stateDisplayModule from '@html/components/state-display';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { nothing, type TemplateResult } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
   describe('additional-stat.ts', () => {
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
+    let stateDisplayStub: sinon.SinonStub;
+    let mockHass: HomeAssistant;
     let mockElement: HTMLElement;
     let mockEntity: EntityInformation;
     let mockConfig: SectionConfig;
@@ -17,18 +21,40 @@ export default () => {
     beforeEach(() => {
       // Create stubs for action handler functions
       actionHandlerStub = stub(actionHandlerModule, 'actionHandler').returns({
-        bind: () => {}, // Mock the bind method
-        handleAction: () => {}, // Add any other methods that might be called
+        bind: () => {},
+        handleAction: () => {},
       });
 
       handleClickActionStub = stub(
         actionHandlerModule,
         'handleClickAction',
-        // @ts-ignore
-      ).returns(() => {});
+      ).returns({
+        handleEvent: () => {},
+      });
+
+      // Stub stateDisplay to return a simple mock
+      stateDisplayStub = stub(stateDisplayModule, 'stateDisplay').returns(
+        html`<span class="mocked-state-display">42</span>`,
+      );
 
       // Mock HTML element
       mockElement = document.createElement('div');
+
+      // Mock HomeAssistant instance
+      mockHass = {
+        states: {
+          'sensor.test_sensor': {
+            entity_id: 'sensor.test_sensor',
+            state: '42',
+            attributes: {
+              friendly_name: 'Test Sensor',
+              device_class: 'measurement',
+              icon: 'mdi:test-icon',
+              unit_of_measurement: 'clients',
+            },
+          },
+        },
+      } as unknown as HomeAssistant;
 
       mockConfig = {
         tap_action: {
@@ -43,6 +69,9 @@ export default () => {
         translation_key: 'test_sensor',
         attributes: {
           friendly_name: 'Test Sensor',
+          device_class: 'measurement',
+          icon: 'mdi:test-icon',
+          unit_of_measurement: 'clients',
         },
       };
     });
@@ -51,103 +80,47 @@ export default () => {
       // Restore all stubs
       actionHandlerStub.restore();
       handleClickActionStub.restore();
+      stateDisplayStub.restore();
     });
 
-    it('should return nothing when entity is undefined', async () => {
-      const result = createAdditionalStat(
-        mockElement,
-        mockConfig,
-        undefined,
-        'mdi:account',
-        'Test Text',
-      );
-
-      // Check that nothing is returned when entity is undefined
-      expect(result).to.equal(nothing);
-    });
-
-    it('should render additional stat with provided icon and text', async () => {
-      // Create test data
-      const icon = 'mdi:test-icon';
-      const text = 'Test Stat Text';
-
+    it('should render an additional stat with ha-state-icon and state display', async () => {
       // Call createAdditionalStat function
       const result = createAdditionalStat(
+        mockHass,
         mockElement,
         mockConfig,
         mockEntity,
-        icon,
-        text,
       );
-
       const el = await fixture(result as TemplateResult);
 
       // Test assertions for the container
       expect(el.tagName.toLowerCase()).to.equal('div');
       expect(el.classList.contains('additional-stat')).to.be.true;
 
-      // Test assertions for the icon
-      const iconEl = el.querySelector('ha-icon');
+      // Test assertions for ha-state-icon
+      const iconEl = el.querySelector('ha-state-icon');
       expect(iconEl).to.exist;
-      expect(iconEl?.getAttribute('icon')).to.equal(icon);
+      expect((iconEl as any).hass).to.equal(mockHass);
+      expect((iconEl as any).stateObj).to.equal(mockEntity);
 
-      // Test assertions for the text
-      const textEl = el.querySelector('span');
-      expect(textEl).to.exist;
-      expect(textEl?.textContent).to.equal(text);
-    });
+      // Test assertions for state display
+      const stateDisplayEl = el.querySelector('.mocked-state-display');
+      expect(stateDisplayEl).to.exist;
+      expect(stateDisplayEl?.textContent).to.equal('42');
 
-    it('should handle empty values gracefully', async () => {
-      // Call createAdditionalStat with empty strings
-      const result = createAdditionalStat(
-        mockElement,
-        mockConfig,
-        mockEntity,
-        '',
-        '',
-      );
-
-      const el = await fixture(result as TemplateResult);
-
-      // Check that the component still renders with empty values
-      const iconEl = el.querySelector('ha-icon');
-      expect(iconEl).to.exist;
-      expect(iconEl?.getAttribute('icon')).to.equal('');
-
-      const textEl = el.querySelector('span');
-      expect(textEl).to.exist;
-      expect(textEl?.textContent).to.equal('');
-    });
-
-    it('should preserve text with special characters', async () => {
-      // Test with text containing special characters
-      const specialText = '123 &lt; clients &gt; <b>Test</b>';
-
-      // Call createAdditionalStat
-      const result = createAdditionalStat(
-        mockElement,
-        mockConfig,
-        mockEntity,
-        'mdi:icon',
-        specialText,
-      );
-
-      const el = await fixture(result as TemplateResult);
-
-      // Check that the text content is preserved
-      const textEl = el.querySelector('span');
-      expect(textEl?.textContent).to.equal(specialText);
+      // Verify stateDisplay was called with correct parameters
+      expect(stateDisplayStub.calledOnce).to.be.true;
+      expect(stateDisplayStub.firstCall.args[0]).to.equal(mockHass);
+      expect(stateDisplayStub.firstCall.args[1]).to.equal(mockEntity);
     });
 
     it('should attach action handlers to the element', async () => {
       const result = createAdditionalStat(
+        mockHass,
         mockElement,
         mockConfig,
         mockEntity,
-        'mdi:icon',
-        'Test Text',
       );
-
       await fixture(result as TemplateResult);
 
       // Check that actionHandler was called
@@ -159,6 +132,79 @@ export default () => {
       expect(handleClickActionStub.firstCall.args[0]).to.equal(mockElement);
       expect(handleClickActionStub.firstCall.args[1]).to.equal(mockConfig);
       expect(handleClickActionStub.firstCall.args[2]).to.equal(mockEntity);
+    });
+
+    it('should work with undefined config', async () => {
+      const result = createAdditionalStat(
+        mockHass,
+        mockElement,
+        undefined,
+        mockEntity,
+      );
+      const el = await fixture(result as TemplateResult);
+
+      // Should still render
+      expect(el.tagName.toLowerCase()).to.equal('div');
+      expect(el.classList.contains('additional-stat')).to.be.true;
+
+      // Action handlers should be called with undefined config
+      expect(actionHandlerStub.calledWith(undefined)).to.be.true;
+      expect(
+        handleClickActionStub.calledWith(mockElement, undefined, mockEntity),
+      ).to.be.true;
+    });
+
+    it('should handle different entity states correctly', async () => {
+      // Test with different entity configurations
+      const testCases = [
+        {
+          entity: {
+            ...mockEntity,
+            state: 'unavailable',
+            attributes: { friendly_name: 'Unavailable Sensor' },
+          },
+          expectedIcon: 'mdi:alert',
+          expectedState: 'Unavailable',
+        },
+        {
+          entity: {
+            ...mockEntity,
+            state: '100',
+            attributes: {
+              friendly_name: 'Percentage Sensor',
+              unit_of_measurement: '%',
+              icon: 'mdi:percent',
+            },
+          },
+          expectedState: '100%',
+        },
+      ];
+
+      for (const testCase of testCases) {
+        // Reset stubs for each test case
+        stateDisplayStub.resetHistory();
+        stateDisplayStub.returns(
+          html`<span class="mocked-state-display"
+            >${testCase.expectedState || 'mock'}</span
+          >`,
+        );
+
+        const result = createAdditionalStat(
+          mockHass,
+          mockElement,
+          mockConfig,
+          testCase.entity,
+        );
+        const el = await fixture(result as TemplateResult);
+
+        // Check that stateDisplay was called with the test entity
+        expect(stateDisplayStub.calledWith(mockHass, testCase.entity)).to.be
+          .true;
+
+        // Check that ha-state-icon was properly configured
+        const iconEl = el.querySelector('ha-state-icon');
+        expect((iconEl as any).stateObj).to.equal(testCase.entity);
+      }
     });
   });
 };

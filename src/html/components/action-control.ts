@@ -20,7 +20,7 @@ const actionIcon = (entity: EntityInformation) => {
     case 'action_flush_arp':
       return 'mdi:broom';
     case 'action_flush_logs':
-      return 'mdi:book-refresh';
+      return 'mdi:file-refresh-outline';
     case 'action_gravity':
       return 'mdi:earth';
     case 'action_restartdns':
@@ -48,7 +48,6 @@ export const createActionButton = (
 ): TemplateResult => {
   const icon = actionIcon(entity);
   const label = entity?.attributes.friendly_name
-    .replace('Pi-hole ', '')
     .replace('Pihole- ', '')
     .replace(' the ', ' ');
 

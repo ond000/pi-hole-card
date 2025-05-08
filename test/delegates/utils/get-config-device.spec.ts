@@ -86,6 +86,7 @@ export default () => {
       ] = {
         id: 'pi_hole_device_2',
         config_entries: ['pi_hole_config_entry_1'],
+        name: 'Pi-hole 2',
       };
 
       // Mock config entry

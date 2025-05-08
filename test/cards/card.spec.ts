@@ -67,6 +67,7 @@ export default () => {
       ).resolves({
         id: 'pi_hole_device',
         config_entries: ['entry_1'],
+        name: 'Pi-hole',
       });
     });
 

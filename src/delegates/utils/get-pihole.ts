@@ -17,6 +17,7 @@ export const getPiHole = (
   const device: PiHoleDevice = {
     device_id: config.device_id,
     controls: [],
+    sensors: [],
     switches: [],
     updates: [],
   };
@@ -26,12 +27,11 @@ export const getPiHole = (
     return undefined;
   }
 
-  const entities = getDeviceEntities(hass, hassDevice.id);
+  const entities = getDeviceEntities(hass, hassDevice.id, hassDevice.name);
 
   // map the entities to the device object
   entities.forEach((entity) => {
     switch (entity.translation_key) {
-      // sensors
       case 'dns_queries_today':
         device.dns_queries_today = entity;
         break;
@@ -44,22 +44,11 @@ export const getPiHole = (
       case 'ads_blocked_today':
         device.ads_blocked_today = entity;
         break;
-      case 'seen_clients':
-        device.seen_clients = entity;
-        break;
-      case 'dns_unique_domains':
-        device.dns_unique_domains = entity;
-        break;
-      case 'dns_queries_cached':
-        device.dns_queries_cached = entity;
-        break;
-      case 'dns_queries_forwarded':
-        device.dns_queries_forwarded = entity;
-        break;
       case 'dns_unique_clients':
         device.dns_unique_clients = entity;
         break;
       case 'remaining_until_blocking_mode':
+        // todo
         device.remaining_until_blocking_mode = entity;
         break;
 
@@ -73,6 +62,9 @@ export const getPiHole = (
         switch (domain) {
           case 'button':
             device.controls.push(entity);
+            break;
+          case 'sensor':
+            device.sensors.push(entity);
             break;
           case 'switch':
             device.switches.push(entity);

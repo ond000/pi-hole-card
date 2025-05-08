@@ -200,9 +200,10 @@ export default () => {
 
       // Verify createAdditionalStats was called with the correct parameters
       expect(createAdditionalStatsStub.calledOnce).to.be.true;
-      expect(createAdditionalStatsStub.firstCall.args[0]).to.equal(element);
-      expect(createAdditionalStatsStub.firstCall.args[1]).to.equal(mockDevice);
-      expect(createAdditionalStatsStub.firstCall.args[2]).to.equal(
+      expect(createAdditionalStatsStub.firstCall.args[0]).to.equal(mockHass);
+      expect(createAdditionalStatsStub.firstCall.args[1]).to.equal(element);
+      expect(createAdditionalStatsStub.firstCall.args[2]).to.equal(mockDevice);
+      expect(createAdditionalStatsStub.firstCall.args[3]).to.equal(
         mockConfig.info,
       );
     });

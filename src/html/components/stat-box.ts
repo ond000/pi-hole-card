@@ -20,7 +20,7 @@ import { type TemplateResult, html, nothing } from 'lit';
 export const createStatBox = (
   element: HTMLElement,
   entity: EntityInformation | undefined,
-  sectionConfig: SectionConfig | undefined,
+  sectionConfig: SectionConfig,
   title: string,
   footerText: string,
   boxClass: string,

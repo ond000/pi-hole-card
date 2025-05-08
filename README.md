@@ -55,6 +55,8 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ![Additional Metrics](assets/additional-metrics.png)
 
+![Additional Metrics](assets/additional-metrics-wide.png)
+
 ### Direct Controls
 
 - **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click as well as Group Default
