@@ -50,8 +50,7 @@ export default () => {
           attributes: {},
           translation_key: 'dns_queries_today',
         },
-        updates: [],
-      } as PiHoleDevice;
+      } as any as PiHoleDevice;
 
       // Create mock config
       mockConfig = {

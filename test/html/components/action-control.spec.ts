@@ -3,11 +3,11 @@ import * as actionHandlerModule from '@delegates/action-handler-delegate';
 import { createActionButton } from '@html/components/action-control';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { nothing, type TemplateResult } from 'lit';
+import { type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
-  describe('pi-toppings.ts', () => {
+  describe('action-control.ts', () => {
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
     let mockElement: HTMLElement;
@@ -38,11 +38,11 @@ export default () => {
 
       // Create a mock entity for testing
       mockEntity = {
-        entity_id: 'switch.test_switch',
+        entity_id: 'button.test_action',
         state: 'on',
         translation_key: undefined,
         attributes: {
-          friendly_name: 'Test Switch',
+          friendly_name: 'Test Action',
         },
       };
     });
@@ -54,27 +54,11 @@ export default () => {
     });
 
     describe('createActionButton', () => {
-      it('should return nothing when entity is undefined', async () => {
-        const result = createActionButton(
-          mockElement,
-          mockConfig,
-          undefined,
-          'mdi:power',
-          'Power',
-          'primary',
-        );
-
-        // Check that nothing is returned when entity is undefined
-        expect(result).to.equal(nothing);
-      });
-
-      it('should render a button with the provided icon and label', async () => {
+      it('should render a button with the correct class', async () => {
         const result = createActionButton(
           mockElement,
           mockConfig,
           mockEntity,
-          'mdi:power',
-          'Power',
           'primary',
         );
 
@@ -85,24 +69,10 @@ export default () => {
 
         // Check that the button has the correct CSS class
         expect(el.classList.contains('primary')).to.be.true;
-
-        // Check that the button contains an icon
-        const icon = el.querySelector('ha-icon');
-        expect(icon).to.exist;
-        expect(icon?.getAttribute('icon')).to.equal('mdi:power');
-
-        // Check that the button has the correct label text
-        expect(el.textContent?.trim()).to.equal('Power');
       });
 
-      it('should use default class when buttonClass is not provided', async () => {
-        const result = createActionButton(
-          mockElement,
-          mockConfig,
-          mockEntity,
-          'mdi:power',
-          'Power',
-        );
+      it('should use empty class when buttonClass is not provided', async () => {
+        const result = createActionButton(mockElement, mockConfig, mockEntity);
 
         const el = await fixture(result as TemplateResult);
 
@@ -110,14 +80,34 @@ export default () => {
         expect(el.className).to.equal('');
       });
 
+      it('should use friendly_name as button label with replacements', async () => {
+        // Test various friendly name patterns
+        const namePatterns = [
+          { original: 'Pi-hole Refresh Data', expected: 'Refresh Data' },
+          { original: 'Pihole- Update Gravity', expected: 'Update Gravity' },
+          { original: 'Flush the Logs', expected: 'Flush Logs' },
+          { original: 'Normal Name', expected: 'Normal Name' },
+        ];
+
+        for (const pattern of namePatterns) {
+          const entityWithCustomName = {
+            ...mockEntity,
+            attributes: { friendly_name: pattern.original },
+          };
+
+          const result = createActionButton(
+            mockElement,
+            mockConfig,
+            entityWithCustomName,
+          );
+
+          const el = await fixture(result as TemplateResult);
+          expect(el.textContent?.trim()).to.equal(pattern.expected);
+        }
+      });
+
       it('should attach action handlers to the button', async () => {
-        const result = createActionButton(
-          mockElement,
-          mockConfig,
-          mockEntity,
-          'mdi:power',
-          'Power',
-        );
+        const result = createActionButton(mockElement, mockConfig, mockEntity);
 
         const el = await fixture(result as TemplateResult);
 
@@ -132,6 +122,58 @@ export default () => {
 
         // Verify action handler was attached to the button
         expect((el as any).actionHandler).to.exist;
+      });
+
+      it('should use the icon from entity attributes if available', async () => {
+        const entityWithIcon = {
+          ...mockEntity,
+          attributes: {
+            friendly_name: 'Test Action',
+            icon: 'mdi:custom-icon',
+          },
+        };
+
+        const result = createActionButton(
+          mockElement,
+          mockConfig,
+          entityWithIcon,
+        );
+
+        const el = await fixture(result as TemplateResult);
+        const iconEl = el.querySelector('ha-icon');
+
+        expect(iconEl).to.exist;
+        expect(iconEl?.getAttribute('icon')).to.equal('mdi:custom-icon');
+      });
+
+      it('should use default icons based on translation_key', async () => {
+        const translationKeyIcons = [
+          { key: 'action_flush_arp', expectedIcon: 'mdi:broom' },
+          { key: 'action_flush_logs', expectedIcon: 'mdi:book-refresh' },
+          { key: 'action_gravity', expectedIcon: 'mdi:earth' },
+          { key: 'action_restartdns', expectedIcon: 'mdi:restart' },
+          { key: 'action_refresh_data', expectedIcon: 'mdi:refresh' },
+          { key: 'unknown_action', expectedIcon: 'mdi:button-pointer' },
+        ];
+
+        for (const item of translationKeyIcons) {
+          const entityWithTranslationKey = {
+            ...mockEntity,
+            translation_key: item.key,
+          };
+
+          const result = createActionButton(
+            mockElement,
+            mockConfig,
+            entityWithTranslationKey,
+          );
+
+          const el = await fixture(result as TemplateResult);
+          const iconEl = el.querySelector('ha-icon');
+
+          expect(iconEl).to.exist;
+          expect(iconEl?.getAttribute('icon')).to.equal(item.expectedIcon);
+        }
       });
     });
   });

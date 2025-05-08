@@ -16,6 +16,8 @@ export const getPiHole = (
 ): PiHoleDevice | undefined => {
   const device: PiHoleDevice = {
     device_id: config.device_id,
+    controls: [],
+    switches: [],
     updates: [],
   };
 
@@ -61,28 +63,6 @@ export const getPiHole = (
         device.remaining_until_blocking_mode = entity;
         break;
 
-      // buttons
-      case 'action_flush_arp':
-        device.action_flush_arp = entity;
-        break;
-      case 'action_flush_logs':
-        device.action_flush_logs = entity;
-        break;
-      case 'action_gravity':
-        device.action_gravity = entity;
-        break;
-      case 'action_restartdns':
-        device.action_restartdns = entity;
-        break;
-      case 'action_refresh_data':
-        device.action_refresh_data = entity;
-        break;
-
-      // switches
-      case 'group':
-        device.group_default = entity;
-        break;
-
       // binary sensors
       case 'status':
         device.status = entity;
@@ -91,14 +71,15 @@ export const getPiHole = (
       default:
         const domain = computeDomain(entity.entity_id);
         switch (domain) {
+          case 'button':
+            device.controls.push(entity);
+            break;
           case 'switch':
-            // going to assume the second switch is the main switch..
-            device.switch_pi_hole = entity;
+            device.switches.push(entity);
             break;
           case 'update':
             device.updates.push(entity);
             break;
-          default:
         }
         break;
     }

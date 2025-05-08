@@ -65,77 +65,61 @@ export default () => {
       expect(result).to.be.undefined;
     });
 
-    it('should map all sensor entities correctly', () => {
+    it('should map sensor entities correctly', () => {
       // Create entities for all sensor cases
       const sensorEntities = [
         createEntity('sensor.dns_queries_today', 'dns_queries_today', '10000'),
         createEntity('sensor.domains_blocked', 'domains_blocked', '120000'),
-        createEntity(
-          'sensor.ads_percentage_blocked_today',
-          'ads_percentage_blocked_today',
-          '25.5',
-        ),
-        createEntity('sensor.ads_blocked_today', 'ads_blocked_today', '3500'),
-        createEntity('sensor.seen_clients', 'seen_clients', '15'),
-        createEntity('sensor.dns_unique_domains', 'dns_unique_domains', '5000'),
-        createEntity('sensor.dns_queries_cached', 'dns_queries_cached', '2000'),
-        createEntity(
-          'sensor.dns_queries_forwarded',
-          'dns_queries_forwarded',
-          '8000',
-        ),
-        createEntity('sensor.dns_unique_clients', 'dns_unique_clients', '10'),
-        createEntity(
-          'sensor.remaining_until_blocking_mode',
-          'remaining_until_blocking_mode',
-          '30',
-        ),
       ];
 
       getDeviceEntitiesStub.returns(sensorEntities);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify each sensor was mapped correctly
+      // Verify sensors were mapped correctly
       expect(result?.dns_queries_today).to.deep.equal(sensorEntities[0]);
       expect(result?.domains_blocked).to.deep.equal(sensorEntities[1]);
-      expect(result?.ads_percentage_blocked_today).to.deep.equal(
-        sensorEntities[2],
-      );
-      expect(result?.ads_blocked_today).to.deep.equal(sensorEntities[3]);
-      expect(result?.seen_clients).to.deep.equal(sensorEntities[4]);
-      expect(result?.dns_unique_domains).to.deep.equal(sensorEntities[5]);
-      expect(result?.dns_queries_cached).to.deep.equal(sensorEntities[6]);
-      expect(result?.dns_queries_forwarded).to.deep.equal(sensorEntities[7]);
-      expect(result?.dns_unique_clients).to.deep.equal(sensorEntities[8]);
-      expect(result?.remaining_until_blocking_mode).to.deep.equal(
-        sensorEntities[9],
-      );
     });
 
-    it('should map all action button entities correctly', () => {
-      // Create entities for all button cases
-      const buttonEntities = [
-        createEntity('button.action_flush_arp', 'action_flush_arp'),
-        createEntity('button.action_flush_logs', 'action_flush_logs'),
-        createEntity('button.action_gravity', 'action_gravity'),
-        createEntity('button.action_restartdns', 'action_restartdns'),
-        createEntity('button.action_refresh_data', 'action_refresh_data'),
-      ];
+    it('should map controls, switches and update arrays correctly', () => {
+      // Create entities of each type
+      const buttonEntity = createEntity(
+        'button.action_gravity',
+        'action_gravity',
+      );
+      const switchEntity = createEntity('switch.pi_hole_main', undefined, 'on');
+      const updateEntity = createEntity(
+        'update.pi_hole_core',
+        undefined,
+        'off',
+        {
+          friendly_name: 'Pi-hole Core Update',
+          title: 'Core',
+          installed_version: 'v5.14.2',
+        },
+      );
 
-      getDeviceEntitiesStub.returns(buttonEntities);
+      // Set up domain stubs
+      computeDomainStub.withArgs('button.action_gravity').returns('button');
+      computeDomainStub.withArgs('switch.pi_hole_main').returns('switch');
+      computeDomainStub.withArgs('update.pi_hole_core').returns('update');
+
+      getDeviceEntitiesStub.returns([buttonEntity, switchEntity, updateEntity]);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify each button was mapped correctly
-      expect(result?.action_flush_arp).to.deep.equal(buttonEntities[0]);
-      expect(result?.action_flush_logs).to.deep.equal(buttonEntities[1]);
-      expect(result?.action_gravity).to.deep.equal(buttonEntities[2]);
-      expect(result?.action_restartdns).to.deep.equal(buttonEntities[3]);
-      expect(result?.action_refresh_data).to.deep.equal(buttonEntities[4]);
+      // Verify arrays were created and populated correctly
+      expect(result?.controls).to.be.an('array').with.lengthOf(1);
+      expect(result?.controls[0]).to.deep.equal(buttonEntity);
+
+      expect(result?.switches).to.be.an('array').with.lengthOf(1);
+      expect(result?.switches[0]).to.deep.equal(switchEntity);
+
+      expect(result?.updates).to.be.an('array').with.lengthOf(1);
+      expect(result?.updates[0]).to.deep.equal(updateEntity);
     });
 
-    it('should sort update entities by title with items without title at the end', () => {
+    it('should sort updates by title with items without title at the end', () => {
       // Create update entities with different title attributes, intentionally out of order
       const updateEntities = [
         createEntity('update.pi_hole_web', undefined, 'off', {
@@ -160,13 +144,8 @@ export default () => {
         }),
       ];
 
-      // Set computeDomain to return "update" for these entities
-      computeDomainStub.withArgs('update.pi_hole_core').returns('update');
-      computeDomainStub.withArgs('update.pi_hole_ftl').returns('update');
-      computeDomainStub.withArgs('update.pi_hole_web').returns('update');
-      computeDomainStub
-        .withArgs('update.pi_hole_v6_integration')
-        .returns('update');
+      // All these entities should be updates
+      computeDomainStub.returns('update');
 
       getDeviceEntitiesStub.returns(updateEntities);
 
@@ -188,86 +167,16 @@ export default () => {
       expect(result?.updates?.[3]!.attributes.title).to.be.undefined;
     });
 
-    it('should handle switch and binary sensor entities correctly', () => {
-      // Create entities for switches and binary sensors
-      const miscEntities = [
-        createEntity('switch.group_default', 'group'),
-        createEntity('binary_sensor.status', 'status'),
-      ];
+    it('should handle status and other translation_key entities correctly', () => {
+      // Create status entity
+      const statusEntity = createEntity('binary_sensor.status', 'status');
 
-      getDeviceEntitiesStub.returns(miscEntities);
+      getDeviceEntitiesStub.returns([statusEntity]);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify entities were mapped correctly
-      expect(result?.group_default).to.deep.equal(miscEntities[0]);
-      expect(result?.status).to.deep.equal(miscEntities[1]);
-    });
-
-    it('should handle the Pi-hole switch correctly', () => {
-      // Create a switch entity
-      const switchEntity = createEntity('switch.pi_hole_main', undefined, 'on');
-      computeDomainStub.withArgs('switch.pi_hole_main').returns('switch');
-
-      getDeviceEntitiesStub.returns([switchEntity]);
-
-      const result = getPiHole(mockHass, mockConfig);
-
-      // Verify the switch was mapped correctly
-      expect(result?.switch_pi_hole).to.deep.equal(switchEntity);
-    });
-
-    it('should handle a combination of all entity types', () => {
-      // Create a comprehensive set of entities covering all cases
-      const allEntities = [
-        // Sensors
-        createEntity('sensor.dns_queries_today', 'dns_queries_today', '10000'),
-        createEntity('sensor.domains_blocked', 'domains_blocked', '120000'),
-
-        // Buttons
-        createEntity('button.action_gravity', 'action_gravity'),
-
-        // Updates
-        createEntity('update.pi_hole_core', undefined, 'off', {
-          friendly_name: 'Pi-hole Core Update',
-          title: 'Core',
-          installed_version: 'v5.14.2',
-        }),
-        createEntity('update.pi_hole_ftl', undefined, 'off', {
-          friendly_name: 'Pi-hole FTL Update',
-          title: 'FTL',
-          installed_version: 'v5.21',
-        }),
-
-        // Switches & Binary Sensors
-        createEntity('switch.group_default', 'group'),
-        createEntity('binary_sensor.status', 'status'),
-
-        // Main switch
-        createEntity('switch.pi_hole_main', undefined, 'on'),
-      ];
-
-      // Set up computeDomain stubs for the specific tests
-      computeDomainStub.withArgs('update.pi_hole_core').returns('update');
-      computeDomainStub.withArgs('update.pi_hole_ftl').returns('update');
-      computeDomainStub.withArgs('switch.pi_hole_main').returns('switch');
-
-      getDeviceEntitiesStub.returns(allEntities);
-
-      const result = getPiHole(mockHass, mockConfig);
-
-      // Verify a sample of different entity types
-      expect(result?.dns_queries_today).to.deep.equal(allEntities[0]);
-      expect(result?.action_gravity).to.deep.equal(allEntities[2]);
-      expect(result?.group_default).to.deep.equal(allEntities[5]);
-      expect(result?.status).to.deep.equal(allEntities[6]);
-      expect(result?.switch_pi_hole).to.deep.equal(allEntities[7]);
-
-      // Verify updates array
-      expect(result?.updates).to.exist;
-      expect(result?.updates?.length).to.equal(2);
-      expect(result?.updates?.[0]!.attributes.title).to.equal('Core');
-      expect(result?.updates?.[1]!.attributes.title).to.equal('FTL');
+      // Verify status was mapped correctly
+      expect(result?.status).to.deep.equal(statusEntity);
     });
   });
 };

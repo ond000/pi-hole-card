@@ -90,19 +90,16 @@ export interface PiHoleDevice {
   action_refresh_data?: EntityInformation;
 
   /**
-   * Switches for Pi-hole
-   */
-  /** Switch for group default */
-  group_default?: EntityInformation;
-
-  /** Switch for Pi-hole blocking */
-  switch_pi_hole?: EntityInformation;
-
-  /**
    * Binary Sensors for Pi-hole
    */
   /** Status of Pi-hole */
   status?: EntityInformation;
+
+  /** Switches for Pi-hole */
+  switches: EntityInformation[];
+
+  /** Control entities for the device */
+  controls: EntityInformation[];
 
   /** Update entities for the device */
   updates: EntityInformation[];

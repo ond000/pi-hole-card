@@ -2,7 +2,7 @@ import type { Config, PiHoleDevice } from '@/types';
 import { stateActive } from '@hass/common/entity/state_active';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
-import { stateDisplay } from './state-display';
+import { stateDisplay } from './components/state-display';
 
 /**
  * Creates the card header section

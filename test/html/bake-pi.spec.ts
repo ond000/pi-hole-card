@@ -126,7 +126,7 @@ export default () => {
             },
           },
         ],
-      } as PiHoleDevice;
+      } as any as PiHoleDevice;
 
       // Mock config
       mockConfig = {
@@ -213,9 +213,10 @@ export default () => {
 
       // Verify createCardActions was called with the correct parameters
       expect(createCardActionsStub.calledOnce).to.be.true;
-      expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
-      expect(createCardActionsStub.firstCall.args[1]).to.equal(mockDevice);
-      expect(createCardActionsStub.firstCall.args[2]).to.equal(
+      expect(createCardActionsStub.firstCall.args[0]).to.equal(mockHass);
+      expect(createCardActionsStub.firstCall.args[1]).to.equal(element);
+      expect(createCardActionsStub.firstCall.args[2]).to.equal(mockDevice);
+      expect(createCardActionsStub.firstCall.args[3]).to.equal(
         mockConfig.controls,
       );
     });

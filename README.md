@@ -57,16 +57,18 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ### Direct Controls
 
-- **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click
+- **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click as well as Group Default
 - **Action Buttons** - Quick access buttons for common maintenance tasks:
   - Refresh Data
   - Restart DNS
   - Update Gravity
   - Flush ARP
   - Flush Logs
-- **Customizable Actions** - Configure custom actions for all control buttons
+- **Customizable Actions** - Configure custom actions for the control buttons in this section
 
 ![Control Buttons](assets/control-buttons.png)
+
+![Control Buttons](assets/control-buttons-wide.png)
 
 ### Version Information
 

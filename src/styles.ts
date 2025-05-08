@@ -191,12 +191,17 @@ export const styles = css`
     color: var(--secondary-text-color);
   }
 
-  .card-actions {
+  .switches {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    padding: 0 8px 8px;
     border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
   }
 
   /* Version information styles */

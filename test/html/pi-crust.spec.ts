@@ -1,7 +1,7 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
+import * as stateDisplayModule from '@html/components/state-display';
 import { createCardHeader } from '@html/pi-crust';
-import * as stateDisplayModule from '@html/state-display';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';
@@ -43,8 +43,7 @@ export default () => {
           attributes: { friendly_name: 'Pi-hole Status' },
           translation_key: undefined,
         },
-        updates: [],
-      } as PiHoleDevice;
+      } as any as PiHoleDevice;
 
       // Default mock config
       mockConfig = {
