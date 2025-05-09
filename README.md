@@ -88,6 +88,9 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Real-time Status** - Visual indication of Pi-hole's current state
 - **Error Detection** - Automatic highlighting when issues are detected
 - **Update Indicators** - Clear notification when updates are available
+- **Block Time Remaining** - Shows how much time remaining until blocking enables
+
+![block-time](assets/block-time.png)
 
 ### Interactive Dashboard
 
@@ -96,7 +99,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Customizable Card** - Set custom title and icon to match your dashboard style
 - **Entity Filtering** - Ability to exclude specific entities or entire sections
 
-![editor](assets/filtering.png)
+![filtering](assets/filtering.png)
 
 ### Responsive Design
 
