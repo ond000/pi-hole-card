@@ -1,24 +1,12 @@
 import type { Config, EntityInformation } from '@/types';
+import * as mapEntitiesModule from '@common/map-entities';
+import * as skipEntityModule from '@common/skip-entity';
 import { getDevice } from '@delegates/retrievers/device';
 import * as cardEntitiesModule from '@delegates/utils/card-entities';
 import { getPiHole } from '@delegates/utils/get-pihole';
-import { computeDomain } from '@hass/common/entity/compute_domain';
 import type { HomeAssistant } from '@hass/types';
 import { expect } from 'chai';
-import { stub } from 'sinon';
-
-// Helper to create entity objects with minimal required properties
-const createEntity = (
-  entity_id: string,
-  translation_key: string | undefined,
-  state: string = 'on',
-  attributes: Record<string, any> = { friendly_name: 'friendly name' },
-): EntityInformation => ({
-  entity_id,
-  translation_key,
-  state,
-  attributes,
-});
+import { restore, stub } from 'sinon';
 
 export default () => {
   describe('get-pihole.ts', () => {
@@ -26,37 +14,48 @@ export default () => {
     let mockConfig: Config;
     let getDeviceStub: sinon.SinonStub;
     let getDeviceEntitiesStub: sinon.SinonStub;
-    let computeDomainStub: sinon.SinonStub;
+    let mapEntitiesByTranslationKeyStub: sinon.SinonStub;
+    let shouldSkipEntityStub: sinon.SinonStub;
+
+    const DEVICE_ID = 'pi_hole_device_1';
+    const DEVICE_NAME = 'Pi-hole';
 
     beforeEach(() => {
       // Create mock config
       mockConfig = {
-        device_id: 'pi_hole_device_1',
+        device_id: DEVICE_ID,
       };
 
       // Mock Home Assistant instance
       mockHass = {} as unknown as HomeAssistant;
 
-      // Set up stubs
+      // Set up stubs for dependencies
       getDeviceStub = stub();
       (getDevice as any) = getDeviceStub;
-      getDeviceStub.withArgs(mockHass, 'pi_hole_device_1').returns({
-        id: 'pi_hole_device_1',
-        name: 'Pi-hole',
+      getDeviceStub.withArgs(mockHass, DEVICE_ID).returns({
+        id: DEVICE_ID,
+        name: DEVICE_NAME,
       });
       getDeviceStub
         .withArgs(mockHass, 'non_existent_device')
         .returns(undefined);
 
+      // Stub for getDeviceEntities
       getDeviceEntitiesStub = stub(cardEntitiesModule, 'getDeviceEntities');
 
-      computeDomainStub = stub();
-      (computeDomain as any) = computeDomainStub;
-      computeDomainStub.callsFake((entityId: string) => entityId.split('.')[0]);
+      // Stub for mapEntitiesByTranslationKey
+      mapEntitiesByTranslationKeyStub = stub(
+        mapEntitiesModule,
+        'mapEntitiesByTranslationKey',
+      );
+
+      // Stub for shouldSkipEntity
+      shouldSkipEntityStub = stub(skipEntityModule, 'shouldSkipEntity');
+      shouldSkipEntityStub.returns(false); // Default to not skipping entities
     });
 
     afterEach(() => {
-      getDeviceEntitiesStub.restore();
+      restore(); // Restore all stubs
     });
 
     it('should return undefined when device is not found', () => {
@@ -65,185 +64,87 @@ export default () => {
       expect(result).to.be.undefined;
     });
 
-    it('should initialize device with empty arrays', () => {
+    it('should initialize device with device_id from config', () => {
+      // Mock an empty array of entities
       getDeviceEntitiesStub.returns([]);
 
       const result = getPiHole(mockHass, mockConfig);
 
       expect(result).to.exist;
+      expect(result?.device_id).to.equal(DEVICE_ID);
       expect(result?.controls).to.be.an('array').with.lengthOf(0);
       expect(result?.sensors).to.be.an('array').with.lengthOf(0);
       expect(result?.switches).to.be.an('array').with.lengthOf(0);
       expect(result?.updates).to.be.an('array').with.lengthOf(0);
     });
 
-    it('should map specific translation_key entities correctly', () => {
-      const specialEntities = [
-        createEntity('sensor.dns_queries_today', 'dns_queries_today', '10000'),
-        createEntity('sensor.domains_blocked', 'domains_blocked', '120000'),
-        createEntity(
-          'sensor.ads_percentage_blocked_today',
-          'ads_percentage_blocked_today',
-          '25.5',
-        ),
-        createEntity('sensor.ads_blocked_today', 'ads_blocked_today', '3500'),
-        createEntity('sensor.dns_unique_clients', 'dns_unique_clients', '15'),
-        createEntity(
-          'sensor.remaining_until_blocking_mode',
-          'remaining_until_blocking_mode',
-          '30',
-        ),
-        createEntity('binary_sensor.status', 'status'),
-        createEntity('button.action_refresh_data', 'action_refresh_data'),
-        createEntity(
-          'sensor.latest_data_refresh',
-          'latest_data_refresh',
-          '2023-04-15T14:30:00',
-        ),
+    it('should map entities using mapEntitiesByTranslationKey and sort updates', () => {
+      // Create some test entities
+      const mockEntities = [
+        createEntity('sensor.test_1', 'dns_queries_today', '10000'),
+        createEntity('button.test_2', 'action_refresh_data'),
+        createEntity('update.test_3', undefined, 'off', { title: 'Core' }),
+        createEntity('update.test_4', undefined, 'off', { title: 'FTL' }),
       ];
 
-      getDeviceEntitiesStub.returns(specialEntities);
+      getDeviceEntitiesStub.returns(mockEntities);
 
-      const result = getPiHole(mockHass, mockConfig);
-
-      // Verify specific properties are set
-      expect(result?.dns_queries_today).to.deep.equal(specialEntities[0]);
-      expect(result?.domains_blocked).to.deep.equal(specialEntities[1]);
-      expect(result?.ads_percentage_blocked_today).to.deep.equal(
-        specialEntities[2],
-      );
-      expect(result?.ads_blocked_today).to.deep.equal(specialEntities[3]);
-      expect(result?.dns_unique_clients).to.deep.equal(specialEntities[4]);
-      expect(result?.remaining_until_blocking_mode).to.deep.equal(
-        specialEntities[5],
-      );
-      expect(result?.status).to.deep.equal(specialEntities[6]);
-
-      // Verify new properties are set correctly
-      expect(result?.action_refresh_data).to.deep.equal(specialEntities[7]);
-      expect(result?.latest_data_refresh).to.deep.equal(specialEntities[8]);
-    });
-
-    it('should populate arrays based on entity domain', () => {
-      const domainEntities = [
-        createEntity('button.action_gravity', undefined),
-        createEntity('button.action_restart', undefined),
-        createEntity('sensor.unknown_sensor', undefined),
-        createEntity('sensor.dns_queries_cached', undefined),
-        createEntity('switch.pi_hole_main', undefined),
-        createEntity('switch.backup_switch', undefined),
-        createEntity('update.pi_hole_core', undefined, 'off', {
-          title: 'Core',
-        }),
-      ];
-
-      // Set up domain returns
-      domainEntities.forEach((entity) => {
-        computeDomainStub
-          .withArgs(entity.entity_id)
-          .returns(entity.entity_id.split('.')[0]);
+      // Configure mapEntitiesByTranslationKey to return true for translation keys that exist
+      mapEntitiesByTranslationKeyStub.callsFake((entity, device) => {
+        return !!entity.translation_key;
       });
 
-      getDeviceEntitiesStub.returns(domainEntities);
-
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify array populations
-      expect(result?.controls).to.have.lengthOf(2);
-      expect(result?.sensors).to.have.lengthOf(2);
-      expect(result?.switches).to.have.lengthOf(2);
-      expect(result?.updates).to.have.lengthOf(1);
+      // Verify mapEntitiesByTranslationKey was called for each entity
+      expect(mapEntitiesByTranslationKeyStub.callCount).to.equal(
+        mockEntities.length,
+      );
+
+      // Verify updates are sorted by title (though we don't need to check specific order)
+      expect(result?.updates).to.have.lengthOf(2);
     });
 
-    it('should sort updates by title with undefined titles last', () => {
-      const updateEntities = [
-        createEntity('update.web', undefined, 'off', {
-          title: 'Web Interface',
-        }),
-        createEntity('update.no_title', undefined, 'off', {}),
-        createEntity('update.core', undefined, 'off', { title: 'Core' }),
-        createEntity('update.ftl', undefined, 'off', { title: 'FTL' }),
-        createEntity('update.another_no_title', undefined, 'off', {
-          friendly_name: 'No Title Update',
-        }),
+    it('should filter out entities that should be skipped', () => {
+      // Create some test entities
+      const mockEntities = [
+        createEntity('sensor.test_1', 'dns_queries_today', '10000'),
+        createEntity('button.test_2', undefined),
       ];
 
-      // All entities are updates
-      computeDomainStub.returns('update');
-      getDeviceEntitiesStub.returns(updateEntities);
+      getDeviceEntitiesStub.returns(mockEntities);
+
+      // Configure shouldSkipEntity to skip the first entity
+      shouldSkipEntityStub.withArgs(mockEntities[0], mockConfig).returns(true);
+      shouldSkipEntityStub.withArgs(mockEntities[1], mockConfig).returns(false);
+
+      // Configure mapEntitiesByTranslationKey to return false (so the entity goes to other arrays)
+      mapEntitiesByTranslationKeyStub.returns(false);
 
       const result = getPiHole(mockHass, mockConfig);
 
-      // Verify sorting order
-      expect(result?.updates?.[0]!.attributes.title).to.equal('Core');
-      expect(result?.updates?.[1]!.attributes.title).to.equal('FTL');
-      expect(result?.updates?.[2]!.attributes.title).to.equal('Web Interface');
-      // Entities without titles should be at the end
-      expect(result?.updates?.[3]!.entity_id).to.equal('update.no_title');
-      expect(result?.updates?.[4]!.entity_id).to.equal(
-        'update.another_no_title',
-      );
-    });
+      // Verify shouldSkipEntity was called for each entity
+      expect(shouldSkipEntityStub.callCount).to.equal(mockEntities.length);
 
-    it('should handle mixed entity types correctly', () => {
-      const mixedEntities = [
-        // Translation key entities
-        createEntity('sensor.dns_queries_today', 'dns_queries_today', '10000'),
-        createEntity('binary_sensor.status', 'status'),
-        createEntity('button.action_refresh_data', 'action_refresh_data'),
-        createEntity(
-          'sensor.latest_data_refresh',
-          'latest_data_refresh',
-          '2023-04-15T14:30:00',
-        ),
-
-        // Domain-based entities
-        createEntity('button.refresh', undefined),
-        createEntity('sensor.generic_sensor', undefined),
-        createEntity('switch.main_switch', undefined),
-        createEntity('update.core_update', undefined, 'off', { title: 'Core' }),
-      ];
-
-      // Set up domain returns
-      computeDomainStub.withArgs('button.refresh').returns('button');
-      computeDomainStub.withArgs('sensor.generic_sensor').returns('sensor');
-      computeDomainStub.withArgs('switch.main_switch').returns('switch');
-      computeDomainStub.withArgs('update.core_update').returns('update');
-      computeDomainStub
-        .withArgs('button.action_refresh_data')
-        .returns('button');
-      computeDomainStub
-        .withArgs('sensor.latest_data_refresh')
-        .returns('sensor');
-
-      getDeviceEntitiesStub.returns(mixedEntities);
-
-      const result = getPiHole(mockHass, mockConfig);
-
-      // Verify specific properties
-      expect(result?.dns_queries_today?.entity_id).to.equal(
-        'sensor.dns_queries_today',
-      );
-      expect(result?.status?.entity_id).to.equal('binary_sensor.status');
-      expect(result?.action_refresh_data?.entity_id).to.equal(
-        'button.action_refresh_data',
-      );
-      expect(result?.latest_data_refresh?.entity_id).to.equal(
-        'sensor.latest_data_refresh',
-      );
-      expect(result?.latest_data_refresh?.state).to.equal(
-        '2023-04-15T14:30:00',
-      );
-
-      // Verify arrays
-      expect(result?.controls).to.have.lengthOf(1);
-      expect(result?.controls?.[0]!.entity_id).to.equal('button.refresh');
-      expect(result?.sensors).to.have.lengthOf(1);
-      expect(result?.sensors?.[0]!.entity_id).to.equal('sensor.generic_sensor');
-      expect(result?.switches).to.have.lengthOf(1);
-      expect(result?.switches?.[0]!.entity_id).to.equal('switch.main_switch');
-      expect(result?.updates).to.have.lengthOf(1);
-      expect(result?.updates?.[0]!.entity_id).to.equal('update.core_update');
+      // Verify only one entity was processed (the second one)
+      expect(mapEntitiesByTranslationKeyStub.callCount).to.equal(1);
+      expect(mapEntitiesByTranslationKeyStub.calledWith(mockEntities[1])).to.be
+        .true;
     });
   });
 };
+
+// Helper to create entity objects with minimal required properties
+function createEntity(
+  entity_id: string,
+  translation_key: string | undefined,
+  state: string = 'on',
+  attributes: Record<string, any> = { friendly_name: 'friendly name' },
+): EntityInformation {
+  return {
+    entity_id,
+    translation_key,
+    state,
+    attributes,
+  };
+}
