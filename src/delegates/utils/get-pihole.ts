@@ -60,7 +60,7 @@ export const getPiHole = (
         device.status = entity;
         break;
 
-      default:
+      default: {
         const domain = computeDomain(entity.entity_id);
         switch (domain) {
           case 'button':
@@ -77,6 +77,7 @@ export const getPiHole = (
             break;
         }
         break;
+      }
     }
   });
 
@@ -85,8 +86,8 @@ export const getPiHole = (
   // so we need to use a default value of 'z' to sort them to the end
   // this is not ideal, but it works for now - it matches the behavior of the Pi-hole admin console
   device.updates.sort((a, b) => {
-    const aTitle = a.attributes.title || 'z';
-    const bTitle = b.attributes.title || 'z';
+    const aTitle = a.attributes.title ?? 'z';
+    const bTitle = b.attributes.title ?? 'z';
     return aTitle.localeCompare(bTitle);
   });
 

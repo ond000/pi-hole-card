@@ -24,7 +24,7 @@ export const createDashboardStats = (
           device.dns_queries_today,
           config.stats,
           'Total queries',
-          `${formatNumber(device.dns_unique_clients?.state || '0')} active clients`,
+          `${formatNumber(device.dns_unique_clients?.state ?? '0')} active clients`,
           'queries-box',
           'mdi:earth',
         )}
