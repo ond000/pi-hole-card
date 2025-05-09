@@ -1,9 +1,10 @@
 import type { Config, PiHoleDevice } from '@/types';
+import * as showSectionModule from '@common/show-section';
 import * as createStatBoxModule from '@html/components/stat-box';
 import { createDashboardStats } from '@html/pi-fillings';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -12,10 +13,15 @@ export default () => {
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let createStatBoxStub: sinon.SinonStub;
+    let showSectionStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create mock element
       mockElement = document.createElement('div');
+
+      // Create stub for show function
+      showSectionStub = stub(showSectionModule, 'show');
+      showSectionStub.returns(true); // Default to showing sections
 
       // Create stub for createStatBox
       createStatBoxStub = stub(createStatBoxModule, 'createStatBox');
@@ -84,9 +90,27 @@ export default () => {
     afterEach(() => {
       // Restore all stubs
       createStatBoxStub.restore();
+      showSectionStub.restore();
+    });
+
+    it('should return nothing when show returns false for statistics section', async () => {
+      // Configure show to return false for statistics section
+      showSectionStub.withArgs(mockConfig, 'statistics').returns(false);
+
+      // Call createDashboardStats
+      const result = createDashboardStats(mockElement, mockDevice, mockConfig);
+
+      // Assert that nothing is returned
+      expect(result).to.equal(nothing);
+
+      // Verify that createStatBox was not called
+      expect(createStatBoxStub.called).to.be.false;
     });
 
     it('should render dashboard stats container with stat groups', async () => {
+      // Ensure show returns true for statistics section
+      showSectionStub.withArgs(mockConfig, 'statistics').returns(true);
+
       const result = createDashboardStats(mockElement, mockDevice, mockConfig);
       const el = await fixture(result as TemplateResult);
 

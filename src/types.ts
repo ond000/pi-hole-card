@@ -21,7 +21,20 @@ export interface Config {
 
   /** actions for controls */
   controls?: SectionConfig;
+
+  /** The entities to exclude */
+  exclude_entities?: string[];
+
+  /** The sections to exclude */
+  exclude_sections?: Sections[];
 }
+
+export type Sections =
+  | 'header'
+  | 'statistics'
+  | 'sensors'
+  | 'controls'
+  | 'footer';
 
 export interface SectionConfig {
   /** Action to perform on tap */

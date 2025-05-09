@@ -1,10 +1,11 @@
 import type { Config, PiHoleDevice } from '@/types';
+import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as stateDisplayModule from '@html/components/state-display';
 import { createCardHeader } from '@html/pi-crust';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -13,6 +14,7 @@ export default () => {
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let stateDisplayStub: sinon.SinonStub;
+    let showSectionStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create stub for stateDisplay
@@ -20,6 +22,10 @@ export default () => {
       stateDisplayStub.returns(
         html`<div class="mocked-state-display">On</div>`,
       );
+
+      // Create stub for show function
+      showSectionStub = stub(showSectionModule, 'show');
+      showSectionStub.returns(true); // Default to showing sections
 
       // Mock HomeAssistant instance
       mockHass = {
@@ -54,9 +60,27 @@ export default () => {
     afterEach(() => {
       // Restore all stubs
       stateDisplayStub.restore();
+      showSectionStub.restore();
+    });
+
+    it('should return nothing when show returns false for header section', async () => {
+      // Configure show to return false for header section
+      showSectionStub.withArgs(mockConfig, 'header').returns(false);
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+
+      // Assert that nothing is returned
+      expect(result).to.equal(nothing);
+
+      // Verify that stateDisplay was not called
+      expect(stateDisplayStub.called).to.be.false;
     });
 
     it('should render card header with default title and icon', async () => {
+      // Ensure show returns true for header section
+      showSectionStub.withArgs(mockConfig, 'header').returns(true);
+
       // Render the card header
       const result = createCardHeader(mockDevice, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);

@@ -1,6 +1,7 @@
 import type { Config, PiHoleDevice } from '@/types';
+import { show } from '@common/show-section';
 import { formatNumber } from '@hass/common/number/format_number';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { createStatBox } from './components/stat-box';
 
 /**
@@ -14,7 +15,8 @@ export const createDashboardStats = (
   element: HTMLElement,
   device: PiHoleDevice,
   config: Config,
-): TemplateResult => {
+): TemplateResult | typeof nothing => {
+  if (!show(config, 'statistics')) return nothing;
   return html`
     <div class="dashboard-stats">
       <!-- First Group: Queries and Blocked -->

@@ -1,6 +1,7 @@
-import type { PiHoleDevice, SectionConfig } from '@/types';
+import type { Config, PiHoleDevice } from '@/types';
+import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { createAdditionalStat } from './components/additional-stat';
 
 /**
@@ -15,12 +16,13 @@ export const createAdditionalStats = (
   hass: HomeAssistant,
   element: HTMLElement,
   device: PiHoleDevice,
-  config: SectionConfig | undefined = {},
-): TemplateResult => {
+  config: Config,
+): TemplateResult | typeof nothing => {
+  if (!show(config, 'sensors')) return nothing;
   return html`
     <div class="additional-stats">
       ${device.sensors.map((sensor) => {
-        return createAdditionalStat(hass, element, config, sensor);
+        return createAdditionalStat(hass, element, config.info, sensor);
       })}
     </div>
   `;

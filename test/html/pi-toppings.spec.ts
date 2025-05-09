@@ -1,10 +1,11 @@
-import type { PiHoleDevice, SectionConfig } from '@/types';
+import type { Config, PiHoleDevice } from '@/types';
+import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as createAdditionalStatModule from '@html/components/additional-stat';
 import { createAdditionalStats } from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -12,15 +13,17 @@ export default () => {
     let mockDevice: PiHoleDevice;
     let mockElement: HTMLElement;
     let mockHass: HomeAssistant;
-    let mockConfig: SectionConfig;
+    let mockConfig: Config;
     let createAdditionalStatStub: sinon.SinonStub;
+    let showSectionStub: sinon.SinonStub;
 
     beforeEach(() => {
       mockElement = document.createElement('div');
       mockHass = {} as HomeAssistant;
-      mockConfig = {
-        tap_action: { action: 'more-info' },
-      };
+
+      // Create stub for show function
+      showSectionStub = stub(showSectionModule, 'show');
+      showSectionStub.returns(true); // Default to showing sections
 
       // Create stub for createAdditionalStat
       createAdditionalStatStub = stub(
@@ -51,13 +54,44 @@ export default () => {
           createSensor('sensor.dns_queries_cached'),
         ],
       } as PiHoleDevice;
+
+      // Mock config with info section
+      mockConfig = {
+        device_id: 'pi_hole_device',
+        info: {
+          tap_action: { action: 'more-info' },
+        },
+      };
     });
 
     afterEach(() => {
       createAdditionalStatStub.restore();
+      showSectionStub.restore();
+    });
+
+    it('should return nothing when show returns false for sensors section', async () => {
+      // Configure show to return false for sensors section
+      showSectionStub.withArgs(mockConfig, 'sensors').returns(false);
+
+      // Call createAdditionalStats
+      const result = createAdditionalStats(
+        mockHass,
+        mockElement,
+        mockDevice,
+        mockConfig,
+      );
+
+      // Assert that nothing is returned
+      expect(result).to.equal(nothing);
+
+      // Verify that createAdditionalStat was not called
+      expect(createAdditionalStatStub.called).to.be.false;
     });
 
     it('should call createAdditionalStat for each sensor in the device', async () => {
+      // Ensure show returns true for sensors section
+      showSectionStub.withArgs(mockConfig, 'sensors').returns(true);
+
       const result = createAdditionalStats(
         mockHass,
         mockElement,
@@ -75,7 +109,7 @@ export default () => {
         const call = createAdditionalStatStub.getCall(index);
         expect(call.args[0]).to.equal(mockHass);
         expect(call.args[1]).to.equal(mockElement);
-        expect(call.args[2]).to.equal(mockConfig);
+        expect(call.args[2]).to.equal(mockConfig.info);
         expect(call.args[3]).to.equal(sensor);
       });
     });
@@ -109,11 +143,41 @@ export default () => {
       expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(0);
     });
 
-    it('should use default empty config when none provided', async () => {
-      const result = createAdditionalStats(mockHass, mockElement, mockDevice);
+    it('should pass info section config to createAdditionalStat', async () => {
+      // Update config with specific info section
+      mockConfig.info = {
+        tap_action: { action: 'toggle' },
+        hold_action: { action: 'more-info' },
+      };
+
+      const result = createAdditionalStats(
+        mockHass,
+        mockElement,
+        mockDevice,
+        mockConfig,
+      );
       await fixture(result as TemplateResult);
 
-      expect(createAdditionalStatStub.firstCall.args[2]).to.deep.equal({});
+      // Verify that first call used the info section config
+      expect(createAdditionalStatStub.firstCall.args[2]).to.deep.equal(
+        mockConfig.info,
+      );
+    });
+
+    it('should handle missing info config by passing undefined', async () => {
+      // Remove info section from config
+      delete mockConfig.info;
+
+      const result = createAdditionalStats(
+        mockHass,
+        mockElement,
+        mockDevice,
+        mockConfig,
+      );
+      await fixture(result as TemplateResult);
+
+      // Verify that undefined was passed for info config
+      expect(createAdditionalStatStub.firstCall.args[2]).to.be.undefined;
     });
   });
 };

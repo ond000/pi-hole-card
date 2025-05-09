@@ -119,6 +119,61 @@ export default () => {
             ],
           },
           {
+            name: 'layout',
+            label: 'Layout',
+            type: 'expandable',
+            flatten: true,
+            icon: 'mdi:view-grid-plus',
+            schema: [
+              {
+                name: 'exclude_sections',
+                label: 'Sections to exclude',
+                required: false,
+                selector: {
+                  select: {
+                    multiple: true,
+                    mode: 'list' as const,
+                    options: [
+                      {
+                        label: 'Header',
+                        value: 'header',
+                      },
+                      {
+                        label: 'Statistics',
+                        value: 'statistics',
+                      },
+                      {
+                        label: 'Sensors',
+                        value: 'sensors',
+                      },
+                      {
+                        label: 'Controls',
+                        value: 'controls',
+                      },
+                      {
+                        label: 'Footer',
+                        value: 'footer',
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                name: 'exclude_entities',
+                label: 'Entities to exclude',
+                required: false,
+                selector: {
+                  entity: {
+                    multiple: true,
+                    filter: {
+                      integration: 'pi_hole_v6',
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          {
             name: 'interactions',
             label: 'Interactions',
             type: 'expandable',

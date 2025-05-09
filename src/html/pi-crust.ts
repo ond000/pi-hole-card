@@ -1,7 +1,8 @@
 import type { Config, PiHoleDevice } from '@/types';
+import { show } from '@common/show-section';
 import { stateActive } from '@hass/common/entity/state_active';
 import type { HomeAssistant } from '@hass/types';
-import { html, type TemplateResult } from 'lit';
+import { html, nothing, type TemplateResult } from 'lit';
 import { stateDisplay } from './components/state-display';
 
 /**
@@ -15,7 +16,8 @@ export const createCardHeader = (
   device: PiHoleDevice,
   hass: HomeAssistant,
   config: Config,
-): TemplateResult => {
+): TemplateResult | typeof nothing => {
+  if (!show(config, 'header')) return nothing;
   const isActive = stateActive(device.status!, device.status?.state);
 
   // Check if we should display the remaining time

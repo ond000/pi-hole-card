@@ -6,9 +6,24 @@ import type { UiAction } from '../panels/lovelace/components/hui-action-editor';
 
 export type Selector =
   | DeviceSelector
+  | EntitySelector
   | IconSelector
+  | SelectSelector
   | StringSelector
   | UiActionSelector;
+
+interface EntitySelectorFilter {
+  integration?: string;
+  domain?: string | readonly string[];
+}
+
+export interface EntitySelector {
+  entity: {
+    multiple?: boolean;
+    include_entities?: string[];
+    filter?: EntitySelectorFilter | readonly EntitySelectorFilter[];
+  } | null;
+}
 
 interface DeviceSelectorFilter {
   integration?: string;
@@ -29,6 +44,20 @@ export interface IconSelector {
     placeholder?: string;
     fallbackPath?: string;
   } | null;
+}
+
+export interface SelectSelector {
+  select: {
+    multiple?: boolean;
+    custom_value?: boolean;
+    mode?: 'list' | 'dropdown';
+    options: string[] | SelectOption[];
+  };
+}
+
+export interface SelectOption {
+  value: string;
+  label: string;
 }
 
 export interface StringSelector {

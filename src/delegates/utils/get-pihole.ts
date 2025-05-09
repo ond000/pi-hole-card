@@ -1,4 +1,6 @@
 import type { Config, PiHoleDevice } from '@/types';
+import { mapEntitiesByTranslationKey } from '@common/map-entities';
+import { shouldSkipEntity } from '@common/skip-entity';
 import { computeDomain } from '@hass/common/entity/compute_domain';
 import type { HomeAssistant } from '@hass/types';
 import { getDevice } from '../retrievers/device';
@@ -29,62 +31,36 @@ export const getPiHole = (
 
   const entities = getDeviceEntities(hass, hassDevice.id, hassDevice.name);
 
-  // map the entities to the device object
+  // Map entities to the device object
   entities.forEach((entity) => {
-    switch (entity.translation_key) {
-      case 'dns_queries_today':
-        device.dns_queries_today = entity;
-        break;
-      case 'domains_blocked':
-        device.domains_blocked = entity;
-        break;
-      case 'ads_percentage_blocked_today':
-        device.ads_percentage_blocked_today = entity;
-        break;
-      case 'ads_blocked_today':
-        device.ads_blocked_today = entity;
-        break;
-      case 'dns_unique_clients':
-        device.dns_unique_clients = entity;
-        break;
-      case 'remaining_until_blocking_mode':
-        device.remaining_until_blocking_mode = entity;
-        break;
-      case 'action_refresh_data':
-        device.action_refresh_data = entity;
-        break;
-      case 'latest_data_refresh':
-        device.latest_data_refresh = entity;
-        break;
-      case 'status':
-        device.status = entity;
-        break;
+    if (shouldSkipEntity(entity, config)) {
+      return;
+    }
 
-      default: {
-        const domain = computeDomain(entity.entity_id);
-        switch (domain) {
-          case 'button':
-            device.controls.push(entity);
-            break;
-          case 'sensor':
-            device.sensors.push(entity);
-            break;
-          case 'switch':
-            device.switches.push(entity);
-            break;
-          case 'update':
-            device.updates.push(entity);
-            break;
-        }
+    // Skip already handled entities by translation key
+    if (mapEntitiesByTranslationKey(entity, device)) {
+      return;
+    }
+
+    // Handle other entities by domain
+    const domain = computeDomain(entity.entity_id);
+    switch (domain) {
+      case 'button':
+        device.controls.push(entity);
         break;
-      }
+      case 'sensor':
+        device.sensors.push(entity);
+        break;
+      case 'switch':
+        device.switches.push(entity);
+        break;
+      case 'update':
+        device.updates.push(entity);
+        break;
     }
   });
 
-  // sort the updates by title - this is a bit of a hack, but it works
-  // we need to sort the updates by title, but the title is not always present
-  // so we need to use a default value of 'z' to sort them to the end
-  // this is not ideal, but it works for now - it matches the behavior of the Pi-hole admin console
+  // Sort updates by title (using nullish coalescing for cleaner code)
   device.updates.sort((a, b) => {
     const aTitle = a.attributes.title ?? 'z';
     const bTitle = b.attributes.title ?? 'z';

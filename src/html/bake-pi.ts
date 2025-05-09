@@ -1,11 +1,10 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
-import { refreshTime } from './components/refresh-time';
-import { createVersionItem } from './components/version-item';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';
 import { createCardActions } from './pi-flavors';
+import { createFooter } from './pi-tin';
 import { createAdditionalStats } from './pi-toppings';
 
 /**
@@ -25,26 +24,12 @@ export const renderPiHoleCard = (
   return html`
     <ha-card>
       ${createCardHeader(device, hass, config)}
-
       <div class="card-content">
         ${createDashboardStats(element, device, config)}
-
-        <!-- Additional Stats Row -->
-        ${createAdditionalStats(hass, element, device, config.info)}
+        ${createAdditionalStats(hass, element, device, config)}
       </div>
-
-      <!-- Card Actions -->
-      ${createCardActions(hass, element, device, config.controls)}
-
-      <!-- Version Information Bar -->
-      <div class="version-info">
-        ${device.updates.map((update) => {
-          return createVersionItem(update);
-        })}
-      </div>
-
-      <!-- Refesh Time -->
-      ${refreshTime(element, hass, device)}
+      ${createCardActions(hass, element, device, config)}
+      ${createFooter(element, hass, config, device)}
     </ha-card>
   `;
 };

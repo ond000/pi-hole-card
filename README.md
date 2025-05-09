@@ -49,7 +49,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ### Additional Metrics
 
-- **Client Statistics** - See active clients, unique domains, unique clients, and time remaining
+- **Client Statistics** - See active clients, unique domains, unique clients, etc.
 - **Performance Data** - View cached queries and forwarded DNS requests
 - **Interactive Elements** - Configurable tap, hold, and double-tap actions for all metrics
 
@@ -61,7 +61,6 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 - **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click as well as Group Default
 - **Action Buttons** - Quick access buttons for common maintenance tasks:
-  - Refresh Data
   - Restart DNS
   - Update Gravity
   - Flush ARP
@@ -80,6 +79,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
   - FTL
   - Web Interface
   - Home Assistant Integration
+  - Last Refresh Time
 
 ![Version Information](assets/version-info.png)
 
@@ -165,14 +165,16 @@ The card will automatically:
 
 ## Configuration Options
 
-| Name      | Type   | Default      | Description                                     |
-| --------- | ------ | ------------ | ----------------------------------------------- |
-| device_id | string | **Required** | The ID of your Pi-hole device in Home Assistant |
-| title     | string | Pi-Hole      | Custom title for the card header                |
-| icon      | string | mdi:pi-hole  | Custom icon for the card header                 |
-| stats     | object | _optional_   | Configure actions for statistics tiles          |
-| info      | object | _optional_   | Configure actions for additional info items     |
-| controls  | object | _optional_   | Configure actions for control buttons           |
+| Name             | Type   | Default      | Description                                     |
+| ---------------- | ------ | ------------ | ----------------------------------------------- |
+| device_id        | string | **Required** | The ID of your Pi-hole device in Home Assistant |
+| title            | string | Pi-Hole      | Custom title for the card header                |
+| icon             | string | mdi:pi-hole  | Custom icon for the card header                 |
+| stats            | object | _none_       | Configure actions for statistics tiles          |
+| info             | object | _none_       | Configure actions for additional info items     |
+| controls         | object | _none_       | Configure actions for control buttons           |
+| exclude_sections | list   | _none_       | Sections of entities to exclude. See below.     |
+| exclude_entities | list   | _none_       | Entities to remove from the card.               |
 
 ### Action Configuration
 
@@ -191,6 +193,16 @@ Actions can be configured to perform various operations such as:
 - Call services
 - Navigate to different views
 - And more!
+
+### Section Options
+
+The following section names can be used with `exclude_sections`:
+
+- header
+- statistics
+- sensors
+- controls
+- footer
 
 ### Auto-discovery
 
@@ -218,6 +230,19 @@ type: custom:pi-hole
 device_id: pi_hole_device_1
 title: 'My Pi-hole Server'
 icon: 'mdi:shield-check'
+```
+
+#### Excluding Sections & Entities
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+exclude_sections:
+  - sensors
+  - controls
+exclude_entities:
+  - button.pi_hole_action_refresh_data
+  - sensor.pi_hole_latest_data_refresh
 ```
 
 ### With Custom Actions
