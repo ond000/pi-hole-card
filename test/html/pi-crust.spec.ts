@@ -142,5 +142,135 @@ export default () => {
       expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
         .true;
     });
+
+    it('should display remaining time when Pi-hole is inactive and remaining time exists', async () => {
+      // Set status to 'off' and add remaining time
+      mockDevice.status!.state = 'off';
+      mockDevice.remaining_until_blocking_mode = {
+        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
+        state: '300', // 5 minutes
+        attributes: { friendly_name: 'Remaining Time' },
+        translation_key: 'remaining_until_blocking_mode',
+      };
+
+      // Configure mock response for remaining time
+      stateDisplayStub
+        .withArgs(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        )
+        .returns(html`<div class="mocked-remaining-time">5 minutes</div>`);
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Verify stateDisplay was called for both status and remaining time
+      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
+        .true;
+      expect(
+        stateDisplayStub.calledWith(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        ),
+      ).to.be.true;
+
+      // Check that remaining time is rendered
+      const remainingTimeEl = el.querySelector('.mocked-remaining-time');
+      expect(remainingTimeEl).to.exist;
+      expect(remainingTimeEl?.textContent).to.equal('5 minutes');
+    });
+
+    it('should not display remaining time when Pi-hole is active', async () => {
+      // Set status to 'on' and add remaining time
+      mockDevice.status!.state = 'on';
+      mockDevice.remaining_until_blocking_mode = {
+        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
+        state: '300', // 5 minutes
+        attributes: { friendly_name: 'Remaining Time' },
+        translation_key: 'remaining_until_blocking_mode',
+      };
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      await fixture(result as TemplateResult);
+
+      // Verify stateDisplay was called for status but not for remaining time
+      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
+        .true;
+      expect(
+        stateDisplayStub.calledWith(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        ),
+      ).to.be.false;
+    });
+
+    it('should not display remaining time when value is 0', async () => {
+      // Set status to 'off' and add remaining time with value 0
+      mockDevice.status!.state = 'off';
+      mockDevice.remaining_until_blocking_mode = {
+        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
+        state: '0',
+        attributes: { friendly_name: 'Remaining Time' },
+        translation_key: 'remaining_until_blocking_mode',
+      };
+
+      // Render the card header
+      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      await fixture(result as TemplateResult);
+
+      // Verify stateDisplay was called for status but not for remaining time
+      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
+        .true;
+      expect(
+        stateDisplayStub.calledWith(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        ),
+      ).to.be.false;
+    });
+
+    it('should not display remaining time when value is unavailable or unknown', async () => {
+      // Test with 'unavailable' state
+      mockDevice.status!.state = 'off';
+      mockDevice.remaining_until_blocking_mode = {
+        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
+        state: 'unavailable',
+        attributes: { friendly_name: 'Remaining Time' },
+        translation_key: 'remaining_until_blocking_mode',
+      };
+
+      let result = createCardHeader(mockDevice, mockHass, mockConfig);
+      await fixture(result as TemplateResult);
+
+      expect(
+        stateDisplayStub.calledWith(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        ),
+      ).to.be.false;
+
+      // Reset stub call history
+      stateDisplayStub.resetHistory();
+
+      // Test with 'unknown' state
+      mockDevice.remaining_until_blocking_mode.state = 'unknown';
+      result = createCardHeader(mockDevice, mockHass, mockConfig);
+      await fixture(result as TemplateResult);
+
+      expect(
+        stateDisplayStub.calledWith(
+          mockHass,
+          mockDevice.remaining_until_blocking_mode,
+          'remaining-time',
+        ),
+      ).to.be.false;
+    });
   });
 };

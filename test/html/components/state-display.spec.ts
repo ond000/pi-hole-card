@@ -61,5 +61,32 @@ export default () => {
       expect((el as any).hass).to.equal(mockHass);
       expect((el as any).stateObj).to.equal(mockEntity);
     });
+
+    it('should apply the provided className when specified', async () => {
+      const customClass = 'custom-state-display';
+      const result = stateDisplay(mockHass, mockEntity, customClass);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that the class attribute was correctly set
+      expect(el.classList.contains(customClass)).to.be.true;
+    });
+
+    it('should not apply any class when className is not provided', async () => {
+      const result = stateDisplay(mockHass, mockEntity);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that no class was applied (just the empty string)
+      expect(el.getAttribute('class')).to.equal('');
+    });
+
+    it('should handle multiple class names correctly', async () => {
+      const multipleClasses = 'first-class second-class';
+      const result = stateDisplay(mockHass, mockEntity, multipleClasses);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that both classes were applied
+      expect(el.classList.contains('first-class')).to.be.true;
+      expect(el.classList.contains('second-class')).to.be.true;
+    });
   });
 };

@@ -1,6 +1,7 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { html, type TemplateResult } from 'lit';
+import { refreshTime } from './components/refresh-time';
 import { createVersionItem } from './components/version-item';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';
@@ -41,6 +42,9 @@ export const renderPiHoleCard = (
           return createVersionItem(update);
         })}
       </div>
+
+      <!-- Refesh Time -->
+      ${refreshTime(element, hass, device)}
     </ha-card>
   `;
 };

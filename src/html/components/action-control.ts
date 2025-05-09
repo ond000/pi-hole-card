@@ -53,7 +53,7 @@ export const createActionButton = (
 
   return html`
     <mwc-button
-      class="${buttonClass || ''}"
+      class="${buttonClass}"
       @action=${handleClickAction(element, config, entity)}
       .actionHandler=${actionHandler(config)}
     >

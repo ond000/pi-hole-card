@@ -94,6 +94,12 @@ export default () => {
           '30',
         ),
         createEntity('binary_sensor.status', 'status'),
+        createEntity('button.action_refresh_data', 'action_refresh_data'),
+        createEntity(
+          'sensor.latest_data_refresh',
+          'latest_data_refresh',
+          '2023-04-15T14:30:00',
+        ),
       ];
 
       getDeviceEntitiesStub.returns(specialEntities);
@@ -112,6 +118,10 @@ export default () => {
         specialEntities[5],
       );
       expect(result?.status).to.deep.equal(specialEntities[6]);
+
+      // Verify new properties are set correctly
+      expect(result?.action_refresh_data).to.deep.equal(specialEntities[7]);
+      expect(result?.latest_data_refresh).to.deep.equal(specialEntities[8]);
     });
 
     it('should populate arrays based on entity domain', () => {
@@ -180,6 +190,12 @@ export default () => {
         // Translation key entities
         createEntity('sensor.dns_queries_today', 'dns_queries_today', '10000'),
         createEntity('binary_sensor.status', 'status'),
+        createEntity('button.action_refresh_data', 'action_refresh_data'),
+        createEntity(
+          'sensor.latest_data_refresh',
+          'latest_data_refresh',
+          '2023-04-15T14:30:00',
+        ),
 
         // Domain-based entities
         createEntity('button.refresh', undefined),
@@ -193,6 +209,12 @@ export default () => {
       computeDomainStub.withArgs('sensor.generic_sensor').returns('sensor');
       computeDomainStub.withArgs('switch.main_switch').returns('switch');
       computeDomainStub.withArgs('update.core_update').returns('update');
+      computeDomainStub
+        .withArgs('button.action_refresh_data')
+        .returns('button');
+      computeDomainStub
+        .withArgs('sensor.latest_data_refresh')
+        .returns('sensor');
 
       getDeviceEntitiesStub.returns(mixedEntities);
 
@@ -203,6 +225,15 @@ export default () => {
         'sensor.dns_queries_today',
       );
       expect(result?.status?.entity_id).to.equal('binary_sensor.status');
+      expect(result?.action_refresh_data?.entity_id).to.equal(
+        'button.action_refresh_data',
+      );
+      expect(result?.latest_data_refresh?.entity_id).to.equal(
+        'sensor.latest_data_refresh',
+      );
+      expect(result?.latest_data_refresh?.state).to.equal(
+        '2023-04-15T14:30:00',
+      );
 
       // Verify arrays
       expect(result?.controls).to.have.lengthOf(1);

@@ -56,6 +56,12 @@ export interface PiHoleDevice {
   /** Remaining Time Until Blocking Mode */
   remaining_until_blocking_mode?: EntityInformation;
 
+  /** Button to Refresh data */
+  action_refresh_data?: EntityInformation;
+
+  /** Last Data Refresh Time */
+  latest_data_refresh?: EntityInformation;
+
   /** Status of Pi-hole */
   status?: EntityInformation;
 

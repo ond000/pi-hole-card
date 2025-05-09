@@ -229,4 +229,27 @@ export const styles = css`
   mwc-button ha-icon {
     margin-right: 3px;
   }
+
+  .remaining-time {
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+
+  .remaining-time::before {
+    content: '-';
+    margin: 0px 8px;
+  }
+
+  .refresh-time {
+    display: flex;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+    justify-content: center;
+  }
+
+  .refresh-time ha-icon {
+    margin-right: 4px;
+    color: var(--switch-checked-color);
+    cursor: pointer;
+  }
 `;

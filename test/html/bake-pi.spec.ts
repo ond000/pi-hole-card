@@ -1,6 +1,7 @@
 import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { renderPiHoleCard } from '@html/bake-pi';
+import * as refreshTimeModule from '@html/components/refresh-time';
 import * as createVersionItemModule from '@html/components/version-item';
 import * as piCrustModule from '@html/pi-crust';
 import * as piFillingsModule from '@html/pi-fillings';
@@ -22,6 +23,7 @@ export default () => {
     let createAdditionalStatsStub: sinon.SinonStub;
     let createCardActionsStub: sinon.SinonStub;
     let createVersionItemStub: sinon.SinonStub;
+    let refreshTimeStub: sinon.SinonStub;
     let element: HTMLElement;
 
     beforeEach(() => {
@@ -61,6 +63,13 @@ export default () => {
       );
       createVersionItemStub.returns(
         html`<div class="mocked-version-item">Version Item</div>`,
+      );
+
+      refreshTimeStub = stub(refreshTimeModule, 'refreshTime');
+      refreshTimeStub.returns(
+        html`<div class="mocked-refresh-time">
+          Last updated: 5 minutes ago
+        </div>`,
       );
 
       // Mock HomeAssistant instance
@@ -131,15 +140,6 @@ export default () => {
       // Mock config
       mockConfig = {
         device_id: 'pi_hole_device',
-        info: {
-          tap_action: { action: 'more-info' },
-        },
-        stats: {
-          tap_action: { action: 'none' },
-        },
-        controls: {
-          tap_action: { action: 'toggle' },
-        },
       };
     });
 
@@ -151,6 +151,7 @@ export default () => {
       createAdditionalStatsStub.restore();
       createCardActionsStub.restore();
       createVersionItemStub.restore();
+      refreshTimeStub.restore();
     });
 
     it('should render a Pi-hole card with all main sections', async () => {
@@ -170,6 +171,7 @@ export default () => {
       expect(el.querySelector('.mocked-additional-stats')).to.exist;
       expect(el.querySelector('.mocked-card-actions')).to.exist;
       expect(el.querySelector('.version-info')).to.exist;
+      expect(el.querySelector('.mocked-refresh-time')).to.exist;
     });
 
     it('should call createCardHeader with the correct parameters', async () => {
@@ -244,6 +246,17 @@ export default () => {
       );
     });
 
+    it('should call refreshTime with the correct parameters', async () => {
+      // Render the Pi-hole card
+      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
+
+      // Verify refreshTime was called with the correct parameters
+      expect(refreshTimeStub.calledOnce).to.be.true;
+      expect(refreshTimeStub.firstCall.args[0]).to.equal(element);
+      expect(refreshTimeStub.firstCall.args[1]).to.equal(mockHass);
+      expect(refreshTimeStub.firstCall.args[2]).to.equal(mockDevice);
+    });
+
     it('should handle empty updates array gracefully', async () => {
       // Create a device with empty updates array
       const deviceWithEmptyUpdates = {
@@ -256,6 +269,9 @@ export default () => {
 
       // Verify createVersionItem was not called
       expect(createVersionItemStub.callCount).to.equal(0);
+
+      // But refreshTime should still be called
+      expect(refreshTimeStub.calledOnce).to.be.true;
     });
   });
 };

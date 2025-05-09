@@ -18,6 +18,13 @@ export const createCardHeader = (
 ): TemplateResult => {
   const isActive = stateActive(device.status!, device.status?.state);
 
+  // Check if we should display the remaining time
+  const hasRemainingTime =
+    device.remaining_until_blocking_mode &&
+    device.remaining_until_blocking_mode.state !== '0' &&
+    device.remaining_until_blocking_mode.state !== 'unavailable' &&
+    device.remaining_until_blocking_mode.state !== 'unknown';
+
   return html`
     <div class="card-header">
       <div class="name">
@@ -34,6 +41,13 @@ export const createCardHeader = (
           icon="${isActive ? 'mdi:check-circle' : 'mdi:close-circle'}"
         ></ha-icon>
         ${stateDisplay(hass, device.status!)}
+        ${!isActive && hasRemainingTime
+          ? html`${stateDisplay(
+              hass,
+              device.remaining_until_blocking_mode!,
+              'remaining-time',
+            )}`
+          : ''}
       </div>
     </div>
   `;

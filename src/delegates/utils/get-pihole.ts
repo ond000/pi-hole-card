@@ -48,11 +48,14 @@ export const getPiHole = (
         device.dns_unique_clients = entity;
         break;
       case 'remaining_until_blocking_mode':
-        // todo
         device.remaining_until_blocking_mode = entity;
         break;
-
-      // binary sensors
+      case 'action_refresh_data':
+        device.action_refresh_data = entity;
+        break;
+      case 'latest_data_refresh':
+        device.latest_data_refresh = entity;
+        break;
       case 'status':
         device.status = entity;
         break;
