@@ -317,6 +317,7 @@ controls:
 - [x] **`Card customization`**: custom title and icon options
 - [x] **`Performance optimizations`**: improved code structure and efficiency
 - [x] **`Enhanced entity mapping`**: better entity identification with translation keys
+- [x] **`Translations`**: ability to add translations
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
 - [ ] **`Additional visualization options`**: more chart types for displaying statistics
 
@@ -352,6 +353,16 @@ controls:
 7. **Submit a Pull Request**: Create a PR against the original project repository. Clearly describe the changes and their motivations.
 8. **Review**: Once your PR is reviewed and approved, it will be merged into the main branch. Congratulations on your contribution!
 </details>
+
+## Translations
+
+The Pi-hole card supports multiple languages to provide a better experience for users worldwide.
+
+### Currently supported languages:
+
+- English
+
+Want to contribute a translation? See our [translation guide](TRANSLATIONS.md) for instructions.
 
 ## License
 
