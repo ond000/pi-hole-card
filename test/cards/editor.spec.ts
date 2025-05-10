@@ -83,9 +83,14 @@ export default () => {
             name: 'device_id',
             selector: {
               device: {
-                filter: {
-                  integration: 'pi_hole_v6',
-                },
+                filter: [
+                  {
+                    integration: 'pi_hole_v6',
+                  },
+                  {
+                    integration: 'pi_hole',
+                  },
+                ],
               },
             },
             required: true,
