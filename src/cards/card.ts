@@ -84,6 +84,6 @@ export class PiHoleCard extends LitElement {
       </ha-card>`;
     }
 
-    return renderPiHoleCard(this, this._device, this._hass, this._config);
+    return renderPiHoleCard(this, this._hass, this._device, this._config);
   }
 }

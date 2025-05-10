@@ -6,15 +6,15 @@ import { createAdditionalStat } from './components/additional-stat';
 
 /**
  * Creates the additional stats section for the Pi-hole card
- * @param hass - The Home Assistant instance
  * @param element - The element to attach the actions to
+ * @param hass - The Home Assistant instance
  * @param device - The Pi-hole device
  * @param config - The configuration for the card
  * @returns TemplateResult
  */
 export const createAdditionalStats = (
-  hass: HomeAssistant,
   element: HTMLElement,
+  hass: HomeAssistant,
   device: PiHoleDevice,
   config: Config,
 ): TemplateResult | typeof nothing => {

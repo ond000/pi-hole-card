@@ -4,11 +4,15 @@ import {
   handleClickAction,
 } from '@delegates/action-handler-delegate';
 import { formatNumber } from '@hass/common/number/format_number';
+import type { HomeAssistant } from '@hass/types';
+import { localize } from '@localize/localize';
+import type { TranslationKey } from '@localize/types';
 import { type TemplateResult, html, nothing } from 'lit';
 
 /**
  * Creates a stat box for the Pi-hole dashboard
  * @param element - The element to attach the action to
+ * @param hass - The Home Assistant object
  * @param entity - The entity information
  * @param sectionConfig - The section configuration
  * @param title - The title of the stat box
@@ -19,10 +23,11 @@ import { type TemplateResult, html, nothing } from 'lit';
  */
 export const createStatBox = (
   element: HTMLElement,
+  hass: HomeAssistant,
   entity: EntityInformation | undefined,
   sectionConfig: SectionConfig | undefined,
-  title: string,
-  footerText: string,
+  title: TranslationKey,
+  footerText: TranslationKey | string,
   boxClass: string,
   iconName: string,
 ): TemplateResult | typeof nothing => {
@@ -32,6 +37,8 @@ export const createStatBox = (
   const value = formatNumber(entity.state, undefined, {
     maximumFractionDigits: 1,
   });
+  const footer =
+    typeof footerText === 'string' ? footerText : localize(hass, footerText);
 
   return html`
     <div
@@ -43,11 +50,11 @@ export const createStatBox = (
         <ha-icon icon="${iconName}"></ha-icon>
       </div>
       <div class="stat-content">
-        <div class="stat-header">${title}</div>
+        <div class="stat-header">${localize(hass, title)}</div>
         <div class="stat-value">${value}${uom}</div>
       </div>
       <div class="stat-footer">
-        <span>${footerText}</span>
+        <span>${footer}</span>
         <ha-icon icon="mdi:arrow-right-circle-outline"></ha-icon>
       </div>
     </div>

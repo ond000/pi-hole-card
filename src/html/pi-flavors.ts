@@ -7,15 +7,15 @@ import { stateContent } from './components/state-content';
 
 /**
  * Creates the card actions section
- * @param hass - The Home Assistant instance
  * @param element - The element to attach the actions to
+ * @param hass - The Home Assistant instance
  * @param device - The Pi-hole device
  * @param config - The configuration for the card
  * @returns TemplateResult
  */
 export const createCardActions = (
-  hass: HomeAssistant,
   element: HTMLElement,
+  hass: HomeAssistant,
   device: PiHoleDevice,
   config: Config,
 ): TemplateResult | typeof nothing => {

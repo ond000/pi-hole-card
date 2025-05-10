@@ -75,8 +75,8 @@ export default () => {
 
       // Call createAdditionalStats
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -93,8 +93,8 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'sensors').returns(true);
 
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -116,8 +116,8 @@ export default () => {
 
     it('should render container with all sensor items', async () => {
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -132,8 +132,8 @@ export default () => {
       mockDevice.sensors = [];
 
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -151,8 +151,8 @@ export default () => {
       };
 
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -169,8 +169,8 @@ export default () => {
       delete mockConfig.info;
 
       const result = createAdditionalStats(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );

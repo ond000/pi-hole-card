@@ -108,8 +108,8 @@ export default () => {
       // Render the Pi-hole card
       const result = renderPiHoleCard(
         element,
-        mockDevice,
         mockHass,
+        mockDevice,
         mockConfig,
       );
       const el = await fixture(result);
@@ -125,7 +125,7 @@ export default () => {
 
     it('should call all component functions with the correct parameters', async () => {
       // Render the Pi-hole card
-      renderPiHoleCard(element, mockDevice, mockHass, mockConfig);
+      renderPiHoleCard(element, mockHass, mockDevice, mockConfig);
 
       // Verify createCardHeader was called with the correct parameters
       expect(createCardHeaderStub.calledOnce).to.be.true;
@@ -136,20 +136,21 @@ export default () => {
       // Verify createDashboardStats was called with the correct parameters
       expect(createDashboardStatsStub.calledOnce).to.be.true;
       expect(createDashboardStatsStub.firstCall.args[0]).to.equal(element);
-      expect(createDashboardStatsStub.firstCall.args[1]).to.equal(mockDevice);
-      expect(createDashboardStatsStub.firstCall.args[2]).to.equal(mockConfig);
+      expect(createDashboardStatsStub.firstCall.args[1]).to.equal(mockHass);
+      expect(createDashboardStatsStub.firstCall.args[2]).to.equal(mockDevice);
+      expect(createDashboardStatsStub.firstCall.args[3]).to.equal(mockConfig);
 
       // Verify createAdditionalStats was called with the correct parameters
       expect(createAdditionalStatsStub.calledOnce).to.be.true;
-      expect(createAdditionalStatsStub.firstCall.args[0]).to.equal(mockHass);
-      expect(createAdditionalStatsStub.firstCall.args[1]).to.equal(element);
+      expect(createAdditionalStatsStub.firstCall.args[0]).to.equal(element);
+      expect(createAdditionalStatsStub.firstCall.args[1]).to.equal(mockHass);
       expect(createAdditionalStatsStub.firstCall.args[2]).to.equal(mockDevice);
       expect(createAdditionalStatsStub.firstCall.args[3]).to.equal(mockConfig);
 
       // Verify createCardActions was called with the correct parameters
       expect(createCardActionsStub.calledOnce).to.be.true;
-      expect(createCardActionsStub.firstCall.args[0]).to.equal(mockHass);
-      expect(createCardActionsStub.firstCall.args[1]).to.equal(element);
+      expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
+      expect(createCardActionsStub.firstCall.args[1]).to.equal(mockHass);
       expect(createCardActionsStub.firstCall.args[2]).to.equal(mockDevice);
       expect(createCardActionsStub.firstCall.args[3]).to.equal(mockConfig);
 

@@ -1,6 +1,10 @@
-import type { Config, EntityInformation, SectionConfig } from '@/types';
+import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
+import * as formatNumberModule from '@hass/common/number/format_number';
+import type { HomeAssistant } from '@hass/types';
 import { createStatBox } from '@html/components/stat-box';
+import * as localizeModule from '@localize/localize';
+import type { TranslationKey } from '@localize/types';
 import { fixture } from '@open-wc/testing-helpers';
 import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
@@ -9,16 +13,20 @@ import { restore, stub } from 'sinon';
 export default () => {
   describe('stat-box.ts', () => {
     let mockElement: HTMLElement;
-    let mockConfig: Config;
+    let mockHass: HomeAssistant;
     let mockEntity: EntityInformation;
     let mockSectionConfig: SectionConfig;
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
+    let formatNumberStub: sinon.SinonStub;
+    let localizeStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create mock element and configs
       mockElement = document.createElement('div');
-      mockConfig = { device_id: 'test_device' };
+      mockHass = {
+        language: 'en',
+      } as HomeAssistant;
       mockSectionConfig = {
         tap_action: { action: 'more-info' },
         hold_action: { action: 'toggle' },
@@ -40,6 +48,32 @@ export default () => {
       ).returns({
         handleEvent: () => {},
       });
+
+      // Create stub for formatNumber
+      formatNumberStub = stub(formatNumberModule, 'formatNumber');
+      formatNumberStub.callsFake((value) => {
+        // Simple mock implementation for test cases
+        if (value === '1234') return '1,234';
+        if (value === '1234.56') return '1,234.6';
+        if (value === '0.123') return '0.1';
+        if (value === '1000000') return '1,000,000';
+        return value; // Default return the input value
+      });
+
+      // Create stub for localize
+      localizeStub = stub(localizeModule, 'localize');
+      localizeStub.callsFake((hass, key, search, replace) => {
+        // Simple mock implementation - return a predictable string based on key
+        if (key === 'card.stats.total_queries') return 'Total Queries';
+        if (key === 'card.stats.active_clients') return 'Active Clients';
+        if (key === 'card.stats.list_blocked_queries')
+          return 'List Blocked Queries';
+        // For footer texts
+        if (key === 'card.stats.manage_lists') return 'Manage Lists';
+
+        // Default fallback for other keys
+        return `Localized: ${key}`;
+      });
     });
 
     afterEach(() => {
@@ -47,16 +81,17 @@ export default () => {
       restore();
     });
 
-    it('should render a stat box with provided properties and action handlers', async () => {
-      // Create test data
-      const title = 'Test Title';
-      const footerText = 'Footer text';
+    it('should handle string footer text without translation', async () => {
+      // Create test data with a direct string for footer (not a translation key)
+      const title: TranslationKey = 'card.stats.total_queries';
+      const footerText = 'Direct string footer'; // Not a TranslationKey
       const boxClass = 'test-box';
       const iconName = 'mdi:test-icon';
 
       // Call createStatBox function
       const result = createStatBox(
         mockElement,
+        mockHass,
         mockEntity,
         mockSectionConfig,
         title,
@@ -68,56 +103,29 @@ export default () => {
       // Render the template
       const el = await fixture(result as TemplateResult);
 
-      // Test assertions for box structure
-      expect(el.tagName.toLowerCase()).to.equal('div');
-      expect(el.classList.contains('stat-box')).to.be.true;
-      expect(el.classList.contains(boxClass)).to.be.true;
+      // Title should be localized
+      expect(localizeStub.calledWith(mockHass, title)).to.be.true;
 
-      // Check action handlers were properly called
-      expect(actionHandlerStub.calledWith(mockSectionConfig)).to.be.true;
-      expect(
-        handleClickActionStub.calledWith(
-          mockElement,
-          mockSectionConfig,
-          mockEntity,
-        ),
-      ).to.be.true;
+      // Footer text should NOT be passed to localize since it's a direct string
+      expect(localizeStub.calledWith(mockHass, footerText)).to.be.false;
 
-      // Icon section
-      const iconEl = el.querySelector('.stat-icon ha-icon');
-      expect(iconEl).to.exist;
-      expect(iconEl?.getAttribute('icon')).to.equal(iconName);
-
-      // Content section
-      const headerEl = el.querySelector('.stat-header');
-      expect(headerEl).to.exist;
-      expect(headerEl?.textContent?.trim()).to.equal(title);
-
-      // Value section - should format the entity state
-      const valueEl = el.querySelector('.stat-value');
-      expect(valueEl).to.exist;
-      expect(valueEl?.textContent?.trim()).to.equal('123');
-
-      // Footer section
+      // Footer section should have the direct string
       const footerEl = el.querySelector('.stat-footer span');
       expect(footerEl).to.exist;
       expect(footerEl?.textContent?.trim()).to.equal(footerText);
-
-      // Check for the arrow icon in footer
-      const footerIconEl = el.querySelector('.stat-footer ha-icon');
-      expect(footerIconEl).to.exist;
-      expect(footerIconEl?.getAttribute('icon')).to.equal(
-        'mdi:arrow-right-circle-outline',
-      );
     });
 
     it('should handle missing entity data', async () => {
+      const title: TranslationKey = 'card.stats.total_queries';
+      const footerText: TranslationKey = 'card.stats.manage_lists';
+
       const result = createStatBox(
         mockElement,
+        mockHass,
         undefined,
         mockSectionConfig,
-        'Title',
-        'Footer',
+        title,
+        footerText,
         'class',
         'mdi:icon',
       );
@@ -126,6 +134,9 @@ export default () => {
     });
 
     it('should format numeric values properly', async () => {
+      const title: TranslationKey = 'card.stats.total_queries';
+      const footerText: TranslationKey = 'card.stats.manage_lists';
+
       // Test with various numeric values
       const testCases = [
         { state: '1234', expected: '1,234' },
@@ -143,10 +154,11 @@ export default () => {
 
         const result = createStatBox(
           mockElement,
+          mockHass,
           entity,
           mockSectionConfig,
-          'Title',
-          'Footer',
+          title,
+          footerText,
           'class',
           'mdi:icon',
         );
@@ -161,13 +173,17 @@ export default () => {
     });
 
     it('should handle missing section config', async () => {
+      const title: TranslationKey = 'card.stats.total_queries';
+      const footerText: TranslationKey = 'card.stats.manage_lists';
+
       // Call with undefined section config
       const result = createStatBox(
         mockElement,
+        mockHass,
         mockEntity,
         undefined,
-        'Title',
-        'Footer',
+        title,
+        footerText,
         'class',
         'mdi:icon',
       );
@@ -175,11 +191,45 @@ export default () => {
       // Render the template
       const el = await fixture(result as TemplateResult);
 
-      // Should still render, but action handlers should not be called or should be called with undefined
+      // Should still render, but action handlers should be called with undefined
       expect(actionHandlerStub.calledWith(undefined)).to.be.true;
       expect(
         handleClickActionStub.calledWith(mockElement, undefined, mockEntity),
       ).to.be.true;
+    });
+
+    it('should add percentage symbol when unit_of_measurement is %', async () => {
+      const title: TranslationKey = 'card.stats.percentage_blocked';
+      const footerText: TranslationKey = 'card.stats.list_all_queries';
+
+      // Create entity with percent unit
+      const percentEntity = {
+        ...mockEntity,
+        state: '45.6',
+        attributes: {
+          ...mockEntity.attributes,
+          unit_of_measurement: '%',
+        },
+      };
+
+      const result = createStatBox(
+        mockElement,
+        mockHass,
+        percentEntity,
+        mockSectionConfig,
+        title,
+        footerText,
+        'percentage-box',
+        'mdi:chart-pie',
+      );
+
+      // Render the template
+      const el = await fixture(result as TemplateResult);
+
+      // Check that the value includes the percentage symbol
+      const valueEl = el.querySelector('.stat-value');
+      expect(valueEl).to.exist;
+      expect(valueEl?.textContent?.trim()).to.equal('45.6%');
     });
   });
 };

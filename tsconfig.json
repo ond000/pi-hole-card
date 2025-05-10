@@ -26,6 +26,7 @@
       "@util/*": ["./src/util/*"],
       "@test/*": ["./test/*"],
       "@html/*": ["./src/html/*"],
+      "@localize/*": ["./src/localize/*"],
       "@delegates/*": ["./src/delegates/*"],
       "@/*": ["./src/*"]
     }

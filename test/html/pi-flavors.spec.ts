@@ -97,8 +97,8 @@ export default () => {
 
       // Call createCardActions
       const result = createCardActions(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -116,8 +116,8 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'controls').returns(true);
 
       const result = createCardActions(
-        mockHass,
         mockElement,
+        mockHass,
         mockDevice,
         mockConfig,
       );
@@ -132,7 +132,7 @@ export default () => {
     });
 
     it('should call stateContent for each switch entity', async () => {
-      createCardActions(mockHass, mockElement, mockDevice, mockConfig);
+      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
 
       // Verify that stateContent was called for each switch
       expect(stateContentStub.callCount).to.equal(2);
@@ -147,7 +147,7 @@ export default () => {
     });
 
     it('should call createActionButton for each control entity', async () => {
-      createCardActions(mockHass, mockElement, mockDevice, mockConfig);
+      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
 
       // Verify that createActionButton was called for each control
       expect(createActionButtonStub.callCount).to.equal(2);
@@ -172,7 +172,7 @@ export default () => {
       // Remove controls config
       delete mockConfig.controls;
 
-      createCardActions(mockHass, mockElement, mockDevice, mockConfig);
+      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
 
       // Verify that createActionButton was called with default config
       expect(createActionButtonStub.firstCall.args[1]).to.deep.equal({
@@ -197,8 +197,8 @@ export default () => {
       } as any as PiHoleDevice;
 
       const result = createCardActions(
-        mockHass,
         mockElement,
+        mockHass,
         emptyDevice,
         mockConfig,
       );
