@@ -1,4 +1,3 @@
-import type { SectionConfig } from '@/types';
 import {
   actionHandler,
   handleClickAction,
@@ -6,6 +5,7 @@ import {
 import * as fireEventModule from '@hass/common/dom/fire_event';
 import type { ActionHandlerEvent } from '@hass/data/lovelace/action_handler';
 import * as actionHandlerDirective from '@hass/panels/lovelace/common/directives/action-handler-directive';
+import type { SectionConfig } from '@type/config';
 import { expect } from 'chai';
 import { restore, type SinonStub, stub } from 'sinon';
 

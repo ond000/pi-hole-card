@@ -1,8 +1,9 @@
-import type { Config, PiHoleDevice } from '@/types';
 import { PiHoleCard } from '@cards/card';
 import * as getConfigDeviceModule from '@delegates/utils/get-config-device';
 import * as getPiHoleModule from '@delegates/utils/get-pihole';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 

@@ -1,11 +1,11 @@
-import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
 import * as formatNumberModule from '@hass/common/number/format_number';
 import type { HomeAssistant } from '@hass/types';
 import { createStatBox } from '@html/components/stat-box';
 import * as localizeModule from '@localize/localize';
-import type { TranslationKey } from '@localize/types';
 import { fixture } from '@open-wc/testing-helpers';
+import type { SectionConfig, StatBoxConfig } from '@type/config';
+import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';
@@ -16,6 +16,7 @@ export default () => {
     let mockHass: HomeAssistant;
     let mockEntity: EntityInformation;
     let mockSectionConfig: SectionConfig;
+    let mockStatBoxConfig: StatBoxConfig;
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
     let formatNumberStub: sinon.SinonStub;
@@ -36,6 +37,14 @@ export default () => {
         state: '123',
         attributes: { friendly_name: 'Test Entity' },
         translation_key: 'test_key',
+      };
+
+      // Create default StatBoxConfig
+      mockStatBoxConfig = {
+        title: 'card.stats.total_queries',
+        footer: 'card.stats.manage_lists',
+        className: 'queries-box',
+        icon: 'mdi:earth',
       };
 
       // Create stubs for action handlers
@@ -81,12 +90,16 @@ export default () => {
       restore();
     });
 
-    it('should handle string footer text without translation', async () => {
-      // Create test data with a direct string for footer (not a translation key)
-      const title: TranslationKey = 'card.stats.total_queries';
-      const footerText = 'Direct string footer'; // Not a TranslationKey
-      const boxClass = 'test-box';
-      const iconName = 'mdi:test-icon';
+    it('should handle complex footer object with replacement', async () => {
+      // Create test config with Translation object for footer
+      const configWithComplexFooter: StatBoxConfig = {
+        ...mockStatBoxConfig,
+        footer: {
+          key: 'card.stats.active_clients',
+          search: '{number}',
+          replace: '42',
+        },
+      };
 
       // Call createStatBox function
       const result = createStatBox(
@@ -94,49 +107,63 @@ export default () => {
         mockHass,
         mockEntity,
         mockSectionConfig,
-        title,
-        footerText,
-        boxClass,
-        iconName,
+        configWithComplexFooter,
+      );
+
+      // Render the template
+      const el = await fixture(result as TemplateResult);
+
+      // Verify localize was called with the complex params
+      expect(
+        localizeStub.calledWith(
+          mockHass,
+          'card.stats.active_clients',
+          '{number}',
+          '42',
+        ),
+      ).to.be.true;
+    });
+
+    it('should handle string footer text with translation', async () => {
+      // Call createStatBox function with string footer
+      const result = createStatBox(
+        mockElement,
+        mockHass,
+        mockEntity,
+        mockSectionConfig,
+        mockStatBoxConfig,
       );
 
       // Render the template
       const el = await fixture(result as TemplateResult);
 
       // Title should be localized
-      expect(localizeStub.calledWith(mockHass, title)).to.be.true;
+      expect(localizeStub.calledWith(mockHass, mockStatBoxConfig.title)).to.be
+        .true;
 
-      // Footer text should NOT be passed to localize since it's a direct string
-      expect(localizeStub.calledWith(mockHass, footerText)).to.be.false;
+      // Footer text should be passed to localize since it's a translation key
+      expect(localizeStub.calledWith(mockHass, mockStatBoxConfig.footer)).to.be
+        .true;
 
-      // Footer section should have the direct string
+      // Footer section should have the localized string
       const footerEl = el.querySelector('.stat-footer span');
       expect(footerEl).to.exist;
-      expect(footerEl?.textContent?.trim()).to.equal(footerText);
+      expect(footerEl?.textContent?.trim()).to.equal('Manage Lists');
     });
 
     it('should handle missing entity data', async () => {
-      const title: TranslationKey = 'card.stats.total_queries';
-      const footerText: TranslationKey = 'card.stats.manage_lists';
-
       const result = createStatBox(
         mockElement,
         mockHass,
         undefined,
         mockSectionConfig,
-        title,
-        footerText,
-        'class',
-        'mdi:icon',
+        mockStatBoxConfig,
       );
 
       expect(result).to.equal(nothing);
     });
 
     it('should format numeric values properly', async () => {
-      const title: TranslationKey = 'card.stats.total_queries';
-      const footerText: TranslationKey = 'card.stats.manage_lists';
-
       // Test with various numeric values
       const testCases = [
         { state: '1234', expected: '1,234' },
@@ -157,10 +184,7 @@ export default () => {
           mockHass,
           entity,
           mockSectionConfig,
-          title,
-          footerText,
-          'class',
-          'mdi:icon',
+          mockStatBoxConfig,
         );
 
         // Render the template
@@ -173,19 +197,13 @@ export default () => {
     });
 
     it('should handle missing section config', async () => {
-      const title: TranslationKey = 'card.stats.total_queries';
-      const footerText: TranslationKey = 'card.stats.manage_lists';
-
       // Call with undefined section config
       const result = createStatBox(
         mockElement,
         mockHass,
         mockEntity,
         undefined,
-        title,
-        footerText,
-        'class',
-        'mdi:icon',
+        mockStatBoxConfig,
       );
 
       // Render the template
@@ -199,8 +217,13 @@ export default () => {
     });
 
     it('should add percentage symbol when unit_of_measurement is %', async () => {
-      const title: TranslationKey = 'card.stats.percentage_blocked';
-      const footerText: TranslationKey = 'card.stats.list_all_queries';
+      // Create config for percentage box
+      const percentConfig: StatBoxConfig = {
+        title: 'card.stats.percentage_blocked',
+        footer: 'card.stats.list_all_queries',
+        className: 'percentage-box',
+        icon: 'mdi:chart-pie',
+      };
 
       // Create entity with percent unit
       const percentEntity = {
@@ -217,10 +240,7 @@ export default () => {
         mockHass,
         percentEntity,
         mockSectionConfig,
-        title,
-        footerText,
-        'percentage-box',
-        'mdi:chart-pie',
+        percentConfig,
       );
 
       // Render the template
@@ -230,6 +250,53 @@ export default () => {
       const valueEl = el.querySelector('.stat-value');
       expect(valueEl).to.exist;
       expect(valueEl?.textContent?.trim()).to.equal('45.6%');
+    });
+
+    it('should apply the correct CSS class', async () => {
+      // Create config with specific class
+      const configWithClass: StatBoxConfig = {
+        ...mockStatBoxConfig,
+        className: 'custom-test-class',
+      };
+
+      const result = createStatBox(
+        mockElement,
+        mockHass,
+        mockEntity,
+        mockSectionConfig,
+        configWithClass,
+      );
+
+      // Render the template
+      const el = await fixture(result as TemplateResult);
+
+      // Check that the box has the correct class
+      expect(el.classList.contains('stat-box')).to.be.true;
+      expect(el.classList.contains('custom-test-class')).to.be.true;
+    });
+
+    it('should display the correct icon', async () => {
+      // Create config with specific icon
+      const configWithIcon: StatBoxConfig = {
+        ...mockStatBoxConfig,
+        icon: 'mdi:custom-test-icon',
+      };
+
+      const result = createStatBox(
+        mockElement,
+        mockHass,
+        mockEntity,
+        mockSectionConfig,
+        configWithIcon,
+      );
+
+      // Render the template
+      const el = await fixture(result as TemplateResult);
+
+      // Check that the icon is correctly applied
+      const iconEl = el.querySelector('.stat-icon ha-icon');
+      expect(iconEl).to.exist;
+      expect(iconEl?.getAttribute('icon')).to.equal('mdi:custom-test-icon');
     });
   });
 };

@@ -1,4 +1,4 @@
-import type { EntityInformation } from '@/types';
+import type { EntityInformation } from '@type/types';
 import { type TemplateResult, html } from 'lit';
 
 /**

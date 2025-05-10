@@ -1,6 +1,7 @@
-import type { Config, PiHoleDevice } from '@/types';
 import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { html, nothing } from 'lit';
 import { refreshTime } from './components/refresh-time';
 import { createVersionItem } from './components/version-item';

@@ -1,8 +1,9 @@
-import type { Config, PiHoleDevice } from '@/types';
 import { mapEntitiesByTranslationKey } from '@common/map-entities';
 import { shouldSkipEntity } from '@common/skip-entity';
 import { computeDomain } from '@hass/common/entity/compute_domain';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { getDevice } from '../retrievers/device';
 import { getDeviceEntities } from './card-entities';
 

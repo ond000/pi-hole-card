@@ -1,7 +1,7 @@
-import type { Config, SectionConfig } from '@/types';
 import { fireEvent } from '@hass/common/dom/fire_event';
 import type { HaFormSchema } from '@hass/components/ha-form/types';
 import type { HomeAssistant } from '@hass/types';
+import type { Config, SectionConfig } from '@type/config';
 import { html, LitElement, nothing, type TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 

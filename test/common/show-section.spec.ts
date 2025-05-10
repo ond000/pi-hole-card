@@ -1,5 +1,5 @@
-import type { Config } from '@/types';
 import { show } from '@common/show-section';
+import type { Config } from '@type/config';
 import { expect } from 'chai';
 
 export default () => {

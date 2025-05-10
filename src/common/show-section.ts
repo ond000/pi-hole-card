@@ -1,4 +1,4 @@
-import type { Config, Sections } from '@/types';
+import type { Config, Sections } from '@type/config';
 
 /**
  * Check if a section should be shown based on the configuration

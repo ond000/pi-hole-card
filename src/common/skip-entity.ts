@@ -1,4 +1,5 @@
-import type { Config, EntityInformation } from '@/types';
+import type { Config } from '@type/config';
+import type { EntityInformation } from '@type/types';
 
 /**
  * Determines if an entity should be skipped based on configuration

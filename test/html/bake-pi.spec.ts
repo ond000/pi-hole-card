@@ -1,4 +1,3 @@
-import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
 import { renderPiHoleCard } from '@html/bake-pi';
 import * as piCrustModule from '@html/pi-crust';
@@ -7,6 +6,8 @@ import * as piFlavorsModule from '@html/pi-flavors';
 import * as piTinModule from '@html/pi-tin';
 import * as piToppingsModule from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { html } from 'lit';
 import { stub } from 'sinon';

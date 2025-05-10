@@ -1,5 +1,6 @@
-import type { Config, PiHoleDevice } from '@/types';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { html, type TemplateResult } from 'lit';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';

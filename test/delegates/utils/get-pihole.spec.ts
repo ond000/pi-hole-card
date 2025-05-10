@@ -1,10 +1,11 @@
-import type { Config, EntityInformation } from '@/types';
 import * as mapEntitiesModule from '@common/map-entities';
 import * as skipEntityModule from '@common/skip-entity';
 import { getDevice } from '@delegates/retrievers/device';
 import * as cardEntitiesModule from '@delegates/utils/card-entities';
 import { getPiHole } from '@delegates/utils/get-pihole';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { restore, stub } from 'sinon';
 

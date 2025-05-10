@@ -1,10 +1,11 @@
-import type { Config, EntityInformation, PiHoleDevice } from '@/types';
 import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as actionControlModule from '@html/components/action-control';
 import * as stateContentModule from '@html/components/state-content';
 import { createCardActions } from '@html/pi-flavors';
 import { fixture } from '@open-wc/testing-helpers';
+import type { Config } from '@type/config';
+import type { EntityInformation, PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';

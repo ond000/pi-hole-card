@@ -1,7 +1,7 @@
-import type { Config } from '@/types';
 import { PiHoleCardEditor } from '@cards/editor';
 import type { HomeAssistant } from '@hass/types';
 import { fixture } from '@open-wc/testing-helpers';
+import type { Config } from '@type/config';
 import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';

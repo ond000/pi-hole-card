@@ -1,6 +1,6 @@
-import type { EntityInformation } from '@/types';
 import { getState } from '@delegates/retrievers/state';
 import type { HomeAssistant } from '@hass/types';
+import type { EntityInformation } from '@type/types';
 
 /**
  * Get all entities for a device

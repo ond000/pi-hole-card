@@ -1,10 +1,11 @@
-import type { Config, PiHoleDevice } from '@/types';
+import * as getStatsModule from '@common/get-stats';
 import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as createStatBoxModule from '@html/components/stat-box';
 import { createDashboardStats } from '@html/pi-fillings';
-import * as localizeModule from '@localize/localize';
 import { fixture } from '@open-wc/testing-helpers';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';
@@ -17,7 +18,8 @@ export default () => {
     let mockConfig: Config;
     let createStatBoxStub: sinon.SinonStub;
     let showSectionStub: sinon.SinonStub;
-    let localizeStub: sinon.SinonStub;
+    let getStatsStub: sinon.SinonStub;
+    let mockDashboardStats: any[][];
 
     beforeEach(() => {
       // Create mock element
@@ -32,49 +34,57 @@ export default () => {
       showSectionStub = stub(showSectionModule, 'show');
       showSectionStub.returns(true); // Default to showing sections
 
-      // Create stub for localize
-      localizeStub = stub(localizeModule, 'localize');
-      localizeStub.callsFake((hass, key, search, replace) => {
-        // If this is the active clients translation with replaceable parameter
-        if (
-          key === 'card.stats.active_clients' &&
-          search === '{number}' &&
-          replace
-        ) {
-          return `${replace} active clients`;
-        }
+      // Mock dashboard stats
+      mockDashboardStats = [
+        [
+          {
+            sensorKey: 'dns_queries_today',
+            title: 'card.stats.total_queries',
+            footer: {
+              key: 'card.stats.active_clients',
+              search: '{number}',
+              replace: '42',
+            },
+            className: 'queries-box',
+            icon: 'mdi:earth',
+          },
+          {
+            sensorKey: 'ads_blocked_today',
+            title: 'card.stats.queries_blocked',
+            footer: 'card.stats.list_blocked_queries',
+            className: 'blocked-box',
+            icon: 'mdi:hand-back-right',
+          },
+        ],
+        [
+          {
+            sensorKey: 'ads_percentage_blocked_today',
+            title: 'card.stats.percentage_blocked',
+            footer: 'card.stats.list_all_queries',
+            className: 'percentage-box',
+            icon: 'mdi:chart-pie',
+          },
+          {
+            sensorKey: 'domains_blocked',
+            title: 'card.stats.domains_on_lists',
+            footer: 'card.stats.manage_lists',
+            className: 'domains-box',
+            icon: 'mdi:format-list-bulleted',
+          },
+        ],
+      ];
 
-        // Return a predictable translation for each key
-        const translations: Record<string, string> = {
-          'card.stats.total_queries': 'Total Queries',
-          'card.stats.queries_blocked': 'Queries Blocked',
-          'card.stats.list_blocked_queries': 'List Blocked Queries',
-          'card.stats.percentage_blocked': 'Percentage Blocked',
-          'card.stats.list_all_queries': 'List All Queries',
-          'card.stats.domains_on_lists': 'Domains on Lists',
-          'card.stats.manage_lists': 'Manage Lists',
-        };
-
-        return translations[key as string] || `Localized: ${key}`;
-      });
+      // Create stub for getDashboardStats
+      getStatsStub = stub(getStatsModule, 'getDashboardStats');
+      getStatsStub.returns(mockDashboardStats);
 
       // Create stub for createStatBox
       createStatBoxStub = stub(createStatBoxModule, 'createStatBox');
       // Configure the stub to return a simple template with identifiable class
       createStatBoxStub.callsFake(
-        (
-          element,
-          hass,
-          entity,
-          sectionConfig,
-          title,
-          footerText,
-          boxClass,
-          iconName,
-        ) => {
-          return html`<div class="mocked-stat-box ${boxClass}">
-            <div class="title">${title}</div>
-            <div class="footer">${footerText}</div>
+        (element, hass, entity, sectionConfig, statConfig) => {
+          return html`<div class="mocked-stat-box ${statConfig.className}">
+            <div class="sensor-key">${statConfig.sensorKey}</div>
           </div>`;
         },
       );
@@ -132,7 +142,7 @@ export default () => {
       // Configure show to return false for statistics section
       showSectionStub.withArgs(mockConfig, 'statistics').returns(false);
 
-      // Call createDashboardStats with the new signature including hass
+      // Call createDashboardStats
       const result = createDashboardStats(
         mockElement,
         mockHass,
@@ -143,182 +153,118 @@ export default () => {
       // Assert that nothing is returned
       expect(result).to.equal(nothing);
 
+      // Verify that getStatsStub was not called
+      expect(getStatsStub.called).to.be.false;
+
       // Verify that createStatBox was not called
       expect(createStatBoxStub.called).to.be.false;
     });
 
-    it('should render dashboard stats container with stat groups', async () => {
-      // Ensure show returns true for statistics section
-      showSectionStub.withArgs(mockConfig, 'statistics').returns(true);
+    it('should call getDashboardStats with correct unique clients count', async () => {
+      // Call createDashboardStats
+      createDashboardStats(mockElement, mockHass, mockDevice, mockConfig);
 
+      // Verify getDashboardStats was called with the correct unique clients count
+      expect(getStatsStub.calledOnce).to.be.true;
+      expect(getStatsStub.firstCall.args[0]).to.equal('42');
+    });
+
+    it('should call createStatBox for each stat in the dashboard configuration', async () => {
+      // Call createDashboardStats
       const result = createDashboardStats(
         mockElement,
         mockHass,
         mockDevice,
         mockConfig,
       );
-      const el = await fixture(result as TemplateResult);
 
-      // Check that the dashboard-stats container is rendered
-      expect(el.tagName.toLowerCase()).to.equal('div');
-      expect(el.classList.contains('dashboard-stats')).to.be.true;
+      await fixture(result as TemplateResult);
 
-      // Check that it contains two stat-group divs
-      const statGroups = el.querySelectorAll('.stat-group');
-      expect(statGroups.length).to.equal(2);
-    });
+      // Total expected calls = sum of all stats in all groups
+      const expectedCalls = mockDashboardStats.reduce(
+        (total, group) => total + group.length,
+        0,
+      );
 
-    it('should call createStatBox with correct parameters for each stat', async () => {
-      createDashboardStats(mockElement, mockHass, mockDevice, mockConfig);
+      // Verify createStatBox was called the expected number of times
+      expect(createStatBoxStub.callCount).to.equal(expectedCalls);
 
-      // Verify createStatBox was called 4 times (once for each stat box)
-      expect(createStatBoxStub.callCount).to.equal(4);
-
-      // Verify calls for each stat box with correct parameters
-
-      // Total queries
+      // Verify the arguments for the first call
+      const firstStatConfig = mockDashboardStats[0]![0];
       expect(createStatBoxStub.firstCall.args[0]).to.equal(mockElement);
       expect(createStatBoxStub.firstCall.args[1]).to.equal(mockHass);
       expect(createStatBoxStub.firstCall.args[2]).to.equal(
         mockDevice.dns_queries_today,
       );
       expect(createStatBoxStub.firstCall.args[3]).to.equal(mockConfig.stats);
-      expect(createStatBoxStub.firstCall.args[4]).to.equal(
-        'card.stats.total_queries',
+      expect(createStatBoxStub.firstCall.args[4]).to.deep.equal(
+        firstStatConfig,
       );
-      // Verify that localize was called for the active clients footer
-      expect(
-        localizeStub.calledWith(
-          mockHass,
-          'card.stats.active_clients',
-          '{number}',
-          '42',
-        ),
-      ).to.be.true;
-      expect(createStatBoxStub.firstCall.args[6]).to.equal('queries-box');
-      expect(createStatBoxStub.firstCall.args[7]).to.equal('mdi:earth');
-
-      // Queries Blocked
-      expect(createStatBoxStub.secondCall.args[0]).to.equal(mockElement);
-      expect(createStatBoxStub.secondCall.args[1]).to.equal(mockHass);
-      expect(createStatBoxStub.secondCall.args[2]).to.equal(
-        mockDevice.ads_blocked_today,
-      );
-      expect(createStatBoxStub.secondCall.args[3]).to.equal(mockConfig.stats);
-      expect(createStatBoxStub.secondCall.args[4]).to.equal(
-        'card.stats.queries_blocked',
-      );
-      expect(createStatBoxStub.secondCall.args[5]).to.equal(
-        'card.stats.list_blocked_queries',
-      );
-      expect(createStatBoxStub.secondCall.args[6]).to.equal('blocked-box');
-      expect(createStatBoxStub.secondCall.args[7]).to.equal(
-        'mdi:hand-back-right',
-      );
-
-      // Percentage Blocked
-      expect(createStatBoxStub.thirdCall.args[0]).to.equal(mockElement);
-      expect(createStatBoxStub.thirdCall.args[1]).to.equal(mockHass);
-      expect(createStatBoxStub.thirdCall.args[2]).to.equal(
-        mockDevice.ads_percentage_blocked_today,
-      );
-      expect(createStatBoxStub.thirdCall.args[3]).to.equal(mockConfig.stats);
-      expect(createStatBoxStub.thirdCall.args[4]).to.equal(
-        'card.stats.percentage_blocked',
-      );
-      expect(createStatBoxStub.thirdCall.args[5]).to.equal(
-        'card.stats.list_all_queries',
-      );
-      expect(createStatBoxStub.thirdCall.args[6]).to.equal('percentage-box');
-      expect(createStatBoxStub.thirdCall.args[7]).to.equal('mdi:chart-pie');
-
-      // Domains on Lists
-      const fourthCall = createStatBoxStub.getCall(3);
-      expect(fourthCall.args[0]).to.equal(mockElement);
-      expect(fourthCall.args[1]).to.equal(mockHass);
-      expect(fourthCall.args[2]).to.equal(mockDevice.domains_blocked);
-      expect(fourthCall.args[3]).to.equal(mockConfig.stats);
-      expect(fourthCall.args[4]).to.equal('card.stats.domains_on_lists');
-      expect(fourthCall.args[5]).to.equal('card.stats.manage_lists');
-      expect(fourthCall.args[6]).to.equal('domains-box');
-      expect(fourthCall.args[7]).to.equal('mdi:format-list-bulleted');
     });
 
-    it('should handle missing entity data', async () => {
-      // Create a device with missing entity data
+    it('should handle missing entities in the device object', async () => {
+      // Create a device missing some stats
       const incompleteDevice = {
-        device_id: 'pi_hole_device',
-        // Only include dns_queries_today
-        dns_queries_today: {
-          entity_id: 'sensor.dns_queries_today',
-          state: '12345',
-          attributes: {},
-          translation_key: 'dns_queries_today',
-        },
-      } as PiHoleDevice;
+        ...mockDevice,
+        ads_blocked_today: undefined,
+      };
 
-      createDashboardStats(mockElement, mockHass, incompleteDevice, mockConfig);
-
-      // Verify createStatBox was still called 4 times
-      expect(createStatBoxStub.callCount).to.equal(4);
-
-      // Check that undefined was passed for missing entities
-      expect(createStatBoxStub.secondCall.args[2]).to.be.undefined; // ads_blocked_today
-      expect(createStatBoxStub.thirdCall.args[2]).to.be.undefined; // ads_percentage_blocked_today
-      expect(createStatBoxStub.getCall(3).args[2]).to.be.undefined; // domains_blocked
-
-      // Check that the first call used the defined entity
-      expect(createStatBoxStub.firstCall.args[2]).to.equal(
-        incompleteDevice.dns_queries_today,
+      // Call createDashboardStats
+      const result = createDashboardStats(
+        mockElement,
+        mockHass,
+        incompleteDevice,
+        mockConfig,
       );
 
-      // Check that the active clients localization was called with '0'
-      expect(
-        localizeStub.calledWith(
-          mockHass,
-          'card.stats.active_clients',
-          '{number}',
-          '0',
-        ),
-      ).to.be.true;
+      await fixture(result as TemplateResult);
+
+      // Verify that createStatBox for the missing entity was called with undefined
+      const adsBlockedConfig = mockDashboardStats[0]![1];
+      const callForAdsBlocked = createStatBoxStub
+        .getCalls()
+        .find((call) => call.args[4] === adsBlockedConfig);
+
+      expect(callForAdsBlocked).to.exist;
+      expect(callForAdsBlocked?.args[2]).to.be.undefined;
     });
 
-    it('should localize active clients text with client count', async () => {
-      createDashboardStats(mockElement, mockHass, mockDevice, mockConfig);
+    it('should render the dashboard-stats container with correct structure', async () => {
+      // Reset createStatBox to use the original implementation for this test
+      createStatBoxStub.restore();
 
-      // Verify localize was called for active clients with correct parameters
-      expect(
-        localizeStub.calledWith(
-          mockHass,
-          'card.stats.active_clients',
-          '{number}',
-          '42',
-        ),
-      ).to.be.true;
-
-      // Now test with a different number of clients
-      const updatedDevice = {
-        ...mockDevice,
-        dns_unique_clients: {
-          ...mockDevice.dns_unique_clients,
-          state: '123',
+      // Stub createStatBox to return a simplified but visible element
+      createStatBoxStub = stub(createStatBoxModule, 'createStatBox').callsFake(
+        (element, hass, entity, sectionConfig, statConfig) => {
+          return html`<div class="test-stat-box ${statConfig.className}">
+            ${(statConfig as any).sensorKey}
+          </div>`;
         },
-      } as any as PiHoleDevice;
+      );
 
-      // Reset the stub call history
-      localizeStub.resetHistory();
+      // Call createDashboardStats
+      const result = createDashboardStats(
+        mockElement,
+        mockHass,
+        mockDevice,
+        mockConfig,
+      );
 
-      createDashboardStats(mockElement, mockHass, updatedDevice, mockConfig);
+      const el = await fixture(result as TemplateResult);
 
-      // Verify localize was called with the updated number
-      expect(
-        localizeStub.calledWith(
-          mockHass,
-          'card.stats.active_clients',
-          '{number}',
-          '123',
-        ),
-      ).to.be.true;
+      // Verify the main container
+      expect(el.tagName.toLowerCase()).to.equal('div');
+      expect(el.classList.contains('dashboard-stats')).to.be.true;
+
+      // Verify the stat groups structure
+      const statGroups = el.querySelectorAll('.stat-group');
+      expect(statGroups.length).to.equal(mockDashboardStats.length);
+
+      // Verify each group has the correct number of stat boxes
+      mockDashboardStats.forEach((group, i) => {
+        const statBoxes = statGroups[i]!.querySelectorAll('.test-stat-box');
+        expect(statBoxes.length).to.equal(group.length);
+      });
     });
   });
 };

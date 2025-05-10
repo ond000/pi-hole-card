@@ -1,6 +1,7 @@
-import type { Config, PiHoleDevice, SectionConfig } from '@/types';
 import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
+import type { Config, SectionConfig } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { createActionButton } from './components/action-control';
 import { stateContent } from './components/state-content';

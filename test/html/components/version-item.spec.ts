@@ -1,6 +1,6 @@
-import type { EntityInformation } from '@/types';
 import { createVersionItem } from '@html/components/version-item';
 import { fixture } from '@open-wc/testing-helpers';
+import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 

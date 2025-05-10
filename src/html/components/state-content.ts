@@ -1,5 +1,5 @@
-import type { EntityInformation } from '@/types';
 import type { HomeAssistant } from '@hass/types';
+import type { EntityInformation } from '@type/types';
 import { html } from 'lit';
 
 /**

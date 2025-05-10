@@ -1,9 +1,10 @@
-import type { EntityInformation, PiHoleDevice, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
 import type { HomeAssistant } from '@hass/types';
 import { refreshTime } from '@html/components/refresh-time';
 import * as stateDisplayModule from '@html/components/state-display';
 import { fixture } from '@open-wc/testing-helpers';
+import type { SectionConfig } from '@type/config';
+import type { EntityInformation, PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';

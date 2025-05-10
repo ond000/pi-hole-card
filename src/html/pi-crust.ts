@@ -1,7 +1,8 @@
-import type { Config, PiHoleDevice } from '@/types';
 import { show } from '@common/show-section';
 import { stateActive } from '@hass/common/entity/state_active';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stateDisplay } from './components/state-display';
 

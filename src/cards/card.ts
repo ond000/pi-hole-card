@@ -2,10 +2,11 @@ import { renderPiHoleCard } from '@/html/bake-pi';
 import { getConfigDevice } from '@delegates/utils/get-config-device';
 import { getPiHole } from '@delegates/utils/get-pihole';
 import type { HomeAssistant } from '@hass/types';
+import type { Config } from '@type/config';
 import { CSSResult, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { styles } from '../styles';
-import type { Config, PiHoleDevice } from '../types';
+import type { PiHoleDevice } from '../types/types';
 const equal = require('fast-deep-equal');
 
 /**

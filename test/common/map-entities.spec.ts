@@ -1,5 +1,5 @@
-import type { EntityInformation, PiHoleDevice } from '@/types';
 import { mapEntitiesByTranslationKey } from '@common/map-entities';
+import type { EntityInformation, PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 
 export default () => {

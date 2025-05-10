@@ -1,9 +1,10 @@
-import type { PiHoleDevice, SectionConfig } from '@/types';
 import {
   actionHandler,
   handleClickAction,
 } from '@delegates/action-handler-delegate';
 import type { HomeAssistant } from '@hass/types';
+import type { SectionConfig } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stateDisplay } from './state-display';
 

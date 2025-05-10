@@ -1,7 +1,8 @@
-import type { Config, PiHoleDevice } from '@/types';
+import { getDashboardStats } from '@common/get-stats';
 import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
-import { localize } from '@localize/localize';
+import type { Config } from '@type/config';
+import type { EntityInformation, PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { createStatBox } from './components/stat-box';
 
@@ -20,60 +21,30 @@ export const createDashboardStats = (
   config: Config,
 ): TemplateResult | typeof nothing => {
   if (!show(config, 'statistics')) return nothing;
+
+  // Get the unique clients count for the configuration
+  const uniqueClientsCount = device.dns_unique_clients?.state ?? '0';
+
+  // Get the stats configuration with the unique clients count
+  const statConfigs = getDashboardStats(uniqueClientsCount);
+
   return html`
     <div class="dashboard-stats">
-      <!-- First Group: Queries and Blocked -->
-      <div class="stat-group">
-        ${createStatBox(
-          element,
-          hass,
-          device.dns_queries_today,
-          config.stats,
-          'card.stats.total_queries',
-          localize(
-            hass,
-            'card.stats.active_clients',
-            '{number}',
-            device.dns_unique_clients?.state ?? '0',
-          ),
-          'queries-box',
-          'mdi:earth',
-        )}
-        ${createStatBox(
-          element,
-          hass,
-          device.ads_blocked_today,
-          config.stats,
-          'card.stats.queries_blocked',
-          'card.stats.list_blocked_queries',
-          'blocked-box',
-          'mdi:hand-back-right',
-        )}
-      </div>
-
-      <!-- Second Group: Percentage and Domains -->
-      <div class="stat-group">
-        ${createStatBox(
-          element,
-          hass,
-          device.ads_percentage_blocked_today,
-          config.stats,
-          'card.stats.percentage_blocked',
-          'card.stats.list_all_queries',
-          'percentage-box',
-          'mdi:chart-pie',
-        )}
-        ${createStatBox(
-          element,
-          hass,
-          device.domains_blocked,
-          config.stats,
-          'card.stats.domains_on_lists',
-          'card.stats.manage_lists',
-          'domains-box',
-          'mdi:format-list-bulleted',
-        )}
-      </div>
+      ${statConfigs.map(
+        (group) => html`
+          <div class="stat-group">
+            ${group.map((statConfig) =>
+              createStatBox(
+                element,
+                hass,
+                device[statConfig.sensorKey] as EntityInformation | undefined,
+                config.stats,
+                statConfig,
+              ),
+            )}
+          </div>
+        `,
+      )}
     </div>
   `;
 };

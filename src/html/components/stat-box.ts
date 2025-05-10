@@ -1,4 +1,3 @@
-import type { EntityInformation, SectionConfig } from '@/types';
 import {
   actionHandler,
   handleClickAction,
@@ -6,7 +5,8 @@ import {
 import { formatNumber } from '@hass/common/number/format_number';
 import type { HomeAssistant } from '@hass/types';
 import { localize } from '@localize/localize';
-import type { TranslationKey } from '@localize/types';
+import type { SectionConfig, StatBoxConfig } from '@type/config';
+import type { EntityInformation } from '@type/types';
 import { type TemplateResult, html, nothing } from 'lit';
 
 /**
@@ -15,10 +15,7 @@ import { type TemplateResult, html, nothing } from 'lit';
  * @param hass - The Home Assistant object
  * @param entity - The entity information
  * @param sectionConfig - The section configuration
- * @param title - The title of the stat box
- * @param footerText - The footer text
- * @param boxClass - The CSS class for styling
- * @param iconName - Icon name for the background (mdi icon)
+ * @param statBoxConfig - The configuration for the stat box
  * @returns TemplateResult
  */
 export const createStatBox = (
@@ -26,10 +23,7 @@ export const createStatBox = (
   hass: HomeAssistant,
   entity: EntityInformation | undefined,
   sectionConfig: SectionConfig | undefined,
-  title: TranslationKey,
-  footerText: TranslationKey | string,
-  boxClass: string,
-  iconName: string,
+  statBoxConfig: StatBoxConfig,
 ): TemplateResult | typeof nothing => {
   if (!entity) return nothing;
 
@@ -38,19 +32,26 @@ export const createStatBox = (
     maximumFractionDigits: 1,
   });
   const footer =
-    typeof footerText === 'string' ? footerText : localize(hass, footerText);
+    typeof statBoxConfig.footer === 'string'
+      ? localize(hass, statBoxConfig.footer)
+      : localize(
+          hass,
+          statBoxConfig.footer.key,
+          statBoxConfig.footer.search,
+          statBoxConfig.footer.replace,
+        );
 
   return html`
     <div
-      class="stat-box ${boxClass}"
+      class="stat-box ${statBoxConfig.className}"
       @action=${handleClickAction(element, sectionConfig, entity)}
       .actionHandler=${actionHandler(sectionConfig)}
     >
       <div class="stat-icon">
-        <ha-icon icon="${iconName}"></ha-icon>
+        <ha-icon icon="${statBoxConfig.icon}"></ha-icon>
       </div>
       <div class="stat-content">
-        <div class="stat-header">${localize(hass, title)}</div>
+        <div class="stat-header">${localize(hass, statBoxConfig.title)}</div>
         <div class="stat-value">${value}${uom}</div>
       </div>
       <div class="stat-footer">

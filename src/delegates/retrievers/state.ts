@@ -1,5 +1,5 @@
-import type { EntityState } from '@/types';
 import type { HomeAssistant } from '@hass/types';
+import type { EntityState } from '@type/types';
 
 /**
  * Retrieves the state of an entity

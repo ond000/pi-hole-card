@@ -1,5 +1,5 @@
 import type { HomeAssistant } from '@hass/types';
-import type { TranslationKey } from './types';
+import type { TranslationKey } from '@type/locale';
 
 import * as en from '../translations/en.json';
 // Import other languages as needed above this line and in order
@@ -26,28 +26,12 @@ export const localize = (
   search = '',
   replace = '',
 ): string => {
-  const lang = hass.language;
-
-  // Try to get the translation safely
   let translated: string | undefined;
 
-  try {
-    // First try with user's language
-    translated = getNestedTranslation(languages[lang], key);
-
-    // If not found, try with English
-    if (translated === undefined) {
-      translated = getNestedTranslation(languages.en, key);
-    }
-  } catch (error) {
-    // If any error occurs, fall back to the key
-    translated = undefined;
-  }
-
-  // If no translation found, use the key itself
-  if (translated === undefined) {
-    return key;
-  }
+  translated =
+    getNestedTranslation(languages[hass.language], key) ??
+    getNestedTranslation(languages.en, key) ??
+    key;
 
   // Replace placeholders
   if (search !== '' && replace !== '') {

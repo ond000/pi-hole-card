@@ -1,9 +1,10 @@
-import type { Config, PiHoleDevice } from '@/types';
 import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as stateDisplayModule from '@html/components/state-display';
 import { createCardHeader } from '@html/pi-crust';
 import { fixture } from '@open-wc/testing-helpers';
+import type { Config } from '@type/config';
+import type { PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';

@@ -1,7 +1,8 @@
-import type { EntityInformation, SectionConfig } from '@/types';
 import * as actionHandlerModule from '@delegates/action-handler-delegate';
 import { createActionButton } from '@html/components/action-control';
 import { fixture } from '@open-wc/testing-helpers';
+import type { SectionConfig } from '@type/config';
+import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 import { stub } from 'sinon';

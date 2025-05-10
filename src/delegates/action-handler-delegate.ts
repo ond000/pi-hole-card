@@ -1,8 +1,9 @@
-import type { EntityInformation, SectionConfig } from '@/types';
 import { fireEvent } from '@hass/common/dom/fire_event';
 import type { ActionHandlerEvent } from '@hass/data/lovelace/action_handler';
 import { actionHandler as hassActionHandler } from '@hass/panels/lovelace/common/directives/action-handler-directive';
 import type { ActionConfigParams } from '@hass/panels/lovelace/common/handle-action';
+import type { SectionConfig } from '@type/config';
+import type { EntityInformation } from '@type/types';
 
 /**
  * Creates an action handler for an entity with specified configuration.

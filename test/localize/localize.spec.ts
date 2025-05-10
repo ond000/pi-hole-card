@@ -1,6 +1,6 @@
 import type { HomeAssistant } from '@hass/types';
 import { localize } from '@localize/localize';
-import type { TranslationKey } from '@localize/types';
+import type { TranslationKey } from '@type/locale';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 

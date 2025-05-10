@@ -1,4 +1,4 @@
-import type { EntityInformation, PiHoleDevice } from '@/types';
+import type { EntityInformation, PiHoleDevice } from '@type/types';
 
 /**
  * Maps entities to the Pi-hole device object based on their translation keys.

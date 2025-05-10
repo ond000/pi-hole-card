@@ -1,5 +1,6 @@
-import type { Config, EntityInformation } from '@/types';
 import { shouldSkipEntity } from '@common/skip-entity';
+import type { Config } from '@type/config';
+import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 
 export default () => {
