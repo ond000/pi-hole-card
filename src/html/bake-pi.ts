@@ -1,6 +1,6 @@
 import type { HomeAssistant } from '@hass/types';
 import type { Config } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleSetup } from '@type/types';
 import { html, type TemplateResult } from 'lit';
 import { createCardHeader } from './pi-crust';
 import { createDashboardStats } from './pi-fillings';
@@ -12,25 +12,26 @@ import { createAdditionalStats } from './pi-toppings';
  * Renders the Pi-hole card content
  * @param element - The HTML element to render the card into
  * @param hass - The Home Assistant instance
- * @param device - The Pi-hole device
+ * @param setup - The Pi-hole setup
  * @param config - The card configuration
  * @returns TemplateResult
  */
 export const renderPiHoleCard = (
   element: HTMLElement,
   hass: HomeAssistant,
-  device: PiHoleDevice,
+  setup: PiHoleSetup,
   config: Config,
 ): TemplateResult => {
+  const primary = setup.holes[0]!;
   return html`
     <ha-card>
-      ${createCardHeader(device, hass, config)}
+      ${createCardHeader(setup, hass, config)}
       <div class="card-content">
-        ${createDashboardStats(element, hass, device, config)}
-        ${createAdditionalStats(element, hass, device, config)}
+        ${createDashboardStats(element, hass, primary, config)}
+        ${createAdditionalStats(element, hass, primary, config)}
       </div>
-      ${createCardActions(element, hass, device, config)}
-      ${createFooter(element, hass, config, device)}
+      ${createCardActions(element, hass, primary, config)}
+      ${createFooter(element, hass, config, primary)}
     </ha-card>
   `;
 };

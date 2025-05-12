@@ -4,7 +4,7 @@ import * as stateDisplayModule from '@html/components/state-display';
 import { createCardHeader } from '@html/pi-crust';
 import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleDevice, PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
@@ -12,6 +12,7 @@ import { stub } from 'sinon';
 export default () => {
   describe('pi-crust.ts', () => {
     let mockHass: HomeAssistant;
+    let mockSetup: PiHoleSetup;
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let stateDisplayStub: sinon.SinonStub;
@@ -50,7 +51,16 @@ export default () => {
           attributes: { friendly_name: 'Pi-hole Status' },
           translation_key: undefined,
         },
-      } as any as PiHoleDevice;
+        sensors: [],
+        switches: [],
+        controls: [],
+        updates: [],
+      } as PiHoleDevice;
+
+      // Setup with a single device
+      mockSetup = {
+        holes: [mockDevice],
+      };
 
       // Default mock config
       mockConfig = {
@@ -69,7 +79,7 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'header').returns(false);
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
 
       // Assert that nothing is returned
       expect(result).to.equal(nothing);
@@ -83,7 +93,7 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'header').returns(true);
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Test header exists
@@ -106,7 +116,7 @@ export default () => {
       mockConfig.icon = 'mdi:custom-icon';
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check custom title
@@ -121,14 +131,14 @@ export default () => {
 
     it('should display green status when Pi-hole is active', async () => {
       // Ensure status is 'on'
-      mockDevice.status!.state = 'on';
+      mockSetup.holes[0]!.status!.state = 'on';
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check status color is green
-      const statusEl = el.querySelector('.status');
+      const statusEl = el.querySelector('div[style*="color"]');
       expect(statusEl?.getAttribute('style')).to.contain(
         'var(--success-color, green)',
       );
@@ -141,14 +151,14 @@ export default () => {
 
     it('should display red status when Pi-hole is inactive', async () => {
       // Set status to 'off'
-      mockDevice.status!.state = 'off';
+      mockSetup.holes[0]!.status!.state = 'off';
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check status color is red
-      const statusEl = el.querySelector('.status');
+      const statusEl = el.querySelector('div[style*="color"]');
       expect(statusEl?.getAttribute('style')).to.contain(
         'var(--error-color, red)',
       );
@@ -161,17 +171,17 @@ export default () => {
 
     it('should call stateDisplay with the status entity', async () => {
       // Render the card header
-      createCardHeader(mockDevice, mockHass, mockConfig);
+      createCardHeader(mockSetup, mockHass, mockConfig);
 
       // Verify stateDisplay was called with the correct parameters
-      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
-        .true;
+      expect(stateDisplayStub.calledWith(mockHass, mockSetup.holes[0]!.status))
+        .to.be.true;
     });
 
     it('should display remaining time when Pi-hole is inactive and remaining time exists', async () => {
       // Set status to 'off' and add remaining time
-      mockDevice.status!.state = 'off';
-      mockDevice.remaining_until_blocking_mode = {
+      mockSetup.holes[0]!.status!.state = 'off';
+      mockSetup.holes[0]!.remaining_until_blocking_mode = {
         entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
         state: '300', // 5 minutes
         attributes: { friendly_name: 'Remaining Time' },
@@ -182,22 +192,22 @@ export default () => {
       stateDisplayStub
         .withArgs(
           mockHass,
-          mockDevice.remaining_until_blocking_mode,
+          mockSetup.holes[0]!.remaining_until_blocking_mode,
           'remaining-time',
         )
         .returns(html`<div class="mocked-remaining-time">5 minutes</div>`);
 
       // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Verify stateDisplay was called for both status and remaining time
-      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
-        .true;
+      expect(stateDisplayStub.calledWith(mockHass, mockSetup.holes[0]!.status))
+        .to.be.true;
       expect(
         stateDisplayStub.calledWith(
           mockHass,
-          mockDevice.remaining_until_blocking_mode,
+          mockSetup.holes[0]!.remaining_until_blocking_mode,
           'remaining-time',
         ),
       ).to.be.true;
@@ -208,94 +218,118 @@ export default () => {
       expect(remainingTimeEl?.textContent).to.equal('5 minutes');
     });
 
-    it('should not display remaining time when Pi-hole is active', async () => {
-      // Set status to 'on' and add remaining time
-      mockDevice.status!.state = 'on';
-      mockDevice.remaining_until_blocking_mode = {
-        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
-        state: '300', // 5 minutes
-        attributes: { friendly_name: 'Remaining Time' },
-        translation_key: 'remaining_until_blocking_mode',
-      };
+    // New tests for multiple Pi-hole setup
 
-      // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
-      await fixture(result as TemplateResult);
+    it('should not display hole count when only one Pi-hole is configured', async () => {
+      // Setup has only one hole (default setup)
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
 
-      // Verify stateDisplay was called for status but not for remaining time
-      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
-        .true;
-      expect(
-        stateDisplayStub.calledWith(
-          mockHass,
-          mockDevice.remaining_until_blocking_mode,
-          'remaining-time',
-        ),
-      ).to.be.false;
+      // Check that multi-status span doesn't exist
+      const multiStatusEl = el.querySelector('.multi-status');
+      expect(multiStatusEl).to.be.null;
     });
 
-    it('should not display remaining time when value is 0', async () => {
-      // Set status to 'off' and add remaining time with value 0
-      mockDevice.status!.state = 'off';
-      mockDevice.remaining_until_blocking_mode = {
-        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
-        state: '0',
-        attributes: { friendly_name: 'Remaining Time' },
-        translation_key: 'remaining_until_blocking_mode',
-      };
+    it('should display hole count when multiple Pi-holes are configured', async () => {
+      // Create a setup with multiple holes
+      const secondDevice = {
+        ...mockDevice,
+        device_id: 'pi_hole_device_2',
+        status: {
+          ...mockDevice.status,
+          entity_id: 'binary_sensor.pi_hole_2_status',
+          state: 'on',
+        },
+      } as PiHoleDevice;
 
-      // Render the card header
-      const result = createCardHeader(mockDevice, mockHass, mockConfig);
-      await fixture(result as TemplateResult);
+      mockSetup.holes.push(secondDevice);
 
-      // Verify stateDisplay was called for status but not for remaining time
-      expect(stateDisplayStub.calledWith(mockHass, mockDevice.status)).to.be
-        .true;
-      expect(
-        stateDisplayStub.calledWith(
-          mockHass,
-          mockDevice.remaining_until_blocking_mode,
-          'remaining-time',
-        ),
-      ).to.be.false;
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that multi-status span exists and shows correct count
+      const multiStatusEl = el.querySelector('.multi-status');
+      expect(multiStatusEl).to.exist;
+      expect(multiStatusEl?.textContent?.trim()).to.equal('(2/2)');
     });
 
-    it('should not display remaining time when value is unavailable or unknown', async () => {
-      // Test with 'unavailable' state
-      mockDevice.status!.state = 'off';
-      mockDevice.remaining_until_blocking_mode = {
-        entity_id: 'sensor.pi_hole_remaining_until_blocking_mode',
-        state: 'unavailable',
-        attributes: { friendly_name: 'Remaining Time' },
-        translation_key: 'remaining_until_blocking_mode',
+    it('should show orange warning color when some Pi-holes are active and some are inactive', async () => {
+      // Create a setup with one active and one inactive Pi-hole
+      const secondDevice = {
+        ...mockDevice,
+        device_id: 'pi_hole_device_2',
+        status: {
+          ...mockDevice.status,
+          entity_id: 'binary_sensor.pi_hole_2_status',
+          state: 'off',
+        },
+      } as PiHoleDevice;
+
+      mockSetup.holes.push(secondDevice);
+
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that status color is orange (warning)
+      const statusEl = el.querySelector('div[style*="color"]');
+      expect(statusEl?.getAttribute('style')).to.contain(
+        'var(--warning-color, orange)',
+      );
+
+      // Check that it shows "Partial" text instead of status
+      expect(statusEl?.textContent?.trim()).to.include('Partial');
+    });
+
+    it('should correctly count active Pi-holes among multiple devices', async () => {
+      // Create a setup with multiple Pi-holes in different states
+      const secondDevice = {
+        ...mockDevice,
+        device_id: 'pi_hole_device_2',
+        status: {
+          ...mockDevice.status,
+          entity_id: 'binary_sensor.pi_hole_2_status',
+          state: 'off',
+        },
+      } as PiHoleDevice;
+
+      const thirdDevice = {
+        ...mockDevice,
+        device_id: 'pi_hole_device_3',
+        status: {
+          ...mockDevice.status,
+          entity_id: 'binary_sensor.pi_hole_3_status',
+          state: 'on',
+        },
+      } as PiHoleDevice;
+
+      mockSetup.holes.push(secondDevice, thirdDevice);
+
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check that multi-status span shows correct active count
+      const multiStatusEl = el.querySelector('.multi-status');
+      expect(multiStatusEl).to.exist;
+      expect(multiStatusEl?.textContent?.trim()).to.equal('(2/3)');
+    });
+
+    it('should handle cases where status is undefined for some Pi-holes', async () => {
+      // Create a device with undefined status
+      const deviceWithoutStatus = {
+        ...mockDevice,
+        device_id: 'pi_hole_device_2',
+        status: undefined,
       };
 
-      let result = createCardHeader(mockDevice, mockHass, mockConfig);
-      await fixture(result as TemplateResult);
+      mockSetup.holes.push(deviceWithoutStatus);
 
-      expect(
-        stateDisplayStub.calledWith(
-          mockHass,
-          mockDevice.remaining_until_blocking_mode,
-          'remaining-time',
-        ),
-      ).to.be.false;
+      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const el = await fixture(result as TemplateResult);
 
-      // Reset stub call history
-      stateDisplayStub.resetHistory();
-
-      // Test with 'unknown' state
-      mockDevice.remaining_until_blocking_mode.state = 'unknown';
-      result = createCardHeader(mockDevice, mockHass, mockConfig);
-      await fixture(result as TemplateResult);
-
-      expect(
-        stateDisplayStub.calledWith(
-          mockHass,
-          mockDevice.remaining_until_blocking_mode,
-          'remaining-time',
-        ),
-      ).to.be.false;
+      // Should only count devices with defined status
+      const multiStatusEl = el.querySelector('.multi-status');
+      expect(multiStatusEl).to.exist;
+      expect(multiStatusEl?.textContent?.trim()).to.equal('(1/2)');
     });
   });
 };

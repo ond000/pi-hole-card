@@ -7,7 +7,7 @@ import * as piTinModule from '@html/pi-tin';
 import * as piToppingsModule from '@html/pi-toppings';
 import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleDevice, PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { html } from 'lit';
 import { stub } from 'sinon';
@@ -15,6 +15,7 @@ import { stub } from 'sinon';
 export default () => {
   describe('bake-pi.ts', () => {
     let mockHass: HomeAssistant;
+    let mockSetup: PiHoleSetup;
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
     let element: HTMLElement;
@@ -90,6 +91,10 @@ export default () => {
         ],
       } as any as PiHoleDevice;
 
+      mockSetup = {
+        holes: [mockDevice],
+      } as PiHoleSetup;
+
       // Mock config
       mockConfig = {
         device_id: 'pi_hole_device',
@@ -107,12 +112,7 @@ export default () => {
 
     it('should render a Pi-hole card with all main sections', async () => {
       // Render the Pi-hole card
-      const result = renderPiHoleCard(
-        element,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
+      const result = renderPiHoleCard(element, mockHass, mockSetup, mockConfig);
       const el = await fixture(result);
 
       // Test main sections exist
@@ -126,11 +126,11 @@ export default () => {
 
     it('should call all component functions with the correct parameters', async () => {
       // Render the Pi-hole card
-      renderPiHoleCard(element, mockHass, mockDevice, mockConfig);
+      renderPiHoleCard(element, mockHass, mockSetup, mockConfig);
 
       // Verify createCardHeader was called with the correct parameters
       expect(createCardHeaderStub.calledOnce).to.be.true;
-      expect(createCardHeaderStub.firstCall.args[0]).to.equal(mockDevice);
+      expect(createCardHeaderStub.firstCall.args[0]).to.equal(mockSetup);
       expect(createCardHeaderStub.firstCall.args[1]).to.equal(mockHass);
       expect(createCardHeaderStub.firstCall.args[2]).to.equal(mockConfig);
 

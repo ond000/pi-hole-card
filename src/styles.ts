@@ -252,4 +252,10 @@ export const styles = css`
     color: var(--switch-checked-color);
     cursor: pointer;
   }
+
+  .multi-status {
+    font-size: 0.9rem;
+    margin-left: 8px;
+    opacity: 0.8;
+  }
 `;
