@@ -60,16 +60,19 @@ export default () => {
     });
 
     it('should return undefined when device is not found', () => {
-      const config = { ...mockConfig, device_id: 'non_existent_device' };
-      const result = getPiHole(mockHass, config);
+      const result = getPiHole(mockHass, mockConfig, 'non_existent_device');
       expect(result).to.be.undefined;
     });
 
-    it('should initialize device with device_id from config', () => {
+    it('should initialize device with device_id', () => {
       // Mock an empty array of entities
       getDeviceEntitiesStub.returns([]);
 
-      const result = getPiHole(mockHass, mockConfig);
+      const result = getPiHole(
+        mockHass,
+        mockConfig,
+        mockConfig.device_id as string,
+      );
 
       expect(result).to.exist;
       expect(result?.device_id).to.equal(DEVICE_ID);
@@ -95,7 +98,11 @@ export default () => {
         return !!entity.translation_key;
       });
 
-      const result = getPiHole(mockHass, mockConfig);
+      const result = getPiHole(
+        mockHass,
+        mockConfig,
+        mockConfig.device_id as string,
+      );
 
       // Verify mapEntitiesByTranslationKey was called for each entity
       expect(mapEntitiesByTranslationKeyStub.callCount).to.equal(
@@ -122,7 +129,11 @@ export default () => {
       // Configure mapEntitiesByTranslationKey to return false (so the entity goes to other arrays)
       mapEntitiesByTranslationKeyStub.returns(false);
 
-      const result = getPiHole(mockHass, mockConfig);
+      const result = getPiHole(
+        mockHass,
+        mockConfig,
+        mockConfig.device_id as string,
+      );
 
       // Verify shouldSkipEntity was called for each entity
       expect(shouldSkipEntityStub.callCount).to.equal(mockEntities.length);

@@ -1,12 +1,12 @@
 import { renderPiHoleCard } from '@/html/bake-pi';
 import { getConfigDevice } from '@delegates/utils/get-config-device';
-import { getPiHole } from '@delegates/utils/get-pihole';
+import { getPiSetup } from '@delegates/utils/get-setup';
 import type { HomeAssistant } from '@hass/types';
 import type { Config } from '@type/config';
 import { CSSResult, html, LitElement } from 'lit';
 import { state } from 'lit/decorators.js';
 import { styles } from '../styles';
-import type { PiHoleDevice } from '../types/types';
+import type { PiHoleSetup } from '../types/types';
 const equal = require('fast-deep-equal');
 
 /**
@@ -21,10 +21,10 @@ export class PiHoleCard extends LitElement {
   private _config!: Config;
 
   /**
-   * Pi-hole information
+   * Pi-hole setup information
    */
   @state()
-  protected _device!: PiHoleDevice;
+  protected _setup!: PiHoleSetup;
 
   /**
    * Home Assistant instance
@@ -56,10 +56,10 @@ export class PiHoleCard extends LitElement {
   set hass(hass: HomeAssistant) {
     this._hass = hass;
 
-    const device = getPiHole(hass, this._config);
+    const setup = getPiSetup(hass, this._config);
 
-    if (device && !equal(device, this._device)) {
-      this._device = device;
+    if (setup && !equal(setup, this._setup)) {
+      this._setup = setup;
     }
   }
 
@@ -85,6 +85,11 @@ export class PiHoleCard extends LitElement {
       </ha-card>`;
     }
 
-    return renderPiHoleCard(this, this._hass, this._device, this._config);
+    return renderPiHoleCard(
+      this,
+      this._hass,
+      this._setup.holes[0]!,
+      this._config,
+    );
   }
 }

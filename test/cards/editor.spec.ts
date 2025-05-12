@@ -91,6 +91,7 @@ export default () => {
                     integration: 'pi_hole',
                   },
                 ],
+                multiple: true,
               },
             },
             required: true,

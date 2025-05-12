@@ -11,21 +11,23 @@ import { getDeviceEntities } from './card-entities';
  * Gets the Pi-hole device information from Home Assistant
  * @param hass - The Home Assistant instance
  * @param config - The configuration object
+ * @param deviceId - The unique identifier for the device
  * @returns The device object or undefined if the device is not found
  */
 export const getPiHole = (
   hass: HomeAssistant,
   config: Config,
+  deviceId: string,
 ): PiHoleDevice | undefined => {
   const device: PiHoleDevice = {
-    device_id: config.device_id,
+    device_id: deviceId,
     controls: [],
     sensors: [],
     switches: [],
     updates: [],
   };
 
-  const hassDevice = getDevice(hass, config.device_id);
+  const hassDevice = getDevice(hass, device.device_id);
   if (!hassDevice) {
     return undefined;
   }

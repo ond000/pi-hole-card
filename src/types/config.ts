@@ -8,7 +8,7 @@ import type { Translation, TranslationKey } from './locale';
 
 export interface Config {
   /** Unique identifier for the device */
-  device_id: string;
+  device_id: string | string[];
 
   /** Card title */
   title?: string;

@@ -1,3 +1,8 @@
+export interface PiHoleSetup {
+  /** Some people like to watch ads burn */
+  holes: PiHoleDevice[];
+}
+
 export interface PiHoleDevice {
   /** Unique identifier for the device */
   device_id: string;

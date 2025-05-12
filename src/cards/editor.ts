@@ -18,6 +18,7 @@ const SCHEMA: HaFormSchema[] = [
             integration: 'pi_hole',
           },
         ],
+        multiple: true,
       },
     },
     required: true,
