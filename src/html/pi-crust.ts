@@ -35,6 +35,17 @@ export const createCardHeader = (
     primary.remaining_until_blocking_mode.state !== 'unavailable' &&
     primary.remaining_until_blocking_mode.state !== 'unknown';
 
+  // Get status color based on active count and mixed status
+  const getStatusColor = () => {
+    if (mixedStatus) {
+      return 'var(--warning-color, orange)';
+    } else if (activeCount > 0) {
+      return 'var(--success-color, green)';
+    } else {
+      return 'var(--error-color, red)';
+    }
+  };
+
   return html`
     <div class="card-header">
       <div class="name">
@@ -46,18 +57,12 @@ export const createCardHeader = (
             >`
           : ''}
       </div>
-      <div
-        style="color: ${mixedStatus
-          ? 'var(--warning-color, orange)'
-          : activeCount > 0
-            ? 'var(--success-color, green)'
-            : 'var(--error-color, red)'}"
-      >
+      <div style="color: ${getStatusColor()}">
         <ha-icon
           icon="${activeCount > 0 ? 'mdi:check-circle' : 'mdi:close-circle'}"
         ></ha-icon>
         ${mixedStatus ? html`Partial` : stateDisplay(hass, primary.status!)}
-        ${!(activeCount > 0) && hasRemainingTime
+        ${activeCount <= 0 && hasRemainingTime
           ? html`${stateDisplay(
               hass,
               primary.remaining_until_blocking_mode!,

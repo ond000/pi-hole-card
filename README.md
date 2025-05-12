@@ -101,6 +101,29 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 
 ![filtering](assets/filtering.png)
 
+### Multi-Pi-hole Support
+
+- **Centralized Control** - Manage multiple Pi-hole instances from a single card
+- **Aggregated Status** - See at a glance how many of your Pi-holes are active
+- **Unified Control** - Centralized access to all switches from your Pi-hole instances
+- **Intelligent Status Indicators** - Status automatically adjusts based on collective state:
+  - Shows "Running" when all instances are active
+  - Shows "Partial" when some instances are active and some are inactive
+  - Shows count of active instances (e.g., "2/3")
+
+Example of Partial
+![Multi Pi-hole Status](assets/multi-pihole-partial.png)
+
+Example of all Running
+![Multi Pi-hole All Running](assets/multi-pihole-running.png)
+
+> [!NOTE]  
+> The multi-Pi-hole feature currently has some limitations:
+>
+> - Statistics shown are from the first Pi-hole in the list only
+> - All switches from all Pi-holes are displayed in a single list
+> - Only header status reflects the multi-Pi-hole state
+
 ### Responsive Design
 
 - **Mobile-friendly** - Optimized layout for both desktop and mobile viewing
@@ -147,7 +170,7 @@ Add the card to your dashboard using the UI editor or YAML:
 
 The card is fully configurable through the card editor, allowing you to customize:
 
-- Pi-hole device selection
+- Pi-hole device selection (single or multiple)
 - Card title and icon
 - Custom actions for statistics, info panels, and control buttons
 
@@ -162,25 +185,36 @@ type: custom:pi-hole
 device_id: your_pihole_device_id
 ```
 
+For multiple Pi-hole instances:
+
+```yaml
+type: custom:pi-hole
+device_id:
+  - your_first_pihole_device_id
+  - your_second_pihole_device_id
+  - etc..
+```
+
 The card will automatically:
 
-- Detect all Pi-hole entities associated with the device
+- Detect all Pi-hole entities associated with the device(s)
 - Organize statistics in the dashboard layout
 - Display control buttons for common actions
 - Show version information for all components
+- For multiple Pi-holes: combine switches and show aggregated status
 
 ## Configuration Options
 
-| Name             | Type   | Default      | Description                                     |
-| ---------------- | ------ | ------------ | ----------------------------------------------- |
-| device_id        | string | **Required** | The ID of your Pi-hole device in Home Assistant |
-| title            | string | Pi-Hole      | Custom title for the card header                |
-| icon             | string | mdi:pi-hole  | Custom icon for the card header                 |
-| stats            | object | _none_       | Configure actions for statistics tiles          |
-| info             | object | _none_       | Configure actions for additional info items     |
-| controls         | object | _none_       | Configure actions for control buttons           |
-| exclude_sections | list   | _none_       | Sections of entities to exclude. See below.     |
-| exclude_entities | list   | _none_       | Entities to remove from the card.               |
+| Name             | Type            | Default      | Description                                           |
+| ---------------- | --------------- | ------------ | ----------------------------------------------------- |
+| device_id        | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant |
+| title            | string          | Pi-Hole      | Custom title for the card header                      |
+| icon             | string          | mdi:pi-hole  | Custom icon for the card header                       |
+| stats            | object          | _none_       | Configure actions for statistics tiles                |
+| info             | object          | _none_       | Configure actions for additional info items           |
+| controls         | object          | _none_       | Configure actions for control buttons                 |
+| exclude_sections | list            | _none_       | Sections of entities to exclude. See below.           |
+| exclude_entities | list            | _none_       | Entities to remove from the card.                     |
 
 ### Action Configuration
 
@@ -227,6 +261,16 @@ This includes sensors, buttons, switches, binary sensors, and update entities.
 ```yaml
 type: custom:pi-hole
 device_id: pi_hole_device_1
+```
+
+### Multiple Pi-hole Configuration
+
+```yaml
+type: custom:pi-hole
+device_id:
+  - pi_hole_device_1
+  - pi_hole_device_2
+title: 'My Pi-hole Network'
 ```
 
 ### With Custom Title and Icon
@@ -318,8 +362,10 @@ controls:
 - [x] **`Performance optimizations`**: improved code structure and efficiency
 - [x] **`Enhanced entity mapping`**: better entity identification with translation keys
 - [x] **`Translations`**: ability to add translations
+- [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
 - [ ] **`Additional visualization options`**: more chart types for displaying statistics
+- [ ] **`Extend Multi-Pi-hole featurs`**: maybe improve this feature some
 
 ## Contributing
 
