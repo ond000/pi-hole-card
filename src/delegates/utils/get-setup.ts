@@ -1,6 +1,6 @@
 import type { HomeAssistant } from '@hass/types';
 import type { Config } from '@type/config';
-import type { PiHoleSetup } from '@type/types';
+import type { EntityInformation, PiHoleSetup } from '@type/types';
 import { getPiHole } from './get-pihole';
 
 /**
@@ -22,9 +22,31 @@ export const getPiSetup = (
     return undefined;
   }
 
+  // keep track of switches that are not in the first device
+  const spareSwitches: EntityInformation[] = [];
+
   const holes = deviceIds
-    .map((deviceId) => getPiHole(hass, config, deviceId))
-    .filter((device) => device !== undefined);
+    .map((deviceId, i) => getPiHole(hass, config, deviceId))
+    .filter((hole) => hole !== undefined)
+    .map((hole, i) => {
+      if (i > 0) {
+        spareSwitches.push(...hole.switches);
+        // don't track entites that are not in the first device
+        return {
+          device_id: hole.device_id,
+          status: hole.status,
+          controls: [],
+          sensors: [],
+          switches: [],
+          updates: [],
+        };
+      }
+      return hole;
+    });
+
+  if (holes.length > 1) {
+    holes[0]!.switches.push(...spareSwitches);
+  }
 
   return {
     holes,

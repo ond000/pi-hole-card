@@ -152,5 +152,141 @@ export default () => {
       // Verify getPiHole was called twice but no valid devices were found
       expect(getPiHoleStub.calledTwice).to.be.true;
     });
+
+    it('should add switches from additional devices to the first device and limit other device fields', () => {
+      // Arrange - Create first device with one switch
+      const device1Switch = {
+        entity_id: 'switch.pi_hole_1',
+        state: 'on',
+        attributes: { friendly_name: 'Pi-hole 1' },
+        translation_key: undefined,
+      };
+
+      const device1Status = {
+        entity_id: 'binary_sensor.pi_hole_status_1',
+        state: 'on',
+        attributes: { friendly_name: 'Pi-hole Status 1' },
+        translation_key: undefined,
+      };
+
+      const device1 = {
+        device_id: 'pi_hole_device_1',
+        status: device1Status,
+        switches: [device1Switch],
+        sensors: [
+          {
+            entity_id: 'sensor.pi_hole_1_dns_queries',
+            state: '1000',
+            attributes: {},
+            translation_key: 'dns_queries',
+          },
+        ],
+        controls: [
+          {
+            entity_id: 'button.pi_hole_1_refresh',
+            state: 'off',
+            attributes: {},
+            translation_key: 'refresh',
+          },
+        ],
+        updates: [
+          {
+            entity_id: 'update.pi_hole_1_core',
+            state: 'off',
+            attributes: {},
+            translation_key: undefined,
+          },
+        ],
+      };
+
+      // Create second device with two switches
+      const device2Switch1 = {
+        entity_id: 'switch.pi_hole_2_primary',
+        state: 'on',
+        attributes: { friendly_name: 'Pi-hole 2 Primary' },
+        translation_key: undefined,
+      };
+
+      const device2Switch2 = {
+        entity_id: 'switch.pi_hole_2_secondary',
+        state: 'off',
+        attributes: { friendly_name: 'Pi-hole 2 Secondary' },
+        translation_key: undefined,
+      };
+
+      const device2Status = {
+        entity_id: 'binary_sensor.pi_hole_status_2',
+        state: 'on',
+        attributes: { friendly_name: 'Pi-hole Status 2' },
+        translation_key: undefined,
+      };
+
+      const device2 = {
+        device_id: 'pi_hole_device_2',
+        status: device2Status,
+        switches: [device2Switch1, device2Switch2],
+        sensors: [
+          {
+            entity_id: 'sensor.pi_hole_2_dns_queries',
+            state: '2000',
+            attributes: {},
+            translation_key: 'dns_queries',
+          },
+        ],
+        controls: [
+          {
+            entity_id: 'button.pi_hole_2_refresh',
+            state: 'off',
+            attributes: {},
+            translation_key: 'refresh',
+          },
+        ],
+        updates: [
+          {
+            entity_id: 'update.pi_hole_2_core',
+            state: 'off',
+            attributes: {},
+            translation_key: undefined,
+          },
+        ],
+      };
+
+      // Set up the stub responses
+      getPiHoleStub
+        .withArgs(mockHass, mockConfig, 'pi_hole_device_1')
+        .returns(device1);
+      getPiHoleStub
+        .withArgs(mockHass, mockConfig, 'pi_hole_device_2')
+        .returns(device2);
+
+      // Set config with multiple device IDs
+      mockConfig.device_id = ['pi_hole_device_1', 'pi_hole_device_2'];
+
+      // Act
+      const result = getPiSetup(mockHass, mockConfig);
+
+      // Assert
+      expect(result).to.exist;
+      expect(result?.holes).to.be.an('array').with.lengthOf(2);
+
+      // Check first device has its original switches plus switches from second device
+      expect(result?.holes[0]?.switches).to.have.lengthOf(3);
+      expect(result?.holes[0]?.switches).to.deep.include(device1Switch);
+      expect(result?.holes[0]?.switches).to.deep.include(device2Switch1);
+      expect(result?.holes[0]?.switches).to.deep.include(device2Switch2);
+
+      // Check first device still has all its original properties
+      expect(result?.holes[0]?.sensors).to.have.lengthOf(1);
+      expect(result?.holes[0]?.controls).to.have.lengthOf(1);
+      expect(result?.holes[0]?.updates).to.have.lengthOf(1);
+
+      // Check second device only has device_id and status, with empty arrays for other properties
+      expect(result?.holes[1]?.device_id).to.equal('pi_hole_device_2');
+      expect(result?.holes[1]?.status).to.deep.equal(device2Status);
+      expect(result?.holes[1]?.switches).to.be.an('array').with.lengthOf(0);
+      expect(result?.holes[1]?.sensors).to.be.an('array').with.lengthOf(0);
+      expect(result?.holes[1]?.controls).to.be.an('array').with.lengthOf(0);
+      expect(result?.holes[1]?.updates).to.be.an('array').with.lengthOf(0);
+    });
   });
 };
