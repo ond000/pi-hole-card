@@ -1,0 +1,14 @@
+{
+  "card": {
+    "stats": {
+      "total_queries": "Peticiones totales",
+      "active_clients": "{number} clientes activos",
+      "queries_blocked": "Peticiones bloqueadas",
+      "list_blocked_queries": "Listar peticiones bloqueadas",
+      "percentage_blocked": "Porcentaje bloqueos",
+      "list_all_queries": "Listar todas las peticiones",
+      "domains_on_lists": "Dominios bloqueados",
+      "manage_lists": "Gestionar listas"
+    }
+  }
+}

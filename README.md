@@ -407,6 +407,7 @@ The Pi-hole card supports multiple languages to provide a better experience for 
 ### Currently supported languages:
 
 - English
+- Spanish
 
 Want to contribute a translation? See our [translation guide](TRANSLATIONS.md) for instructions.
 

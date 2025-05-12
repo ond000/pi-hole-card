@@ -5,6 +5,7 @@ Thank you for your interest in helping translate the Pi-hole Card! Translations 
 ## Currently Supported Languages
 
 - English (en)
+- Spanish (es)
 - _Your language could be next!_
 
 ## How to Add a Translation
