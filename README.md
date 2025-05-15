@@ -215,6 +215,7 @@ The card will automatically:
 | controls         | object          | _none_       | Configure actions for control buttons                 |
 | exclude_sections | list            | _none_       | Sections of entities to exclude. See below.           |
 | exclude_entities | list            | _none_       | Entities to remove from the card.                     |
+| entity_order     | list            | _none_       | Custom order for switch, button, sensor entities      |
 
 ### Action Configuration
 
@@ -348,6 +349,18 @@ controls:
     data:
       title: Pi-hole Controls
       content: 'Advanced Pi-hole control panel'
+```
+
+### Custom Entity Order
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+entity_order:
+  - button.pi_hole_action_refresh_data
+  - sensor.pi_hole_dns_queries_today
+  - sensor.pi_hole_ads_blocked_today
+  - switch.pi_hole
 ```
 
 ## Project Roadmap

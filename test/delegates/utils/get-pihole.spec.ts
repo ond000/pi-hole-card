@@ -143,6 +143,59 @@ export default () => {
       expect(mapEntitiesByTranslationKeyStub.calledWith(mockEntities[1])).to.be
         .true;
     });
+
+    it('should respect entity_order in config for entity ordering', () => {
+      // Create test entities in a specific order
+      const mockEntities = [
+        createEntity('button.test_1', 'action_refresh_data', 'on'),
+        createEntity('sensor.test_2', 'dns_queries_today', '1000'),
+        createEntity('switch.test_3', undefined, 'on'),
+        createEntity('button.test_4', undefined, 'off'),
+      ];
+
+      // Define a different order in the config
+      mockConfig.entity_order = [
+        'button.test_4', // This should come first
+        'sensor.test_2', // This should come second
+        'button.test_1', // This should come third
+        // 'switch.test_3' is not included, so it should come last
+      ];
+
+      getDeviceEntitiesStub.returns(mockEntities);
+
+      // Configure any needed stubs to pass through the entities
+      mapEntitiesByTranslationKeyStub.returns(false);
+      shouldSkipEntityStub.returns(false);
+
+      // Get the result
+      const result = getPiHole(mockHass, mockConfig, DEVICE_ID);
+
+      // Verify that entities were processed in the order specified by entity_order
+      // Check calls to mapEntitiesByTranslationKey which should reflect processing order
+      expect(mapEntitiesByTranslationKeyStub.callCount).to.equal(
+        mockEntities.length,
+      );
+
+      // The first call should be for button.test_4
+      expect(
+        mapEntitiesByTranslationKeyStub.getCall(0).args[0].entity_id,
+      ).to.equal('button.test_4');
+
+      // The second call should be for sensor.test_2
+      expect(
+        mapEntitiesByTranslationKeyStub.getCall(1).args[0].entity_id,
+      ).to.equal('sensor.test_2');
+
+      // The third call should be for button.test_1
+      expect(
+        mapEntitiesByTranslationKeyStub.getCall(2).args[0].entity_id,
+      ).to.equal('button.test_1');
+
+      // The fourth call should be for switch.test_3 (not in entity_order)
+      expect(
+        mapEntitiesByTranslationKeyStub.getCall(3).args[0].entity_id,
+      ).to.equal('switch.test_3');
+    });
   });
 };
 

@@ -49,6 +49,34 @@ const SCHEMA: HaFormSchema[] = [
           },
         },
       },
+      {
+        name: 'entity_order',
+        label: 'Entity display order (click in order)',
+        required: false,
+        selector: {
+          entity: {
+            multiple: true,
+            filter: [
+              {
+                integration: 'pi_hole_v6',
+                domain: 'sensor',
+              },
+              {
+                integration: 'pi_hole_v6',
+                domain: 'switch',
+              },
+              {
+                integration: 'pi_hole',
+                domain: 'sensor',
+              },
+              {
+                integration: 'pi_hole',
+                domain: 'switch',
+              },
+            ],
+          },
+        },
+      },
     ],
   },
   {
@@ -268,6 +296,10 @@ export class PiHoleCardEditor extends LitElement {
 
     if (!config.exclude_sections?.length) {
       delete config.exclude_sections;
+    }
+
+    if (!config.entity_order?.length) {
+      delete config.entity_order;
     }
 
     // @ts-ignore

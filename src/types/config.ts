@@ -30,6 +30,9 @@ export interface Config {
 
   /** The sections to exclude */
   exclude_sections?: Sections[];
+
+  /** The order in which entities should be displayed */
+  entity_order?: string[];
 }
 export type Sections =
   | 'header'

@@ -122,6 +122,19 @@ export default () => {
                   },
                 },
               },
+              {
+                name: 'entity_order',
+                label: 'Entity display order (click in order)',
+                required: false,
+                selector: {
+                  entity: {
+                    multiple: true,
+                    filter: {
+                      integration: 'pi_hole_v6',
+                    },
+                  },
+                },
+              },
             ],
           },
           {
@@ -362,6 +375,9 @@ export default () => {
             stats: {},
             info: {},
             controls: {},
+            exclude_entities: [],
+            exclude_sections: [],
+            entity_order: [],
           },
         };
 
@@ -379,6 +395,12 @@ export default () => {
         expect(dispatchStub.firstCall.args[0].detail.config.info).to.be
           .undefined;
         expect(dispatchStub.firstCall.args[0].detail.config.controls).to.be
+          .undefined;
+        expect(dispatchStub.firstCall.args[0].detail.config.exclude_entities).to
+          .be.undefined;
+        expect(dispatchStub.firstCall.args[0].detail.config.exclude_sections).to
+          .be.undefined;
+        expect(dispatchStub.firstCall.args[0].detail.config.entity_order).to.be
           .undefined;
       });
     });
