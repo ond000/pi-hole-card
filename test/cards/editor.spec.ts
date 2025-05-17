@@ -157,6 +157,10 @@ export default () => {
                         value: 'controls',
                       },
                       {
+                        label: 'Pause Buttons',
+                        value: 'pause',
+                      },
+                      {
                         label: 'Footer',
                         value: 'footer',
                       },
@@ -174,12 +178,17 @@ export default () => {
                     mode: 'list' as const,
                     options: [
                       {
+                        label: 'Pause Buttons',
+                        value: 'pause',
+                      },
+                      {
                         label: 'Buttons',
                         value: 'buttons',
                       },
+
                       {
-                        label: 'Switches',
-                        value: 'switches',
+                        label: 'Actions',
+                        value: 'actions',
                       },
                     ],
                   },
@@ -233,6 +242,32 @@ export default () => {
             flatten: true,
             icon: 'mdi:gesture-tap',
             schema: [
+              {
+                name: 'pause_durations',
+                label: 'Pause durations',
+                required: false,
+                selector: {
+                  select: {
+                    multiple: true,
+                    custom_value: true,
+                    mode: 'list' as const,
+                    options: [
+                      {
+                        label: '60 seconds',
+                        value: '60',
+                      },
+                      {
+                        label: '5 minutes',
+                        value: '300',
+                      },
+                      {
+                        label: '15 minutes',
+                        value: '900',
+                      },
+                    ],
+                  },
+                },
+              },
               {
                 name: 'stats',
                 label: 'Statistics',

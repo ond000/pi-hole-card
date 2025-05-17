@@ -36,13 +36,17 @@ export interface Config {
 
   /** Sections that should be collapsed by default */
   collapsed_sections?: CollapsibleSections[];
+
+  /** Custom pause durations in seconds (optional) */
+  pause_durations?: number[];
 }
 
-export type CollapsibleSections = 'actions' | 'switches';
+export type CollapsibleSections = 'actions' | 'pause' | 'switches';
 export type Sections =
   | 'header'
   | 'statistics'
   | 'sensors'
+  | 'pause'
   | 'controls'
   | 'footer';
 

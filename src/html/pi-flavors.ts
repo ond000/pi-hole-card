@@ -6,6 +6,7 @@ import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { toggleSection } from '../common/toggle-section';
 import { createActionButton } from './components/action-control';
+import { pause } from './components/pause';
 import { stateContent } from './components/state-content';
 
 /**
@@ -36,19 +37,24 @@ export const createCardActions = (
     },
   };
 
+  const switchCollapsed = isCollapsed(config, 'switches');
+  const actionsCollapsed = isCollapsed(config, 'actions');
+
   return html`
     <div>
+      ${pause(hass, device, config)}
       <div class="collapsible-section">
         <div
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.switches')}
         >
           <span>Switches</span>
-          <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
+          <ha-icon
+            class="caret-icon"
+            icon="mdi:chevron-${switchCollapsed ? 'right' : 'down'}"
+          ></ha-icon>
         </div>
-        <div
-          class="switches ${isCollapsed(config, 'switches') ? 'hidden' : ''}"
-        >
+        <div class="switches ${switchCollapsed ? 'hidden' : ''}">
           ${device.switches.map((piSwitch) => {
             const orderExists = config.entity_order?.includes(
               piSwitch.entity_id,
@@ -75,9 +81,12 @@ export const createCardActions = (
           @click=${(e: Event) => toggleSection(e, '.actions')}
         >
           <span>Actions</span>
-          <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
+          <ha-icon
+            class="caret-icon"
+            icon="mdi:chevron-${actionsCollapsed ? 'right' : 'down'}"
+          ></ha-icon>
         </div>
-        <div class="actions ${isCollapsed(config, 'actions') ? 'hidden' : ''}">
+        <div class="actions ${actionsCollapsed ? 'hidden' : ''}">
           ${device.controls.map((control) => {
             return createActionButton(element, sectionConfig, control, '');
           })}

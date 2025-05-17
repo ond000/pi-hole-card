@@ -246,6 +246,7 @@ The following section names can be used with `exclude_sections`:
 - header
 - statistics
 - sensors
+- pause
 - controls
 - footer
 

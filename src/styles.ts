@@ -252,6 +252,7 @@ export const styles = css`
     margin-right: 3px;
   }
 
+  /* Switch styles */
   .remaining-time {
     font-size: 1.2rem;
     font-weight: 400;
@@ -262,6 +263,7 @@ export const styles = css`
     margin: 0px 8px;
   }
 
+  /* Refresh time styles */
   .refresh-time {
     display: flex;
     font-size: 0.85rem;
@@ -275,12 +277,14 @@ export const styles = css`
     cursor: pointer;
   }
 
+  /* Status icon styles */
   .multi-status {
     font-size: 0.9rem;
     margin-left: 8px;
     opacity: 0.8;
   }
 
+  /* Divider styles */
   .divider {
     height: 1px;
     background-color: var(--secondary-text-color);
@@ -290,5 +294,13 @@ export const styles = css`
 
   .wide {
     width: 100%;
+  }
+
+  /* Pause buttons */
+  .pause {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
   }
 `;

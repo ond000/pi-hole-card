@@ -1,3 +1,4 @@
+import pauseHoleSpec from '@test/delegates/utils/pause-hole.spec';
 import actionControlSpec from './action-control.spec';
 import additionalStatSpec from './additional-stat.spec';
 import refreshTimeSpec from './refresh-time.spec';
@@ -10,6 +11,7 @@ export default () => {
   describe('components', () => {
     additionalStatSpec();
     actionControlSpec();
+    pauseHoleSpec();
     refreshTimeSpec();
     statBoxSpec();
     stateContentSpec();
