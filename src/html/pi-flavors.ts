@@ -3,6 +3,7 @@ import type { HomeAssistant } from '@hass/types';
 import type { Config, SectionConfig } from '@type/config';
 import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
+import { toggleSection } from '../common/toggle-section';
 import { createActionButton } from './components/action-control';
 import { stateContent } from './components/state-content';
 
@@ -36,15 +37,34 @@ export const createCardActions = (
 
   return html`
     <div>
-      <div class="switches">
-        ${device.switches.map((piSwitch) => {
-          return stateContent(hass, piSwitch);
-        })}
+      <div class="collapsible-section">
+        <div
+          class="section-header"
+          @click=${(e: Event) => toggleSection(e, '.switches')}
+        >
+          <span>Switches</span>
+          <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
+        </div>
+        <div class="switches">
+          ${device.switches.map((piSwitch) => {
+            return stateContent(hass, piSwitch);
+          })}
+        </div>
       </div>
-      <div class="actions">
-        ${device.controls.map((control) => {
-          return createActionButton(element, sectionConfig, control, '');
-        })}
+
+      <div class="collapsible-section">
+        <div
+          class="section-header"
+          @click=${(e: Event) => toggleSection(e, '.actions')}
+        >
+          <span>Actions</span>
+          <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
+        </div>
+        <div class="actions">
+          ${device.controls.map((control) => {
+            return createActionButton(element, sectionConfig, control, '');
+          })}
+        </div>
       </div>
     </div>
   `;

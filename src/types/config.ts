@@ -33,7 +33,12 @@ export interface Config {
 
   /** The order in which entities should be displayed */
   entity_order?: string[];
+
+  /** Sections that should be collapsed by default */
+  collapsed_sections?: CollapsibleSections[];
 }
+
+export type CollapsibleSections = 'buttons' | 'switches';
 export type Sections =
   | 'header'
   | 'statistics'

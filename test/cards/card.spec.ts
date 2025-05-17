@@ -1,10 +1,13 @@
+import { styles } from '@/styles';
 import { PiHoleCard } from '@cards/card';
 import * as getConfigDeviceModule from '@delegates/utils/get-config-device';
 import * as getPiHoleModule from '@delegates/utils/get-pihole';
 import type { HomeAssistant } from '@hass/types';
+import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
 import type { PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
+import type { TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -124,6 +127,26 @@ export default () => {
 
       // Check that it returns an element with the expected tag name
       expect(editorElement.tagName.toLowerCase()).to.equal('pi-hole-editor');
+    });
+
+    describe('styles', () => {
+      it('should return expected styles', () => {
+        const actual = PiHoleCard.styles;
+        expect(actual).to.deep.equal(styles);
+      });
+    });
+
+    describe('rendering', () => {
+      it('should render a loading message when not ready', async () => {
+        const card = new PiHoleCard();
+
+        card.setConfig(undefined as any as Config);
+
+        const el = await fixture(card.render() as TemplateResult);
+
+        expect(el.querySelector('.no-devices')).to.exist;
+        expect(el.textContent).to.include('Loading...');
+      });
     });
   });
 };

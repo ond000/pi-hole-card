@@ -98,6 +98,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Visual Indicators** - Color-coded statistics to understand status at a glance
 - **Customizable Card** - Set custom title and icon to match your dashboard style
 - **Entity Filtering** - Ability to exclude specific entities or entire sections
+- **Collapsible Sections** - Ability to collapse/expand sections to save space
 
 ![filtering](assets/filtering.png)
 
@@ -376,8 +377,9 @@ entity_order:
 - [x] **`Enhanced entity mapping`**: better entity identification with translation keys
 - [x] **`Translations`**: ability to add translations
 - [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances
+- [x] **`Collapsible sections`**: collapse/expand card sections to save space
+- [x] **`Additional visualization options`**: using HA native more-info, etc.
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
-- [ ] **`Additional visualization options`**: more chart types for displaying statistics
 - [ ] **`Extend Multi-Pi-hole featurs`**: maybe improve this feature some
 
 ## Contributing

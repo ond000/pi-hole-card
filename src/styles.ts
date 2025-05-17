@@ -36,7 +36,7 @@ export const styles = css`
   }
 
   .card-content {
-    padding: 16px;
+    padding: 16px 16px 0px 16px;
   }
 
   /* Dashboard-style layout with grouped stat boxes */
@@ -168,17 +168,42 @@ export const styles = css`
     color: var(--secondary-text-color);
   }
 
-  .switches {
+  /* Collapsible section styles */
+  .section-header {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
-    border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
   }
 
+  .section-header span {
+    font-weight: 500;
+  }
+
+  .caret-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .switches,
   .actions {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    transition:
+      max-height 0.3s ease,
+      opacity 0.3s ease;
+    overflow: hidden;
+    max-height: 500px; /* Adjust as needed */
+    opacity: 1;
+  }
+
+  .hidden {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
   }
 
   /* Version information styles */
@@ -191,7 +216,6 @@ export const styles = css`
     color: var(--secondary-text-color);
     border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
     background-color: var(--card-background-color);
-    margin-top: 8px;
     gap: 12px;
   }
 
