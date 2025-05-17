@@ -49,34 +49,6 @@ const SCHEMA: HaFormSchema[] = [
           },
         },
       },
-      {
-        name: 'entity_order',
-        label: 'Entity display order (click in order)',
-        required: false,
-        selector: {
-          entity: {
-            multiple: true,
-            filter: [
-              {
-                integration: 'pi_hole_v6',
-                domain: 'sensor',
-              },
-              {
-                integration: 'pi_hole_v6',
-                domain: 'switch',
-              },
-              {
-                integration: 'pi_hole',
-                domain: 'sensor',
-              },
-              {
-                integration: 'pi_hole',
-                domain: 'switch',
-              },
-            ],
-          },
-        },
-      },
     ],
   },
   {
@@ -120,15 +92,62 @@ const SCHEMA: HaFormSchema[] = [
         },
       },
       {
+        name: 'collapsed_sections',
+        label: 'Sections collapsed by default',
+        required: false,
+        selector: {
+          select: {
+            multiple: true,
+            mode: 'list' as const,
+            options: [
+              {
+                label: 'Buttons',
+                value: 'buttons',
+              },
+              {
+                label: 'Switches',
+                value: 'switches',
+              },
+            ],
+          },
+        },
+      },
+      {
         name: 'exclude_entities',
         label: 'Entities to exclude',
         required: false,
         selector: {
           entity: {
             multiple: true,
-            filter: {
-              integration: 'pi_hole_v6',
-            },
+            filter: [
+              {
+                integration: 'pi_hole_v6',
+              },
+              {
+                integration: 'pi_hole',
+              },
+            ],
+          },
+        },
+      },
+      {
+        name: 'entity_order',
+        label: 'Entity display order (click in order)',
+        required: false,
+        selector: {
+          entity: {
+            multiple: true,
+            filter: [
+              {
+                integration: 'pi_hole_v6',
+                domain: ['button', 'sensor', 'switch'],
+              },
+
+              {
+                integration: 'pi_hole',
+                domain: ['button', 'sensor', 'switch'],
+              },
+            ],
           },
         },
       },
@@ -300,6 +319,10 @@ export class PiHoleCardEditor extends LitElement {
 
     if (!config.entity_order?.length) {
       delete config.entity_order;
+    }
+
+    if (!config.collapsed_sections?.length) {
+      delete config.collapsed_sections;
     }
 
     // @ts-ignore

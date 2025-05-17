@@ -38,7 +38,7 @@ export interface Config {
   collapsed_sections?: CollapsibleSections[];
 }
 
-export type CollapsibleSections = 'buttons' | 'switches';
+export type CollapsibleSections = 'actions' | 'switches';
 export type Sections =
   | 'header'
   | 'statistics'

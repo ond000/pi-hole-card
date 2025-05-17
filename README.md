@@ -100,6 +100,8 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Entity Filtering** - Ability to exclude specific entities or entire sections
 - **Collapsible Sections** - Ability to collapse/expand sections to save space
 
+![collapse](assets/collapse.png)
+
 ![filtering](assets/filtering.png)
 
 ### Multi-Pi-hole Support
@@ -206,17 +208,18 @@ The card will automatically:
 
 ## Configuration Options
 
-| Name             | Type            | Default      | Description                                           |
-| ---------------- | --------------- | ------------ | ----------------------------------------------------- |
-| device_id        | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant |
-| title            | string          | Pi-Hole      | Custom title for the card header                      |
-| icon             | string          | mdi:pi-hole  | Custom icon for the card header                       |
-| stats            | object          | _none_       | Configure actions for statistics tiles                |
-| info             | object          | _none_       | Configure actions for additional info items           |
-| controls         | object          | _none_       | Configure actions for control buttons                 |
-| exclude_sections | list            | _none_       | Sections of entities to exclude. See below.           |
-| exclude_entities | list            | _none_       | Entities to remove from the card.                     |
-| entity_order     | list            | _none_       | Custom order for switch, button, sensor entities      |
+| Name               | Type            | Default      | Description                                           |
+| ------------------ | --------------- | ------------ | ----------------------------------------------------- |
+| device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant |
+| title              | string          | Pi-Hole      | Custom title for the card header                      |
+| icon               | string          | mdi:pi-hole  | Custom icon for the card header                       |
+| stats              | object          | _none_       | Configure actions for statistics tiles                |
+| info               | object          | _none_       | Configure actions for additional info items           |
+| controls           | object          | _none_       | Configure actions for control buttons                 |
+| exclude_sections   | list            | _none_       | Sections of entities to exclude. See below.           |
+| exclude_entities   | list            | _none_       | Entities to remove from the card.                     |
+| entity_order       | list            | _none_       | Custom order for switch, button, sensor entities      |
+| collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.        |
 
 ### Action Configuration
 
@@ -245,6 +248,13 @@ The following section names can be used with `exclude_sections`:
 - sensors
 - controls
 - footer
+
+### Collapse Options
+
+The following section names can be used with `collapsed_sections`:
+
+- actions
+- switches
 
 ### Auto-discovery
 
@@ -362,6 +372,16 @@ entity_order:
   - sensor.pi_hole_dns_queries_today
   - sensor.pi_hole_ads_blocked_today
   - switch.pi_hole
+```
+
+### Collapsed Sections
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+collapsed_sections:
+  - actions
+  - switches
 ```
 
 ## Project Roadmap

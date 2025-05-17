@@ -1,3 +1,4 @@
+import { isCollapsed } from '@common/collapsed-state';
 import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import type { Config, SectionConfig } from '@type/config';
@@ -45,7 +46,9 @@ export const createCardActions = (
           <span>Switches</span>
           <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
         </div>
-        <div class="switches">
+        <div
+          class="switches ${isCollapsed(config, 'switches') ? 'hidden' : ''}"
+        >
           ${device.switches.map((piSwitch) => {
             return stateContent(hass, piSwitch);
           })}
@@ -60,7 +63,7 @@ export const createCardActions = (
           <span>Actions</span>
           <ha-icon class="caret-icon" icon="mdi:chevron-down"></ha-icon>
         </div>
-        <div class="actions">
+        <div class="actions ${isCollapsed(config, 'actions') ? 'hidden' : ''}">
           ${device.controls.map((control) => {
             return createActionButton(element, sectionConfig, control, '');
           })}

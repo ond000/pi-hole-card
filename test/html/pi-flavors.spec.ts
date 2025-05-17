@@ -1,3 +1,4 @@
+import * as collapsedStateModule from '@common/collapsed-state';
 import * as showSectionModule from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import * as actionControlModule from '@html/components/action-control';
@@ -19,6 +20,7 @@ export default () => {
     let createActionButtonStub: sinon.SinonStub;
     let stateContentStub: sinon.SinonStub;
     let showSectionStub: sinon.SinonStub;
+    let isCollapsedStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create mock element and hass
@@ -28,6 +30,10 @@ export default () => {
       // Create stub for show function
       showSectionStub = stub(showSectionModule, 'show');
       showSectionStub.returns(true); // Default to showing sections
+
+      // Create stub for isCollapsed function
+      isCollapsedStub = stub(collapsedStateModule, 'isCollapsed');
+      isCollapsedStub.returns(false); // Default to not collapsed
 
       // Create stubs for helper functions
       createActionButtonStub = stub(actionControlModule, 'createActionButton');
@@ -90,6 +96,7 @@ export default () => {
       createActionButtonStub.restore();
       stateContentStub.restore();
       showSectionStub.restore();
+      isCollapsedStub.restore();
     });
 
     it('should return nothing when show returns false for controls section', async () => {
@@ -130,6 +137,54 @@ export default () => {
 
       expect(switchesDiv).to.exist;
       expect(actionsDiv).to.exist;
+    });
+
+    it('should add the hidden class to switches section when it is collapsed', async () => {
+      // Configure isCollapsed to return true for switches
+      isCollapsedStub.withArgs(mockConfig, 'switches').returns(true);
+      isCollapsedStub.withArgs(mockConfig, 'actions').returns(false);
+
+      const result = createCardActions(
+        mockElement,
+        mockHass,
+        mockDevice,
+        mockConfig,
+      );
+      const el = await fixture(result as TemplateResult);
+
+      // Check that switches div has the hidden class
+      const switchesDiv = el.querySelector('.switches');
+      expect(switchesDiv).to.exist;
+      expect(switchesDiv!.classList.contains('hidden')).to.be.true;
+
+      // Check that actions div does not have the hidden class
+      const actionsDiv = el.querySelector('.actions');
+      expect(actionsDiv).to.exist;
+      expect(actionsDiv!.classList.contains('hidden')).to.be.false;
+    });
+
+    it('should add the hidden class to actions section when it is collapsed', async () => {
+      // Configure isCollapsed to return true for actions
+      isCollapsedStub.withArgs(mockConfig, 'switches').returns(false);
+      isCollapsedStub.withArgs(mockConfig, 'actions').returns(true);
+
+      const result = createCardActions(
+        mockElement,
+        mockHass,
+        mockDevice,
+        mockConfig,
+      );
+      const el = await fixture(result as TemplateResult);
+
+      // Check that switches div does not have the hidden class
+      const switchesDiv = el.querySelector('.switches');
+      expect(switchesDiv).to.exist;
+      expect(switchesDiv!.classList.contains('hidden')).to.be.false;
+
+      // Check that actions div has the hidden class
+      const actionsDiv = el.querySelector('.actions');
+      expect(actionsDiv).to.exist;
+      expect(actionsDiv!.classList.contains('hidden')).to.be.true;
     });
 
     it('should call stateContent for each switch entity', async () => {

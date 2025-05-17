@@ -154,7 +154,6 @@ export const styles = css`
     align-items: center;
     font-size: 0.9rem;
     color: var(--secondary-text-color);
-    background-color: var(--card-background-color, #f0f0f0);
     padding: 8px;
     border-radius: 4px;
     min-width: 120px;
@@ -215,7 +214,6 @@ export const styles = css`
     font-size: 0.85rem;
     color: var(--secondary-text-color);
     border-top: 1px solid var(--divider-color, rgba(0, 0, 0, 0.12));
-    background-color: var(--card-background-color);
     gap: 12px;
   }
 
