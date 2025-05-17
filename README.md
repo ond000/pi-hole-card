@@ -5,7 +5,7 @@
 </p>
 <p align="center"><h1 align="center">Pi-hole Card</h1></p>
 <p align="center">
-	<em>Complete Pi-hole monitoring and control for Home Assistant</em>
+  <em>Complete Pi-hole monitoring and control for Home Assistant</em>
 </p>
 
 ![Home Assistant](https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white)
@@ -23,11 +23,11 @@
 
 <p align="center">Built with the tools and technologies:</p>
 <p align="center">
-	<img src="https://img.shields.io/badge/npm-CB3837.svg?style=for-the-badge&logo=npm&logoColor=white" alt="npm">
-	<img src="https://img.shields.io/badge/Prettier-F7B93E.svg?style=for-the-badge&logo=Prettier&logoColor=black" alt="Prettier">
-	<img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
-	<img src="https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=GitHub-Actions&logoColor=white" alt="GitHub%20Actions">
-	<img src="https://img.shields.io/badge/Lit-324FFF.svg?style=for-the-badge&logo=Lit&logoColor=white" alt="Lit">
+  <img src="https://img.shields.io/badge/npm-CB3837.svg?style=for-the-badge&logo=npm&logoColor=white" alt="npm">
+  <img src="https://img.shields.io/badge/Prettier-F7B93E.svg?style=for-the-badge&logo=Prettier&logoColor=black" alt="Prettier">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=GitHub-Actions&logoColor=white" alt="GitHub%20Actions">
+  <img src="https://img.shields.io/badge/Lit-324FFF.svg?style=for-the-badge&logo=Lit&logoColor=white" alt="Lit">
 </p>
 <br>
 
@@ -60,12 +60,18 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 ### Direct Controls
 
 - **Enable/Disable Controls** - Toggle Pi-hole filtering with a single click as well as Group Default
+- **Pause Ad-Blocking** - Temporarily disable filtering for a specified duration:
+  - Configurable durations (default: 60s, 5min, 15min)
+  - Automatically re-enables filtering after time expires
+  - Shows remaining time until blocking resumes
 - **Action Buttons** - Quick access buttons for common maintenance tasks:
   - Restart DNS
   - Update Gravity
   - Flush ARP
   - Flush Logs
 - **Customizable Actions** - Configure custom actions for the control buttons in this section
+
+![Pause Ad-Blocking](assets/pause.png)
 
 ![Control Buttons](assets/control-buttons.png)
 
@@ -88,7 +94,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Real-time Status** - Visual indication of Pi-hole's current state
 - **Error Detection** - Automatic highlighting when issues are detected
 - **Update Indicators** - Clear notification when updates are available
-- **Block Time Remaining** - Shows how much time remaining until blocking enables
+- **Block Time Remaining** - Shows remaining time until ad-blocking resumes when paused
 
 ![block-time](assets/block-time.png)
 
@@ -98,7 +104,10 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Visual Indicators** - Color-coded statistics to understand status at a glance
 - **Customizable Card** - Set custom title and icon to match your dashboard style
 - **Entity Filtering** - Ability to exclude specific entities or entire sections
-- **Collapsible Sections** - Ability to collapse/expand sections to save space
+- **Collapsible Sections** - Ability to collapse/expand sections to save space:
+  - Switches section (on/off toggles)
+  - Actions section (control buttons)
+  - Pause section (pause durations)
 
 ![collapse](assets/collapse.png)
 
@@ -213,6 +222,7 @@ The card will automatically:
 | device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant         |
 | title              | string          | Pi-Hole      | Custom title for the card header                              |
 | icon               | string          | mdi:pi-hole  | Custom icon for the card header                               |
+| pause_durations    | array           | [60,300,900] | Durations in seconds for the pause buttons                    |
 | stats              | object          | _none_       | Configure actions for statistics tiles                        |
 | info               | object          | _none_       | Configure actions for additional info items                   |
 | controls           | object          | _none_       | Configure actions for control buttons                         |
@@ -246,8 +256,8 @@ The following section names can be used with `exclude_sections`:
 - header
 - statistics
 - sensors
-- pause
 - controls
+- pause
 - footer
 
 ### Collapse Options
@@ -256,6 +266,7 @@ The following section names can be used with `collapsed_sections`:
 
 - actions
 - switches
+- pause
 
 ### Auto-discovery
 
@@ -295,7 +306,21 @@ title: 'My Pi-hole Server'
 icon: 'mdi:shield-check'
 ```
 
-#### Excluding Sections & Entities
+### With Custom Pause Durations
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+pause_durations:
+  - 60 # 1 minute
+  - 300 # 5 minutes
+  - 1800 # 30 minutes
+  - 3600 # 1 hour
+```
+
+![Pause Ad-Blocking](assets/custom-pause.png)
+
+### Excluding Sections & Entities
 
 ```yaml
 type: custom:pi-hole
@@ -400,6 +425,7 @@ device_id: pi_hole_device_1
 collapsed_sections:
   - actions
   - switches
+  - pause # Start with pause section collapsed
 ```
 
 ## Project Roadmap
@@ -409,16 +435,19 @@ collapsed_sections:
 - [x] **`Dashboard statistics`**: visual representation of key metrics
 - [x] **`Control buttons`**: quick actions for common Pi-hole tasks
 - [x] **`Version info`**: display component versions
-- [x] **`Custom actions`**: tap/hold/double-tap actions for all elements
+- [x] **`Custom actions`**: tap/hold/double-tap actions for all elements - thanks @dunxd
 - [x] **`Card customization`**: custom title and icon options
 - [x] **`Performance optimizations`**: improved code structure and efficiency
 - [x] **`Enhanced entity mapping`**: better entity identification with translation keys
-- [x] **`Translations`**: ability to add translations
-- [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances
-- [x] **`Collapsible sections`**: collapse/expand card sections to save space
+- [x] **`Translations`**: ability to add translations - thanks @ajavibp
+- [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances - thanks @Drudoo
+- [x] **`Collapsible sections`**: collapse/expand card sections to save space - thanks @Teleportist
 - [x] **`Additional visualization options`**: using HA native more-info, etc.
+- [x] **`Pause ad-blocking`**: temporarily disable filtering for specified durations - thanks @StuartHaire
+- [x] **`Entity ordering`**: customize the order of displayed entities - thanks @Teleportist
+- [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate
+- [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
-- [ ] **`Extend Multi-Pi-hole featurs`**: maybe improve this feature some
 
 ## Contributing
 

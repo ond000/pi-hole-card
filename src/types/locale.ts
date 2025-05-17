@@ -9,7 +9,11 @@ export type TranslationKey =
   | 'card.stats.percentage_blocked'
   | 'card.stats.list_all_queries'
   | 'card.stats.domains_on_lists'
-  | 'card.stats.manage_lists';
+  | 'card.stats.manage_lists'
+  | 'card.sections.pause'
+  | 'card.sections.switches'
+  | 'card.sections.actions'
+  | 'card.units.seconds';
 
 export interface Translation {
   /** The translation key */

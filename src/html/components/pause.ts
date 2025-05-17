@@ -3,6 +3,7 @@ import { show } from '@common/show-section';
 import { toggleSection } from '@common/toggle-section';
 import { handlePauseClick } from '@delegates/utils/pause-hole';
 import type { HomeAssistant } from '@hass/types';
+import { localize } from '@localize/localize';
 import type { Config } from '@type/config';
 import type { PiHoleDevice } from '@type/types';
 import { html, nothing } from 'lit';
@@ -32,7 +33,7 @@ export const pause = (
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.pause')}
         >
-          <span>Pause Ad-Blocking</span>
+          <span>${localize(hass, 'card.sections.pause')}</span>
           <ha-icon
             class="caret-icon"
             icon="mdi:chevron-${pauseCollapsed ? 'right' : 'down'}"
@@ -42,7 +43,7 @@ export const pause = (
           ${pauseDuration.map((duration) => {
             return html`<mwc-button
               @click=${handlePauseClick(hass, device, duration)}
-              >${duration} seconds</mwc-button
+              >${duration} ${localize(hass, 'card.units.seconds')}</mwc-button
             >`;
           })}
         </div>

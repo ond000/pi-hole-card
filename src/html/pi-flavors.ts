@@ -1,6 +1,7 @@
 import { isCollapsed } from '@common/collapsed-state';
 import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
+import { localize } from '@localize/localize';
 import type { Config, SectionConfig } from '@type/config';
 import type { PiHoleDevice } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
@@ -48,7 +49,7 @@ export const createCardActions = (
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.switches')}
         >
-          <span>Switches</span>
+          <span>${localize(hass, 'card.sections.switches')}</span>
           <ha-icon
             class="caret-icon"
             icon="mdi:chevron-${switchCollapsed ? 'right' : 'down'}"
@@ -80,7 +81,7 @@ export const createCardActions = (
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.actions')}
         >
-          <span>Actions</span>
+          <span>${localize(hass, 'card.sections.actions')}</span>
           <ha-icon
             class="caret-icon"
             icon="mdi:chevron-${actionsCollapsed ? 'right' : 'down'}"
