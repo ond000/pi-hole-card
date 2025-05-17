@@ -280,4 +280,15 @@ export const styles = css`
     margin-left: 8px;
     opacity: 0.8;
   }
+
+  .divider {
+    height: 1px;
+    background-color: var(--secondary-text-color);
+    width: 100%;
+    margin: 0px 16px;
+  }
+
+  .wide {
+    width: 100%;
+  }
 `;

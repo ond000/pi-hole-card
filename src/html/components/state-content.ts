@@ -8,8 +8,13 @@ import { html } from 'lit';
  * @param {EntityInformation} entity - The entity to render
  * @returns {TemplateResult} A lit-html template for the state card content
  */
-export const stateContent = (hass: HomeAssistant, entity: EntityInformation) =>
+export const stateContent = (
+  hass: HomeAssistant,
+  entity: EntityInformation,
+  className?: string,
+) =>
   html`<state-card-content
     .hass=${hass}
     .stateObj=${entity}
+    class=${className}
   ></state-card-content>`;

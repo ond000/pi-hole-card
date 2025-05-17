@@ -208,18 +208,18 @@ The card will automatically:
 
 ## Configuration Options
 
-| Name               | Type            | Default      | Description                                           |
-| ------------------ | --------------- | ------------ | ----------------------------------------------------- |
-| device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant |
-| title              | string          | Pi-Hole      | Custom title for the card header                      |
-| icon               | string          | mdi:pi-hole  | Custom icon for the card header                       |
-| stats              | object          | _none_       | Configure actions for statistics tiles                |
-| info               | object          | _none_       | Configure actions for additional info items           |
-| controls           | object          | _none_       | Configure actions for control buttons                 |
-| exclude_sections   | list            | _none_       | Sections of entities to exclude. See below.           |
-| exclude_entities   | list            | _none_       | Entities to remove from the card.                     |
-| entity_order       | list            | _none_       | Custom order for switch, button, sensor entities      |
-| collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.        |
+| Name               | Type            | Default      | Description                                                   |
+| ------------------ | --------------- | ------------ | ------------------------------------------------------------- |
+| device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant         |
+| title              | string          | Pi-Hole      | Custom title for the card header                              |
+| icon               | string          | mdi:pi-hole  | Custom icon for the card header                               |
+| stats              | object          | _none_       | Configure actions for statistics tiles                        |
+| info               | object          | _none_       | Configure actions for additional info items                   |
+| controls           | object          | _none_       | Configure actions for control buttons                         |
+| exclude_sections   | list            | _none_       | Sections of entities to exclude. See below.                   |
+| exclude_entities   | list            | _none_       | Entities to remove from the card.                             |
+| entity_order       | list            | _none_       | Custom order for switch, button, sensor entities or dividers. |
+| collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.                |
 
 ### Action Configuration
 
@@ -373,6 +373,23 @@ entity_order:
   - sensor.pi_hole_ads_blocked_today
   - switch.pi_hole
 ```
+
+### Entity Order with Dividers
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+entity_order:
+  - button.pi_hole_action_refresh_data
+  - divider
+  - sensor.pi_hole_dns_queries_today
+  - sensor.pi_hole_ads_blocked_today
+  - divider
+  - switch.pi_hole
+```
+
+![divider1](assets/divider-1.png)
+![divider2](assets/divider-2.png)
 
 ### Collapsed Sections
 

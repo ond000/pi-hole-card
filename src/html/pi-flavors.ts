@@ -50,6 +50,20 @@ export const createCardActions = (
           class="switches ${isCollapsed(config, 'switches') ? 'hidden' : ''}"
         >
           ${device.switches.map((piSwitch) => {
+            const orderExists = config.entity_order?.includes(
+              piSwitch.entity_id,
+            );
+            if (orderExists) {
+              const orderIndex = config.entity_order!.indexOf(
+                piSwitch.entity_id,
+              );
+              const nextItem = config.entity_order![orderIndex + 1];
+
+              if (nextItem === 'divider') {
+                return html`<div class="divider"></div>
+                  ${stateContent(hass, piSwitch, 'wide')} `;
+              }
+            }
             return stateContent(hass, piSwitch);
           })}
         </div>
