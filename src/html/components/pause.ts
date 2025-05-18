@@ -24,29 +24,29 @@ export const pause = (
   device: PiHoleDevice,
   config: Config,
 ) => {
+  if (!show(config, 'pause')) return nothing;
+
   const pauseCollapsed = isCollapsed(config, 'pause');
   const pauseDuration = config.pause_durations ?? [60, 300, 900];
 
-  return show(config, 'pause')
-    ? html`<div class="collapsible-section">
-        <div
-          class="section-header"
-          @click=${(e: Event) => toggleSection(e, '.pause')}
-        >
-          <span>${localize(hass, 'card.sections.pause')}</span>
-          <ha-icon
-            class="caret-icon"
-            icon="mdi:chevron-${pauseCollapsed ? 'right' : 'down'}"
-          ></ha-icon>
-        </div>
-        <div class="pause ${pauseCollapsed ? 'hidden' : ''}">
-          ${pauseDuration.map((duration) => {
-            return html`<mwc-button
-              @click=${handlePauseClick(hass, device, duration)}
-              >${duration} ${localize(hass, 'card.units.seconds')}</mwc-button
-            >`;
-          })}
-        </div>
-      </div>`
-    : nothing;
+  return html`<div class="collapsible-section">
+    <div
+      class="section-header"
+      @click=${(e: Event) => toggleSection(e, '.pause')}
+    >
+      <span>${localize(hass, 'card.sections.pause')}</span>
+      <ha-icon
+        class="caret-icon"
+        icon="mdi:chevron-${pauseCollapsed ? 'right' : 'down'}"
+      ></ha-icon>
+    </div>
+    <div class="pause ${pauseCollapsed ? 'hidden' : ''}">
+      ${pauseDuration.map((duration) => {
+        return html`<mwc-button
+          @click=${handlePauseClick(hass, device, duration)}
+          >${duration} ${localize(hass, 'card.units.seconds')}</mwc-button
+        >`;
+      })}
+    </div>
+  </div>`;
 };

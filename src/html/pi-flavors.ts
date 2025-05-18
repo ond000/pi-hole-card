@@ -11,14 +11,17 @@ import { pause } from './components/pause';
 import { stateContent } from './components/state-content';
 
 /**
- * Creates the card actions section
- * @param element - The element to attach the actions to
- * @param hass - The Home Assistant instance
- * @param device - The Pi-hole device
- * @param config - The configuration for the card
- * @returns TemplateResult
+ * Renders the controls section for the Pi-hole card, including collapsible sections
+ * for switches and actions. Each section can be toggled open or closed, and displays
+ * the relevant controls based on the provided configuration and device state.
+ *
+ * @param element - The root HTMLElement for the card.
+ * @param hass - The Home Assistant instance.
+ * @param device - The PiHoleDevice object containing switches and controls.
+ * @param config - The configuration object for the card, including section visibility and entity order.
+ * @returns A lit-html TemplateResult representing the controls UI, or `nothing` if the section is hidden.
  */
-export const createCardActions = (
+const controls = (
   element: HTMLElement,
   hass: HomeAssistant,
   device: PiHoleDevice,
@@ -41,10 +44,7 @@ export const createCardActions = (
   const switchCollapsed = isCollapsed(config, 'switches');
   const actionsCollapsed = isCollapsed(config, 'actions');
 
-  return html`
-    <div>
-      ${pause(hass, device, config)}
-      <div class="collapsible-section">
+  return html`<div class="collapsible-section">
         <div
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.switches')}
@@ -93,6 +93,26 @@ export const createCardActions = (
           })}
         </div>
       </div>
+    </div>`;
+};
+
+/**
+ * Creates the card actions section
+ * @param element - The element to attach the actions to
+ * @param hass - The Home Assistant instance
+ * @param device - The Pi-hole device
+ * @param config - The configuration for the card
+ * @returns TemplateResult
+ */
+export const createCardActions = (
+  element: HTMLElement,
+  hass: HomeAssistant,
+  device: PiHoleDevice,
+  config: Config,
+): TemplateResult => {
+  return html`
+    <div>
+      ${pause(hass, device, config)}${controls(element, hass, device, config)}
     </div>
   `;
 };

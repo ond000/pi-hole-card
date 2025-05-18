@@ -438,11 +438,11 @@ collapsed_sections:
 - [x] **`Custom actions`**: tap/hold/double-tap actions for all elements - thanks @dunxd
 - [x] **`Card customization`**: custom title and icon options
 - [x] **`Performance optimizations`**: improved code structure and efficiency
-- [x] **`Enhanced entity mapping`**: better entity identification with translation keys
+- [x] **`Enhanced entity mapping`**: better entity identification with translation keys - thanks @bastgau
 - [x] **`Translations`**: ability to add translations - thanks @ajavibp
 - [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances - thanks @Drudoo
 - [x] **`Collapsible sections`**: collapse/expand card sections to save space - thanks @Teleportist
-- [x] **`Additional visualization options`**: using HA native more-info, etc.
+- [x] **`Additional visualization options`**: using HA native more-info, etc. - thanks @dunxd
 - [x] **`Pause ad-blocking`**: temporarily disable filtering for specified durations - thanks @StuartHaire
 - [x] **`Entity ordering`**: customize the order of displayed entities - thanks @Teleportist
 - [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate
