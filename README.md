@@ -445,7 +445,7 @@ collapsed_sections:
 - [x] **`Additional visualization options`**: using HA native more-info, etc. - thanks @dunxd
 - [x] **`Pause ad-blocking`**: temporarily disable filtering for specified durations - thanks @StuartHaire
 - [x] **`Entity ordering`**: customize the order of displayed entities - thanks @Teleportist
-- [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate
+- [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate, @bastgau
 - [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
 

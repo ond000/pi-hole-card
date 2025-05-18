@@ -27,8 +27,6 @@ const controls = (
   device: PiHoleDevice,
   config: Config,
 ): TemplateResult | typeof nothing => {
-  if (!show(config, 'controls')) return nothing;
-
   const sectionConfig: SectionConfig = config.controls ?? {
     tap_action: {
       action: 'toggle',
@@ -44,7 +42,8 @@ const controls = (
   const switchCollapsed = isCollapsed(config, 'switches');
   const actionsCollapsed = isCollapsed(config, 'actions');
 
-  return html`<div class="collapsible-section">
+  return html`${show(config, 'switches')
+    ? html`<div class="collapsible-section">
         <div
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.switches')}
@@ -74,9 +73,10 @@ const controls = (
             return stateContent(hass, piSwitch);
           })}
         </div>
-      </div>
-
-      <div class="collapsible-section">
+      </div>`
+    : nothing}
+  ${show(config, 'actions')
+    ? html`<div class="collapsible-section">
         <div
           class="section-header"
           @click=${(e: Event) => toggleSection(e, '.actions')}
@@ -93,7 +93,8 @@ const controls = (
           })}
         </div>
       </div>
-    </div>`;
+    </div>`
+    : nothing}`;
 };
 
 /**

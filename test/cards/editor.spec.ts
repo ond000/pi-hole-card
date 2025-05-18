@@ -141,8 +141,20 @@ export default () => {
                     mode: 'list' as const,
                     options: [
                       {
+                        label: 'Actions',
+                        value: 'actions',
+                      },
+                      {
+                        label: 'Footer',
+                        value: 'footer',
+                      },
+                      {
                         label: 'Header',
                         value: 'header',
+                      },
+                      {
+                        label: 'Pause Buttons',
+                        value: 'pause',
                       },
                       {
                         label: 'Statistics',
@@ -153,16 +165,8 @@ export default () => {
                         value: 'sensors',
                       },
                       {
-                        label: 'Controls',
-                        value: 'controls',
-                      },
-                      {
-                        label: 'Pause Buttons',
-                        value: 'pause',
-                      },
-                      {
-                        label: 'Footer',
-                        value: 'footer',
+                        label: 'Switches',
+                        value: 'switches',
                       },
                     ],
                   },

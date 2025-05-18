@@ -43,12 +43,13 @@ export interface Config {
 
 export type CollapsibleSections = 'actions' | 'pause' | 'switches';
 export type Sections =
+  | 'actions'
+  | 'footer'
   | 'header'
+  | 'pause'
   | 'statistics'
   | 'sensors'
-  | 'pause'
-  | 'controls'
-  | 'footer';
+  | 'switches';
 
 export interface SectionConfig {
   /** Action to perform on tap */

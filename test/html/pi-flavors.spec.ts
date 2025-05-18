@@ -8,7 +8,7 @@ import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
 import type { EntityInformation, PiHoleDevice } from '@type/types';
 import { expect } from 'chai';
-import { html, nothing, type TemplateResult } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
 export default () => {
@@ -97,26 +97,6 @@ export default () => {
       stateContentStub.restore();
       showSectionStub.restore();
       isCollapsedStub.restore();
-    });
-
-    it('should return nothing when show returns false for controls section', async () => {
-      // Configure show to return false for controls section
-      showSectionStub.withArgs(mockConfig, 'controls').returns(false);
-
-      // Call createCardActions
-      const result = createCardActions(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-
-      // Assert that nothing is returned
-      expect(result).to.equal(nothing);
-
-      // Verify that helper functions were not called
-      expect(createActionButtonStub.called).to.be.false;
-      expect(stateContentStub.called).to.be.false;
     });
 
     it('should render separate divs for switches and actions', async () => {

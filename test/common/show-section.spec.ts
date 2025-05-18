@@ -16,7 +16,8 @@ export default () => {
         expect(show(config, 'header')).to.be.true;
         expect(show(config, 'statistics')).to.be.true;
         expect(show(config, 'sensors')).to.be.true;
-        expect(show(config, 'controls')).to.be.true;
+        expect(show(config, 'actions')).to.be.true;
+        expect(show(config, 'switches')).to.be.true;
         expect(show(config, 'footer')).to.be.true;
       });
 
@@ -29,7 +30,7 @@ export default () => {
 
         // Act & Assert
         expect(show(config, 'header')).to.be.true;
-        expect(show(config, 'controls')).to.be.true;
+        expect(show(config, 'actions')).to.be.true;
         expect(show(config, 'footer')).to.be.true;
       });
 
@@ -59,7 +60,8 @@ export default () => {
         expect(show(config, 'header')).to.be.true;
         expect(show(config, 'statistics')).to.be.true;
         expect(show(config, 'sensors')).to.be.true;
-        expect(show(config, 'controls')).to.be.true;
+        expect(show(config, 'actions')).to.be.true;
+        expect(show(config, 'switches')).to.be.true;
         expect(show(config, 'footer')).to.be.true;
       });
     });
