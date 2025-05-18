@@ -253,12 +253,13 @@ Actions can be configured to perform various operations such as:
 
 The following section names can be used with `exclude_sections`:
 
+- actions
+- footer
 - header
+- pause
 - statistics
 - sensors
-- controls
-- pause
-- footer
+- switches
 
 ### Collapse Options
 
@@ -327,7 +328,7 @@ type: custom:pi-hole
 device_id: pi_hole_device_1
 exclude_sections:
   - sensors
-  - controls
+  - switches
 exclude_entities:
   - button.pi_hole_action_refresh_data
   - sensor.pi_hole_latest_data_refresh
