@@ -66,8 +66,8 @@ const controls = (
               const nextItem = config.entity_order![orderIndex + 1];
 
               if (nextItem === 'divider') {
-                return html`<div class="divider"></div>
-                  ${stateContent(hass, piSwitch, 'wide')} `;
+                return html`${stateContent(hass, piSwitch)}
+                  <div class="divider"></div>`;
               }
             }
             return stateContent(hass, piSwitch);

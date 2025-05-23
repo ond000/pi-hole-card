@@ -289,11 +289,7 @@ export const styles = css`
     height: 1px;
     background-color: var(--secondary-text-color);
     width: 100%;
-    margin: 0px 16px;
-  }
-
-  .wide {
-    width: 100%;
+    margin: 10px 16px;
   }
 
   /* Pause buttons */

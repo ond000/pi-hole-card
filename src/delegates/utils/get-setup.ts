@@ -1,3 +1,4 @@
+import { sortEntitiesByOrder } from '@common/sort-entities';
 import type { HomeAssistant } from '@hass/types';
 import type { Config } from '@type/config';
 import type { EntityInformation, PiHoleSetup } from '@type/types';
@@ -45,7 +46,12 @@ export const getPiSetup = (
     });
 
   if (holes.length > 1) {
-    holes[0]!.switches.push(...spareSwitches);
+    const primary = holes[0]!;
+    // resort the combined switches
+    primary.switches = sortEntitiesByOrder(config, [
+      ...primary.switches,
+      ...spareSwitches,
+    ]);
   }
 
   return {
