@@ -152,8 +152,9 @@ export default () => {
       expect(createCardActionsStub.calledOnce).to.be.true;
       expect(createCardActionsStub.firstCall.args[0]).to.equal(element);
       expect(createCardActionsStub.firstCall.args[1]).to.equal(mockHass);
-      expect(createCardActionsStub.firstCall.args[2]).to.equal(mockDevice);
-      expect(createCardActionsStub.firstCall.args[3]).to.equal(mockConfig);
+      expect(createCardActionsStub.firstCall.args[2]).to.equal(mockSetup);
+      expect(createCardActionsStub.firstCall.args[3]).to.equal(mockDevice);
+      expect(createCardActionsStub.firstCall.args[4]).to.equal(mockConfig);
 
       // Verify createFooter was called with the correct parameters
       expect(createFooterStub.calledOnce).to.be.true;

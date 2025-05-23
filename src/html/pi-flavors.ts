@@ -3,7 +3,7 @@ import { show } from '@common/show-section';
 import type { HomeAssistant } from '@hass/types';
 import { localize } from '@localize/localize';
 import type { Config, SectionConfig } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleDevice, PiHoleSetup } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { toggleSection } from '../common/toggle-section';
 import { createActionButton } from './components/action-control';
@@ -101,6 +101,7 @@ const controls = (
  * Creates the card actions section
  * @param element - The element to attach the actions to
  * @param hass - The Home Assistant instance
+ * @param setup - The Pi-hole setup to be paused.
  * @param device - The Pi-hole device
  * @param config - The configuration for the card
  * @returns TemplateResult
@@ -108,12 +109,13 @@ const controls = (
 export const createCardActions = (
   element: HTMLElement,
   hass: HomeAssistant,
+  setup: PiHoleSetup,
   device: PiHoleDevice,
   config: Config,
 ): TemplateResult => {
   return html`
     <div>
-      ${pause(hass, device, config)}${controls(element, hass, device, config)}
+      ${pause(hass, setup, config)}${controls(element, hass, device, config)}
     </div>
   `;
 };

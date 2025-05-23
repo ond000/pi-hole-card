@@ -1,14 +1,14 @@
 import { formatSecondsToHHMMSS } from '@common/convert-time';
 import { handlePauseClick } from '@delegates/utils/pause-hole';
 import type { HomeAssistant } from '@hass/types';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
 export default () => {
   describe('handle-pause-click.ts', () => {
     let mockHass: HomeAssistant;
-    let mockDevice: PiHoleDevice;
+    let mockSetup: PiHoleSetup;
     let callServiceStub: sinon.SinonStub;
     let formatTimeStub: sinon.SinonStub;
 
@@ -20,13 +20,13 @@ export default () => {
       } as unknown as HomeAssistant;
 
       // Create a mock device
-      mockDevice = {
-        device_id: 'pi_hole_device_1',
-        sensors: [],
-        switches: [],
-        controls: [],
-        updates: [],
-      } as PiHoleDevice;
+      mockSetup = {
+        holes: [
+          {
+            device_id: 'pi_hole_device_1',
+          },
+        ],
+      } as PiHoleSetup;
 
       // Create a stub for formatSecondsToHHMMSS
       formatTimeStub = stub();
@@ -41,7 +41,7 @@ export default () => {
 
     it('should return a function that can be called later', () => {
       // Act
-      const result = handlePauseClick(mockHass, mockDevice, 60);
+      const result = handlePauseClick(mockHass, mockSetup, 60);
 
       // Assert
       expect(result).to.be.a('function');
@@ -57,7 +57,7 @@ export default () => {
       formatTimeStub.withArgs(duration).returns(formattedTime);
 
       // Act
-      const pauseFunction = handlePauseClick(mockHass, mockDevice, duration);
+      const pauseFunction = handlePauseClick(mockHass, mockSetup, duration);
 
       // Invoking the returned function should call the service
       pauseFunction();
@@ -90,7 +90,7 @@ export default () => {
         formatTimeStub.withArgs(seconds).returns(formatted);
 
         // Act
-        const pauseFunction = handlePauseClick(mockHass, mockDevice, seconds);
+        const pauseFunction = handlePauseClick(mockHass, mockSetup, seconds);
         pauseFunction();
 
         // Assert
@@ -98,24 +98,6 @@ export default () => {
         expect(callServiceStub.calledOnce).to.be.true;
         expect(callServiceStub.firstCall.args[2].duration).to.equal(formatted);
       });
-    });
-
-    it('should use the device_id from the provided device', () => {
-      // Arrange
-      const differentDevice = {
-        ...mockDevice,
-        device_id: 'different_device_id',
-      };
-      formatTimeStub.returns('00:01:00');
-
-      // Act
-      const pauseFunction = handlePauseClick(mockHass, differentDevice, 60);
-      pauseFunction();
-
-      // Assert
-      expect(callServiceStub.firstCall.args[2].device_id).to.equal(
-        'different_device_id',
-      );
     });
   });
 };

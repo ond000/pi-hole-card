@@ -64,6 +64,7 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
   - Configurable durations (default: 60s, 5min, 15min)
   - Automatically re-enables filtering after time expires
   - Shows remaining time until blocking resumes
+  - Pause multiple Pi-holes if configured
 - **Action Buttons** - Quick access buttons for common maintenance tasks:
   - Restart DNS
   - Update Gravity
@@ -444,7 +445,7 @@ collapsed_sections:
 - [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances - thanks @Drudoo
 - [x] **`Collapsible sections`**: collapse/expand card sections to save space - thanks @Teleportist
 - [x] **`Additional visualization options`**: using HA native more-info, etc. - thanks @dunxd
-- [x] **`Pause ad-blocking`**: temporarily disable filtering for specified durations - thanks @StuartHaire
+- [x] **`Pause ad-blocking`**: temporarily disable filtering for specified durations - thanks @StuartHaire, @VVRud
 - [x] **`Entity ordering`**: customize the order of displayed entities - thanks @Teleportist
 - [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate, @bastgau
 - [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist

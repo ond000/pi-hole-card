@@ -6,7 +6,7 @@ import type { HomeAssistant } from '@hass/types';
 import { pause } from '@html/components/pause';
 import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
@@ -14,7 +14,7 @@ import { stub } from 'sinon';
 export default () => {
   describe('pause.ts', () => {
     let mockHass: HomeAssistant;
-    let mockDevice: PiHoleDevice;
+    let mockSetup: PiHoleSetup;
     let mockConfig: Config;
     let showSectionStub: sinon.SinonStub;
     let isCollapsedStub: sinon.SinonStub;
@@ -26,15 +26,7 @@ export default () => {
       mockHass = {} as HomeAssistant;
 
       // Create mock device
-      mockDevice = {
-        device_id: 'pi_hole_device',
-        status: {
-          entity_id: 'binary_sensor.pi_hole_status',
-          state: 'on',
-          attributes: { friendly_name: 'Pi-hole Status' },
-          translation_key: undefined,
-        },
-      } as any as PiHoleDevice;
+      mockSetup = {} as PiHoleSetup;
 
       // Create mock config
       mockConfig = {
@@ -69,7 +61,7 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'pause').returns(false);
 
       // Call pause component
-      const result = pause(mockHass, mockDevice, mockConfig);
+      const result = pause(mockHass, mockSetup, mockConfig);
 
       // Assert that nothing is returned
       expect(result).to.equal(nothing);
@@ -84,7 +76,7 @@ export default () => {
       delete mockConfig.pause_durations;
 
       // Call pause component
-      const result = pause(mockHass, mockDevice, mockConfig);
+      const result = pause(mockHass, mockSetup, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Verify section structure
@@ -105,7 +97,7 @@ export default () => {
       // Verify handlePauseClick was called for each duration with correct parameters
       expect(handlePauseClickStub.callCount).to.equal(3);
       expect(handlePauseClickStub.firstCall.args[0]).to.equal(mockHass);
-      expect(handlePauseClickStub.firstCall.args[1]).to.equal(mockDevice);
+      expect(handlePauseClickStub.firstCall.args[1]).to.equal(mockSetup);
       expect(handlePauseClickStub.firstCall.args[2]).to.equal(60);
       expect(handlePauseClickStub.secondCall.args[2]).to.equal(300);
       expect(handlePauseClickStub.thirdCall.args[2]).to.equal(900);
@@ -113,7 +105,7 @@ export default () => {
 
     it('should render pause section with custom durations from config', async () => {
       // Call pause component with custom durations in config
-      const result = pause(mockHass, mockDevice, mockConfig);
+      const result = pause(mockHass, mockSetup, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check pause buttons - should have custom values (60, 300, 1800)
@@ -135,7 +127,7 @@ export default () => {
       isCollapsedStub.withArgs(mockConfig, 'pause').returns(true);
 
       // Call pause component
-      const result = pause(mockHass, mockDevice, mockConfig);
+      const result = pause(mockHass, mockSetup, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Check that the pause container has the hidden class
@@ -151,7 +143,7 @@ export default () => {
 
     it('should attach click handler to toggle section visibility', async () => {
       // Call pause component
-      const result = pause(mockHass, mockDevice, mockConfig);
+      const result = pause(mockHass, mockSetup, mockConfig);
       const el = await fixture(result as TemplateResult);
 
       // Get section header

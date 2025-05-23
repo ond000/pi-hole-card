@@ -5,14 +5,14 @@ import { handlePauseClick } from '@delegates/utils/pause-hole';
 import type { HomeAssistant } from '@hass/types';
 import { localize } from '@localize/localize';
 import type { Config } from '@type/config';
-import type { PiHoleDevice } from '@type/types';
+import type { PiHoleSetup } from '@type/types';
 import { html, nothing } from 'lit';
 
 /**
  * Renders a collapsible UI section for pausing Pi-hole ad-blocking for a specified duration.
  *
  * @param hass - The Home Assistant instance.
- * @param device - The Pi-hole device to control.
+ * @param setup - The Pi-hole setup to be paused.
  * @param config - The configuration object containing UI and pause duration settings.
  * @returns A lit-html template for the pause section, or `nothing` if the section should not be shown.
  *
@@ -21,7 +21,7 @@ import { html, nothing } from 'lit';
  */
 export const pause = (
   hass: HomeAssistant,
-  device: PiHoleDevice,
+  setup: PiHoleSetup,
   config: Config,
 ) => {
   if (!show(config, 'pause')) return nothing;
@@ -43,7 +43,7 @@ export const pause = (
     <div class="pause ${pauseCollapsed ? 'hidden' : ''}">
       ${pauseDuration.map((duration) => {
         return html`<mwc-button
-          @click=${handlePauseClick(hass, device, duration)}
+          @click=${handlePauseClick(hass, setup, duration)}
           >${duration} ${localize(hass, 'card.units.seconds')}</mwc-button
         >`;
       })}

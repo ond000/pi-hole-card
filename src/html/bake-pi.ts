@@ -30,7 +30,7 @@ export const renderPiHoleCard = (
         ${createDashboardStats(element, hass, primary, config)}
         ${createAdditionalStats(element, hass, primary, config)}
       </div>
-      ${createCardActions(element, hass, primary, config)}
+      ${createCardActions(element, hass, setup, primary, config)}
       ${createFooter(element, hass, config, primary)}
     </ha-card>
   `;

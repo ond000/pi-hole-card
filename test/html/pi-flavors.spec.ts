@@ -6,7 +6,7 @@ import * as stateContentModule from '@html/components/state-content';
 import { createCardActions } from '@html/pi-flavors';
 import { fixture } from '@open-wc/testing-helpers';
 import type { Config } from '@type/config';
-import type { EntityInformation, PiHoleDevice } from '@type/types';
+import type { EntityInformation, PiHoleDevice, PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
@@ -14,6 +14,7 @@ import { stub } from 'sinon';
 export default () => {
   describe('pi-flavors.ts', () => {
     let mockHass: HomeAssistant;
+    let mockSetup: PiHoleSetup;
     let mockDevice: PiHoleDevice;
     let mockElement: HTMLElement;
     let mockConfig: Config;
@@ -26,6 +27,7 @@ export default () => {
       // Create mock element and hass
       mockElement = document.createElement('div');
       mockHass = {} as HomeAssistant;
+      mockSetup = {} as PiHoleSetup;
 
       // Create stub for show function
       showSectionStub = stub(showSectionModule, 'show');
@@ -106,6 +108,7 @@ export default () => {
       const result = createCardActions(
         mockElement,
         mockHass,
+        mockSetup,
         mockDevice,
         mockConfig,
       );
@@ -127,6 +130,7 @@ export default () => {
       const result = createCardActions(
         mockElement,
         mockHass,
+        mockSetup,
         mockDevice,
         mockConfig,
       );
@@ -151,6 +155,7 @@ export default () => {
       const result = createCardActions(
         mockElement,
         mockHass,
+        mockSetup,
         mockDevice,
         mockConfig,
       );
@@ -168,7 +173,13 @@ export default () => {
     });
 
     it('should call stateContent for each switch entity', async () => {
-      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
+      createCardActions(
+        mockElement,
+        mockHass,
+        mockSetup,
+        mockDevice,
+        mockConfig,
+      );
 
       // Verify that stateContent was called for each switch
       expect(stateContentStub.callCount).to.equal(2);
@@ -183,7 +194,13 @@ export default () => {
     });
 
     it('should call createActionButton for each control entity', async () => {
-      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
+      createCardActions(
+        mockElement,
+        mockHass,
+        mockSetup,
+        mockDevice,
+        mockConfig,
+      );
 
       // Verify that createActionButton was called for each control
       expect(createActionButtonStub.callCount).to.equal(2);
@@ -208,7 +225,13 @@ export default () => {
       // Remove controls config
       delete mockConfig.controls;
 
-      createCardActions(mockElement, mockHass, mockDevice, mockConfig);
+      createCardActions(
+        mockElement,
+        mockHass,
+        mockSetup,
+        mockDevice,
+        mockConfig,
+      );
 
       // Verify that createActionButton was called with default config
       expect(createActionButtonStub.firstCall.args[1]).to.deep.equal({
@@ -235,6 +258,7 @@ export default () => {
       const result = createCardActions(
         mockElement,
         mockHass,
+        mockSetup,
         emptyDevice,
         mockConfig,
       );
