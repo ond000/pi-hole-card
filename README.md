@@ -231,6 +231,7 @@ The card will automatically:
 | exclude_entities   | list            | _none_       | Entities to remove from the card.                             |
 | entity_order       | list            | _none_       | Custom order for switch, button, sensor entities or dividers. |
 | collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.                |
+| switch_spacing     | string          | flex         | Layout style for switches: flex, space-around, space-between  |
 
 ### Action Configuration
 
@@ -269,6 +270,14 @@ The following section names can be used with `collapsed_sections`:
 - actions
 - switches
 - pause
+
+### Switch Spacing Options
+
+The `switch_spacing` option controls how switches are arranged in the switches section:
+
+- flex (default): Switches flow naturally with standard flexbox behavior
+- space-around: Equal space around each switch
+- space-between: Maximum space between switches, no space at edges
 
 ### Auto-discovery
 
@@ -390,11 +399,12 @@ controls:
       content: 'Advanced Pi-hole control panel'
 ```
 
-### Custom Entity Order
+### Custom Entity Order & Switch Spacing
 
 ```yaml
 type: custom:pi-hole
 device_id: pi_hole_device_1
+switch_spacing: 'space-around'
 entity_order:
   - button.pi_hole_action_refresh_data
   - sensor.pi_hole_dns_queries_today

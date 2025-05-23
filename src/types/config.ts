@@ -5,7 +5,6 @@ import type { Translation, TranslationKey } from './locale';
 /**
  * Configuration settings for the pi-hole card
  */
-
 export interface Config {
   /** Unique identifier for the device */
   device_id: string | string[];
@@ -39,8 +38,12 @@ export interface Config {
 
   /** Custom pause durations in seconds (optional) */
   pause_durations?: number[];
+
+  /** Style for the switches */
+  switch_spacing?: SwitchSpacing;
 }
 
+export type SwitchSpacing = 'flex' | 'space-around' | 'space-between';
 export type CollapsibleSections = 'actions' | 'pause' | 'switches';
 export type Sections =
   | 'actions'

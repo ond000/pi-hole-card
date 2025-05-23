@@ -199,6 +199,31 @@ export default () => {
                 },
               },
               {
+                name: 'switch_style',
+                label: 'Style for switches',
+                required: false,
+                selector: {
+                  select: {
+                    multiple: false,
+                    mode: 'dropdown' as const,
+                    options: [
+                      {
+                        label: 'Flex (default)',
+                        value: 'flex',
+                      },
+                      {
+                        label: 'Space Around',
+                        value: 'space-around',
+                      },
+                      {
+                        label: 'Space Between',
+                        value: 'space-between',
+                      },
+                    ],
+                  },
+                },
+              },
+              {
                 name: 'exclude_entities',
                 label: 'Entities to exclude',
                 required: false,
@@ -232,6 +257,40 @@ export default () => {
                       {
                         integration: 'pi_hole',
                         domain: ['button', 'sensor', 'switch'],
+                      },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+          {
+            name: 'styles',
+            label: 'Styles',
+            type: 'expandable',
+            flatten: true,
+            icon: 'mdi:brush-variant',
+            schema: [
+              {
+                name: 'switch_spacing',
+                label: 'Switch Spacing',
+                required: false,
+                selector: {
+                  select: {
+                    multiple: false,
+                    mode: 'dropdown' as const,
+                    options: [
+                      {
+                        label: 'Flex (default)',
+                        value: 'flex',
+                      },
+                      {
+                        label: 'Space Around',
+                        value: 'space-around',
+                      },
+                      {
+                        label: 'Space Between',
+                        value: 'space-between',
                       },
                     ],
                   },

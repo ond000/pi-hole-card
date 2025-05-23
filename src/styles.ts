@@ -263,6 +263,14 @@ export const styles = css`
     margin: 0px 8px;
   }
 
+  .space-around {
+    justify-content: space-around;
+  }
+
+  .space-between > state-card-content {
+    width: 100%;
+  }
+
   /* Refresh time styles */
   .refresh-time {
     display: flex;

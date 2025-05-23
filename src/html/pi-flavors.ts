@@ -54,7 +54,15 @@ const controls = (
             icon="mdi:chevron-${switchCollapsed ? 'right' : 'down'}"
           ></ha-icon>
         </div>
-        <div class="switches ${switchCollapsed ? 'hidden' : ''}">
+        <div
+          class="${[
+            'switches',
+            switchCollapsed ? 'hidden' : undefined,
+            config.switch_spacing,
+          ]
+            .filter((s) => s)
+            .join(' ')}"
+        >
           ${device.switches.map((piSwitch) => {
             const orderExists = config.entity_order?.includes(
               piSwitch.entity_id,
