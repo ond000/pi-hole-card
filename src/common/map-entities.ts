@@ -19,6 +19,7 @@ export const mapEntitiesByTranslationKey = (
     remaining_until_blocking_mode: 'remaining_until_blocking_mode',
     action_refresh_data: 'action_refresh_data',
     latest_data_refresh: 'latest_data_refresh',
+    ftl_info_message_count: 'info_message_count',
     status: 'status',
   };
 

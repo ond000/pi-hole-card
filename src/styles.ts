@@ -18,6 +18,7 @@ export const styles = css`
 
   .name {
     display: flex;
+    align-items: center;
     font-size: 1.2rem;
     font-weight: 500;
   }
@@ -306,5 +307,22 @@ export const styles = css`
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
+  }
+
+  /* Warning badge styles */
+  .warning-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: var(--warning-color, #ff9800);
+    color: var(--secondary-text-color);
+    font-weight: bolder;
+    font-size: 1rem;
+    margin-right: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    min-width: 25px;
   }
 `;

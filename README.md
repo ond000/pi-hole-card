@@ -96,8 +96,11 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Error Detection** - Automatic highlighting when issues are detected
 - **Update Indicators** - Clear notification when updates are available
 - **Block Time Remaining** - Shows remaining time until ad-blocking resumes when paused
+- **FTL Diagnostic Message Count** - Shows diagnostic message count when more than 0
 
 ![block-time](assets/block-time.png)
+
+![diagnostics](assets/diagnostics.png)
 
 ### Interactive Dashboard
 
@@ -459,6 +462,7 @@ collapsed_sections:
 - [x] **`Entity ordering`**: customize the order of displayed entities - thanks @Teleportist
 - [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate, @bastgau
 - [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist
+- [x] **`Diagnostics info indicator`**: show diagnostic messages count - thanks @WalterPepeka
 - [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
 
 ## Contributing

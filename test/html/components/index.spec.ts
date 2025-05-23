@@ -1,6 +1,7 @@
 import pauseHoleSpec from '@test/delegates/utils/pause-hole.spec';
 import actionControlSpec from './action-control.spec';
 import additionalStatSpec from './additional-stat.spec';
+import iconSpec from './pi-icon.spec';
 import refreshTimeSpec from './refresh-time.spec';
 import statBoxSpec from './stat-box.spec';
 import stateContentSpec from './state-content.spec';
@@ -11,6 +12,7 @@ export default () => {
   describe('components', () => {
     additionalStatSpec();
     actionControlSpec();
+    iconSpec();
     pauseHoleSpec();
     refreshTimeSpec();
     statBoxSpec();

@@ -31,6 +31,9 @@ export interface PiHoleDevice {
   /** Last Data Refresh Time */
   latest_data_refresh?: EntityInformation;
 
+  /** Info message count entity */
+  info_message_count?: EntityInformation;
+
   /** Status of Pi-hole */
   status?: EntityInformation;
 

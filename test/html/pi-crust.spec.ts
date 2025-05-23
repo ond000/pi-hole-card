@@ -102,7 +102,7 @@ export default () => {
 
       // Check default title
       const nameEl = el.querySelector('.name');
-      expect(nameEl?.textContent?.trim()).to.equal('Pi-Hole');
+      expect(nameEl?.textContent?.trim()).to.equal('Pi-hole');
 
       // Check default icon
       const iconEl = nameEl?.querySelector('ha-icon');

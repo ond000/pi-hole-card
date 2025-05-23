@@ -4,6 +4,7 @@ import type { HomeAssistant } from '@hass/types';
 import type { Config } from '@type/config';
 import type { PiHoleSetup } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
+import { icon } from './components/pi-icon';
 import { stateDisplay } from './components/state-display';
 
 /**
@@ -49,8 +50,7 @@ export const createCardHeader = (
   return html`
     <div class="card-header">
       <div class="name">
-        <ha-icon icon="${config.icon ?? 'mdi:pi-hole'}"></ha-icon>
-        ${config.title ?? 'Pi-Hole'}
+        ${icon(config, setup)}${config.title ?? 'Pi-hole'}
         ${setup.holes.length > 1
           ? html`<span class="multi-status"
               >(${activeCount}/${setup.holes.length})</span

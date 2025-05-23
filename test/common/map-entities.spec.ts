@@ -52,6 +52,7 @@ export default () => {
           },
           { key: 'action_refresh_data', prop: 'action_refresh_data' },
           { key: 'latest_data_refresh', prop: 'latest_data_refresh' },
+          { key: 'ftl_info_message_count', prop: 'info_message_count' },
           { key: 'status', prop: 'status' },
         ];
 
