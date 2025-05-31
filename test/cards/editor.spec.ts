@@ -186,8 +186,8 @@ export default () => {
                         value: 'pause',
                       },
                       {
-                        label: 'Buttons',
-                        value: 'buttons',
+                        label: 'Switches',
+                        value: 'switches',
                       },
 
                       {
