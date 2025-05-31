@@ -113,8 +113,8 @@ const SCHEMA: HaFormSchema[] = [
                 value: 'pause',
               },
               {
-                label: 'Buttons',
-                value: 'buttons',
+                label: 'Switches',
+                value: 'switches',
               },
 
               {
