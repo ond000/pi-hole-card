@@ -219,6 +219,23 @@ The card will automatically:
 - Show version information for all components
 - For multiple Pi-holes: combine switches and show aggregated status
 
+### Finding Your Device ID
+
+If you're unsure what your Pi-hole device ID is, here are several ways to find it:
+
+#### Method 1: Use the Card Editor (Recommended)
+
+1. Add the card through the visual editor
+2. Select your Pi-hole device from the dropdown
+3. Click "Show Code Editor" or "View YAML" to see the generated configuration
+4. Copy the `device_id` value for use in manual YAML configuration
+
+#### Method 2: Devices Page
+
+1. Go to **Settings** → **Devices & Services** → **Devices**
+2. Search for "Pi-hole" or browse to find your Pi-hole device
+3. Click on the device and look at the URL - the device ID will be in the URL path
+
 ## Configuration Options
 
 | Name               | Type            | Default      | Description                                                   |
