@@ -470,7 +470,7 @@ collapsed_sections:
 - [x] **`Custom actions`**: tap/hold/double-tap actions for all elements - thanks @dunxd
 - [x] **`Card customization`**: custom title and icon options
 - [x] **`Performance optimizations`**: improved code structure and efficiency
-- [x] **`Enhanced entity mapping`**: better entity identification with translation keys - thanks @bastgau
+- [x] **`Enhanced entity mapping`**: **⭐ First contributor ⭐** better entity identification with translation keys - thanks @bastgau
 - [x] **`Translations`**: ability to add translations - thanks @ajavibp
 - [x] **`Multi-Pi-hole support`**: manage and monitor multiple Pi-hole instances - thanks @Drudoo
 - [x] **`Collapsible sections`**: collapse/expand card sections to save space - thanks @Teleportist
@@ -480,7 +480,7 @@ collapsed_sections:
 - [x] **`Section hiding`**: ability to disable sections or entities - thanks @pcnate, @bastgau, @Anto79-ops
 - [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist
 - [x] **`Diagnostics info indicator`**: show diagnostic messages count - thanks @WalterPepeka
-- [ ] **`Links directly to sub pages`**: direct links to specific Pi-hole admin pages
+- [x] **`Greek translation`**: **⭐ Second contributor ⭐** added Greek language support - thanks @ChriZathens
 
 ## Contributing
 
