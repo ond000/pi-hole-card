@@ -126,13 +126,15 @@ export default () => {
 
     it('should call all component functions with the correct parameters', async () => {
       // Render the Pi-hole card
-      renderPiHoleCard(element, mockHass, mockSetup, mockConfig);
+      const result = renderPiHoleCard(element, mockHass, mockSetup, mockConfig);
+      const el = await fixture(result);
 
       // Verify createCardHeader was called with the correct parameters
       expect(createCardHeaderStub.calledOnce).to.be.true;
-      expect(createCardHeaderStub.firstCall.args[0]).to.equal(mockSetup);
-      expect(createCardHeaderStub.firstCall.args[1]).to.equal(mockHass);
-      expect(createCardHeaderStub.firstCall.args[2]).to.equal(mockConfig);
+      expect(createCardHeaderStub.firstCall.args[0]).to.equal(element);
+      expect(createCardHeaderStub.firstCall.args[1]).to.equal(mockSetup);
+      expect(createCardHeaderStub.firstCall.args[2]).to.equal(mockHass);
+      expect(createCardHeaderStub.firstCall.args[3]).to.equal(mockConfig);
 
       // Verify createDashboardStats was called with the correct parameters
       expect(createDashboardStatsStub.calledOnce).to.be.true;
@@ -162,6 +164,14 @@ export default () => {
       expect(createFooterStub.firstCall.args[1]).to.equal(mockHass);
       expect(createFooterStub.firstCall.args[2]).to.equal(mockConfig);
       expect(createFooterStub.firstCall.args[3]).to.equal(mockDevice);
+
+      // Test that the rendered HTML contains the expected structure
+      expect(el.querySelector('.mocked-card-header')).to.exist;
+      expect(el.querySelector('.card-content')).to.exist;
+      expect(el.querySelector('.mocked-dashboard-stats')).to.exist;
+      expect(el.querySelector('.mocked-additional-stats')).to.exist;
+      expect(el.querySelector('.mocked-card-actions')).to.exist;
+      expect(el.querySelector('.mocked-footer')).to.exist;
     });
   });
 };

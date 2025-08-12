@@ -325,4 +325,8 @@ export const styles = css`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     min-width: 25px;
   }
+
+  .badge {
+    cursor: pointer;
+  }
 `;

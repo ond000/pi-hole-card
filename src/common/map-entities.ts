@@ -21,6 +21,7 @@ export const mapEntitiesByTranslationKey = (
     latest_data_refresh: 'latest_data_refresh',
     ftl_info_message_count: 'info_message_count',
     status: 'status',
+    action_ftl_purge_diagnosis_messages: 'purge_diagnosis_messages',
   };
 
   const key = entity.translation_key;

@@ -259,6 +259,35 @@ const SCHEMA: HaFormSchema[] = [
         },
       },
       {
+        name: 'badge',
+        label: 'Badge',
+        type: 'expandable',
+        icon: 'mdi:badge-account-horizontal',
+        schema: [
+          {
+            name: 'tap_action',
+            label: 'Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'hold_action',
+            label: 'Hold Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+          {
+            name: 'double_tap_action',
+            label: 'Double Tap Action',
+            selector: {
+              ui_action: {},
+            },
+          },
+        ],
+      },
+      {
         name: 'stats',
         label: 'Statistics',
         type: 'expandable',
@@ -405,6 +434,9 @@ export class PiHoleCardEditor extends LitElement {
     }
     if (shouldDelete(config.controls)) {
       delete config.controls;
+    }
+    if (shouldDelete(config.badge)) {
+      delete config.badge;
     }
 
     if (!config.exclude_entities?.length) {

@@ -97,6 +97,10 @@ A comprehensive dashboard card for managing and monitoring your Pi-hole DNS ad b
 - **Update Indicators** - Clear notification when updates are available
 - **Block Time Remaining** - Shows remaining time until ad-blocking resumes when paused
 - **FTL Diagnostic Message Count** - Shows diagnostic message count when more than 0
+- **Interactive Diagnostic Management** - Smart icon behavior based on diagnostic message count:
+  - **When diagnostic messages exist**: Tap to purge diagnostic messages, hold/double-tap for more info
+  - **When no diagnostic messages**: All interactions show more info about the diagnostic entity
+  - **Custom Actions**: Override default behavior with custom tap, hold, and double-tap actions
 
 ![block-time](assets/block-time.png)
 
@@ -243,6 +247,7 @@ If you're unsure what your Pi-hole device ID is, here are several ways to find i
 | device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant         |
 | title              | string          | Pi-Hole      | Custom title for the card header                              |
 | icon               | string          | mdi:pi-hole  | Custom icon for the card header                               |
+| badge              | object          | _none_       | Configure actions for the card icon/badge                     |
 | pause_durations    | array           | [60,300,900] | Durations in seconds for the pause buttons                    |
 | stats              | object          | _none_       | Configure actions for statistics tiles                        |
 | info               | object          | _none_       | Configure actions for additional info items                   |
@@ -383,6 +388,69 @@ controls:
     action: more-info
 ```
 
+### With Custom Badge Actions
+
+The card icon/badge supports custom actions that can override the default diagnostic message behavior:
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+badge:
+  tap_action:
+    action: navigate
+    navigation_path: /lovelace/pi-hole-dashboard
+  hold_action:
+    action: call-service
+    perform_action: browser_mod.popup
+    data:
+      title: Pi-hole Status
+      content: 'Quick overview of Pi-hole status'
+  double_tap_action:
+    action: more-info
+    entity_id: sensor.pi_hole_status
+```
+
+### With Switch Toggle and Pause Actions
+
+For quick Pi-hole control, you can configure the badge to toggle the main switch on tap and pause for 30 seconds on hold:
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+badge:
+  tap_action:
+    action: perform-action
+    perform_action: switch.toggle
+    target:
+      entity_id: switch.pi_hole
+  hold_action:
+    action: perform-action
+    perform_action: pi_hole_v6.disable
+    data:
+      device_id: pi_hole_device_1
+      duration: '00:00:30'
+  double_tap_action:
+    action: more-info
+    entity_id: switch.pi_hole
+```
+
+> [!NOTE]  
+> **Default Badge Behavior**: If no custom `badge` actions are configured, the card will automatically:
+>
+> - **Tap**: Purge diagnostic messages (when messages exist) or show more info (when no messages)
+> - **Hold/Double-tap**: Show more info about the diagnostic message entity
+>
+> **Requirements**: Both `purge_diagnosis_messages` and `info_message_count` entities must be enabled for the default behavior to work.
+
+> [!WARNING]  
+> **Multi-Pi-hole Action Behavior**: When using multiple Pi-hole instances, actions are executed for each configured Pi-hole. This can lead to unexpected behavior:
+>
+> - **More-info actions**: Only one dialog can be open at a time, so you may only see info for the first or last Pi-hole
+> - **Navigation actions**: Multiple navigation attempts may conflict with each other
+> - **Service calls**: Will be executed for all Pi-holes, which may or may not be desired
+>
+> Consider using single-entity actions or service calls with specific targeting when configuring multi-Pi-hole setups.
+
 ### Custom Actions for All Sections
 
 ```yaml
@@ -481,6 +549,7 @@ collapsed_sections:
 - [x] **`Visual separators`**: add dividers for switches - thanks @Teleportist
 - [x] **`Diagnostics info indicator`**: show diagnostic messages count - thanks @WalterPepeka
 - [x] **`Greek translation`**: **⭐ Second contributor ⭐** added Greek language support - thanks @ChriZathens
+- [x] **`Customizable badge actions`**: configurable tap/hold/double-tap actions for card badge - thanks @moshoari
 
 ## Contributing
 

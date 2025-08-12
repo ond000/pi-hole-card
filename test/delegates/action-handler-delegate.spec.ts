@@ -1,10 +1,12 @@
 import {
   actionHandler,
   handleClickAction,
+  handleMultiPiClickAction,
 } from '@delegates/action-handler-delegate';
 import * as fireEventModule from '@hass/common/dom/fire_event';
 import type { ActionHandlerEvent } from '@hass/data/lovelace/action_handler';
 import * as actionHandlerDirective from '@hass/panels/lovelace/common/directives/action-handler-directive';
+import type { ActionConfigParams } from '@hass/panels/lovelace/common/handle-action';
 import type { SectionConfig } from '@type/config';
 import { expect } from 'chai';
 import { restore, type SinonStub, stub } from 'sinon';
@@ -217,6 +219,151 @@ export default () => {
         expect(configArg).to.include({
           entity: 'light.living_room',
         });
+      });
+    });
+
+    describe('handleMultiPiClickAction', () => {
+      it('should not fire an event if no action is provided in the event detail', () => {
+        // Arrange
+        const element = document.createElement('div');
+        const actionConfigs = [
+          {
+            entity: 'light.living_room',
+            tap_action: { action: 'toggle' },
+          },
+          {
+            entity: 'light.kitchen',
+            tap_action: { action: 'toggle' },
+          },
+        ] as ActionConfigParams[];
+        const handler = handleMultiPiClickAction(element, actionConfigs);
+        const event = { detail: {} } as ActionHandlerEvent;
+
+        // Act
+        handler.handleEvent(event);
+
+        // Assert
+        expect(fireEventStub.called).to.be.false;
+      });
+
+      it('should fire "hass-action" events for each config when an action is provided', () => {
+        // Arrange
+        const element = document.createElement('div');
+        const actionConfigs = [
+          {
+            entity: 'light.living_room',
+            tap_action: { action: 'toggle' },
+            hold_action: { action: 'more-info' },
+          },
+          {
+            entity: 'light.kitchen',
+            tap_action: { action: 'toggle' },
+            double_tap_action: { action: 'more-info' },
+          },
+        ] as ActionConfigParams[];
+        const handler = handleMultiPiClickAction(element, actionConfigs);
+        const event = { detail: { action: 'tap' } } as ActionHandlerEvent;
+
+        // Act
+        handler.handleEvent(event);
+
+        // Assert
+        expect(fireEventStub.calledTwice).to.be.true;
+
+        // Check first call
+        expect(fireEventStub.firstCall.args[0]).to.equal(element);
+        expect(fireEventStub.firstCall.args[1]).to.equal('hass-action');
+        expect(fireEventStub.firstCall.args[2].config).to.deep.equal(
+          actionConfigs[0],
+        );
+        expect(fireEventStub.firstCall.args[2].action).to.equal('tap');
+
+        // Check second call
+        expect(fireEventStub.secondCall.args[0]).to.equal(element);
+        expect(fireEventStub.secondCall.args[1]).to.equal('hass-action');
+        expect(fireEventStub.secondCall.args[2].config).to.deep.equal(
+          actionConfigs[1],
+        );
+        expect(fireEventStub.secondCall.args[2].action).to.equal('tap');
+      });
+
+      it('should correctly handle different action types for multiple configs', () => {
+        // Arrange
+        const element = document.createElement('div');
+        const actionConfigs = [
+          {
+            entity: 'light.living_room',
+            tap_action: { action: 'toggle' },
+            hold_action: { action: 'more-info' },
+          },
+          {
+            entity: 'light.kitchen',
+            tap_action: { action: 'toggle' },
+            double_tap_action: { action: 'none' },
+          },
+        ] as ActionConfigParams[];
+        const handler = handleMultiPiClickAction(element, actionConfigs);
+
+        // Test with different action types
+        const actions = ['tap', 'double_tap', 'hold'];
+
+        actions.forEach((actionType) => {
+          // Reset the stub counter
+          fireEventStub.resetHistory();
+
+          // Create event with specific action type
+          const event = {
+            detail: { action: actionType },
+          } as ActionHandlerEvent;
+
+          // Act
+          handler.handleEvent(event);
+
+          // Assert
+          expect(fireEventStub.calledTwice).to.be.true;
+          expect(fireEventStub.firstCall.args[2].action).to.equal(actionType);
+          expect(fireEventStub.secondCall.args[2].action).to.equal(actionType);
+        });
+      });
+
+      it('should handle empty action configs array', () => {
+        // Arrange
+        const element = document.createElement('div');
+        const actionConfigs: any[] = [];
+        const handler = handleMultiPiClickAction(element, actionConfigs);
+        const event = { detail: { action: 'tap' } } as ActionHandlerEvent;
+
+        // Act
+        handler.handleEvent(event);
+
+        // Assert
+        expect(fireEventStub.called).to.be.false;
+      });
+
+      it('should fire events for single config in array', () => {
+        // Arrange
+        const element = document.createElement('div');
+        const actionConfigs = [
+          {
+            entity: 'light.living_room',
+            tap_action: { action: 'toggle' },
+            hold_action: { action: 'more-info' },
+          },
+        ] as ActionConfigParams[];
+        const handler = handleMultiPiClickAction(element, actionConfigs);
+        const event = { detail: { action: 'tap' } } as ActionHandlerEvent;
+
+        // Act
+        handler.handleEvent(event);
+
+        // Assert
+        expect(fireEventStub.calledOnce).to.be.true;
+        expect(fireEventStub.firstCall.args[0]).to.equal(element);
+        expect(fireEventStub.firstCall.args[1]).to.equal('hass-action');
+        expect(fireEventStub.firstCall.args[2].config).to.deep.equal(
+          actionConfigs[0],
+        );
+        expect(fireEventStub.firstCall.args[2].action).to.equal('tap');
       });
     });
   });

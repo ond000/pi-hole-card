@@ -94,3 +94,31 @@ export const handleClickAction = (
     },
   };
 };
+
+export const handleMultiPiClickAction = (
+  element: HTMLElement,
+  actionConfigs: ActionConfigParams[],
+): { handleEvent: (ev: ActionHandlerEvent) => void } => {
+  return {
+    /**
+     * Handles an action event by creating and dispatching a 'hass-action' custom event.
+     * The event contains the entity configuration and the action type (tap, double_tap, hold).
+     *
+     * @param {ActionHandlerEvent} ev - The action handler event to process
+     */
+    handleEvent: (ev: ActionHandlerEvent): void => {
+      // Extract action from event detail
+      const action = ev.detail?.action;
+      if (!action) return;
+
+      // Process each action configuration
+      actionConfigs.forEach((config) => {
+        // @ts-ignore
+        fireEvent(element, 'hass-action', {
+          config,
+          action,
+        });
+      });
+    },
+  };
+};

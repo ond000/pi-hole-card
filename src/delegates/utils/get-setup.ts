@@ -35,7 +35,11 @@ export const getPiSetup = (
         // don't track entites that are not in the first device
         return {
           device_id: hole.device_id,
+          // required for the setup state to work
           status: hole.status,
+          // required for the badge actions to work
+          info_message_count: hole.info_message_count,
+          purge_diagnosis_messages: hole.purge_diagnosis_messages,
           controls: [],
           sensors: [],
           switches: [],

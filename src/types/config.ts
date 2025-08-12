@@ -15,6 +15,9 @@ export interface Config {
   /** Card icon */
   icon?: string;
 
+  /** actions for badge */
+  badge?: SectionConfig;
+
   /** actions for stats boxes */
   stats?: SectionConfig;
 

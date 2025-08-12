@@ -35,6 +35,23 @@ export default () => {
         expect(device.dns_queries_today).to.equal(entity);
       });
 
+      it('should map action_ftl_purge_diagnosis_messages to purge_diagnosis_messages property', () => {
+        // Create test entity with the new translation key
+        const entity: EntityInformation = {
+          entity_id: 'button.purge_diagnosis_messages',
+          state: 'off',
+          attributes: { friendly_name: 'Purge Diagnosis Messages' },
+          translation_key: 'action_ftl_purge_diagnosis_messages',
+        };
+
+        // Map the entity to the device
+        const result = mapEntitiesByTranslationKey(entity, device);
+
+        // Check that the mapping was successful
+        expect(result).to.be.true;
+        expect(device.purge_diagnosis_messages).to.equal(entity);
+      });
+
       it('should map all supported translation keys correctly', () => {
         // Define all supported translation keys and their corresponding property names
         const supportedKeys = [
@@ -54,6 +71,10 @@ export default () => {
           { key: 'latest_data_refresh', prop: 'latest_data_refresh' },
           { key: 'ftl_info_message_count', prop: 'info_message_count' },
           { key: 'status', prop: 'status' },
+          {
+            key: 'action_ftl_purge_diagnosis_messages',
+            prop: 'purge_diagnosis_messages',
+          },
         ];
 
         // Test each key

@@ -1,4 +1,5 @@
 import * as showSectionModule from '@common/show-section';
+import * as actionHandlerDelegate from '@delegates/action-handler-delegate';
 import type { HomeAssistant } from '@hass/types';
 import * as stateDisplayModule from '@html/components/state-display';
 import { createCardHeader } from '@html/pi-crust';
@@ -15,10 +16,16 @@ export default () => {
     let mockSetup: PiHoleSetup;
     let mockDevice: PiHoleDevice;
     let mockConfig: Config;
+    let mockElement: HTMLElement;
     let stateDisplayStub: sinon.SinonStub;
     let showSectionStub: sinon.SinonStub;
+    let actionHandlerStub: sinon.SinonStub;
+    let handleMultiPiClickActionStub: sinon.SinonStub;
 
     beforeEach(() => {
+      // Create mock element
+      mockElement = document.createElement('div');
+
       // Create stub for stateDisplay
       stateDisplayStub = stub(stateDisplayModule, 'stateDisplay');
       stateDisplayStub.returns(
@@ -28,6 +35,15 @@ export default () => {
       // Create stub for show function
       showSectionStub = stub(showSectionModule, 'show');
       showSectionStub.returns(true); // Default to showing sections
+
+      // Stub action handler functions
+      actionHandlerStub = stub(actionHandlerDelegate, 'actionHandler').returns(
+        () => {},
+      );
+      handleMultiPiClickActionStub = stub(
+        actionHandlerDelegate,
+        'handleMultiPiClickAction',
+      ).returns({ handleEvent: () => {} });
 
       // Mock HomeAssistant instance
       mockHass = {
@@ -72,6 +88,8 @@ export default () => {
       // Restore all stubs
       stateDisplayStub.restore();
       showSectionStub.restore();
+      actionHandlerStub.restore();
+      handleMultiPiClickActionStub.restore();
     });
 
     it('should return nothing when show returns false for header section', async () => {
@@ -79,7 +97,12 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'header').returns(false);
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
 
       // Assert that nothing is returned
       expect(result).to.equal(nothing);
@@ -93,7 +116,12 @@ export default () => {
       showSectionStub.withArgs(mockConfig, 'header').returns(true);
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Test header exists
@@ -116,7 +144,12 @@ export default () => {
       mockConfig.icon = 'mdi:custom-icon';
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check custom title
@@ -134,7 +167,12 @@ export default () => {
       mockSetup.holes[0]!.status!.state = 'on';
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check status color is green
@@ -154,7 +192,12 @@ export default () => {
       mockSetup.holes[0]!.status!.state = 'off';
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check status color is red
@@ -171,7 +214,7 @@ export default () => {
 
     it('should call stateDisplay with the status entity', async () => {
       // Render the card header
-      createCardHeader(mockSetup, mockHass, mockConfig);
+      createCardHeader(mockElement, mockSetup, mockHass, mockConfig);
 
       // Verify stateDisplay was called with the correct parameters
       expect(stateDisplayStub.calledWith(mockHass, mockSetup.holes[0]!.status))
@@ -198,7 +241,12 @@ export default () => {
         .returns(html`<div class="mocked-remaining-time">5 minutes</div>`);
 
       // Render the card header
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Verify stateDisplay was called for both status and remaining time
@@ -222,7 +270,12 @@ export default () => {
 
     it('should not display hole count when only one Pi-hole is configured', async () => {
       // Setup has only one hole (default setup)
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check that multi-status span doesn't exist
@@ -244,7 +297,12 @@ export default () => {
 
       mockSetup.holes.push(secondDevice);
 
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check that multi-status span exists and shows correct count
@@ -267,7 +325,12 @@ export default () => {
 
       mockSetup.holes.push(secondDevice);
 
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check that status color is orange (warning)
@@ -304,7 +367,12 @@ export default () => {
 
       mockSetup.holes.push(secondDevice, thirdDevice);
 
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Check that multi-status span shows correct active count
@@ -323,7 +391,12 @@ export default () => {
 
       mockSetup.holes.push(deviceWithoutStatus);
 
-      const result = createCardHeader(mockSetup, mockHass, mockConfig);
+      const result = createCardHeader(
+        mockElement,
+        mockSetup,
+        mockHass,
+        mockConfig,
+      );
       const el = await fixture(result as TemplateResult);
 
       // Should only count devices with defined status

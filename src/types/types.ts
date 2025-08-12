@@ -34,6 +34,9 @@ export interface PiHoleDevice {
   /** Info message count entity */
   info_message_count?: EntityInformation;
 
+  /** Button to Purge Diagnosis Messages */
+  purge_diagnosis_messages?: EntityInformation;
+
   /** Status of Pi-hole */
   status?: EntityInformation;
 

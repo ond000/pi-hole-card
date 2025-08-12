@@ -9,12 +9,14 @@ import { stateDisplay } from './components/state-display';
 
 /**
  * Creates the card header section
+ * @param element - The HTML element to render the card into
  * @param setup - The Pi-hole setup
  * @param hass - The Home Assistant instance
  * @param config - The card configuration
  * @returns TemplateResult
  */
 export const createCardHeader = (
+  element: HTMLElement,
   setup: PiHoleSetup,
   hass: HomeAssistant,
   config: Config,
@@ -50,7 +52,7 @@ export const createCardHeader = (
   return html`
     <div class="card-header">
       <div class="name">
-        ${icon(config, setup)}${config.title ?? 'Pi-hole'}
+        ${icon(element, config, setup)}${config.title ?? 'Pi-hole'}
         ${setup.holes.length > 1
           ? html`<span class="multi-status"
               >(${activeCount}/${setup.holes.length})</span
