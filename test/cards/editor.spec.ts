@@ -316,15 +316,15 @@ describe('editor.ts', () => {
                   options: [
                     {
                       label: '60 seconds',
-                      value: '60',
+                      value: '60s',
                     },
                     {
                       label: '5 minutes',
-                      value: '300',
+                      value: '5m',
                     },
                     {
                       label: '15 minutes',
-                      value: '900',
+                      value: '15m',
                     },
                   ],
                 },
