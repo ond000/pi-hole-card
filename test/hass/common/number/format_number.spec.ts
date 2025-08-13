@@ -7,7 +7,6 @@ import { NumberFormat } from '@hass/data/translations';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
-export default () => {
   describe('format_number.ts', () => {
     describe('numberFormatToLocale', () => {
       it('should return correct locale for comma_decimal format', () => {
@@ -162,4 +161,3 @@ export default () => {
       });
     });
   });
-};

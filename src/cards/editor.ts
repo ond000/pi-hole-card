@@ -5,19 +5,133 @@ import type { Config, SectionConfig } from '@type/config';
 import { html, LitElement, nothing, type TemplateResult } from 'lit';
 import { state } from 'lit/decorators.js';
 
+// Constants for repeated patterns
+const PI_HOLE_INTEGRATION_FILTER = [
+  {
+    integration: 'pi_hole_v6',
+  },
+  {
+    integration: 'pi_hole',
+  },
+];
+
+const PI_HOLE_ENTITY_FILTER = [
+  {
+    integration: 'pi_hole_v6',
+    domain: ['button', 'sensor', 'switch'],
+  },
+  {
+    integration: 'pi_hole',
+    domain: ['button', 'sensor', 'switch'],
+  },
+];
+
+const SWITCH_SPACING_OPTIONS = [
+  {
+    label: 'Flex (default)',
+    value: 'flex',
+  },
+  {
+    label: 'Space Around',
+    value: 'space-around',
+  },
+  {
+    label: 'Space Between',
+    value: 'space-between',
+  },
+];
+
+const SECTION_EXCLUDE_OPTIONS = [
+  {
+    label: 'Actions',
+    value: 'actions',
+  },
+  {
+    label: 'Footer',
+    value: 'footer',
+  },
+  {
+    label: 'Header',
+    value: 'header',
+  },
+  {
+    label: 'Pause Buttons',
+    value: 'pause',
+  },
+  {
+    label: 'Statistics',
+    value: 'statistics',
+  },
+  {
+    label: 'Sensors',
+    value: 'sensors',
+  },
+  {
+    label: 'Switches',
+    value: 'switches',
+  },
+];
+
+const COLLAPSED_SECTION_OPTIONS = [
+  {
+    label: 'Pause Buttons',
+    value: 'pause',
+  },
+  {
+    label: 'Switches',
+    value: 'switches',
+  },
+  {
+    label: 'Actions',
+    value: 'actions',
+  },
+];
+
+const PAUSE_DURATION_OPTIONS = [
+  {
+    label: '60 seconds',
+    value: '60s',
+  },
+  {
+    label: '5 minutes',
+    value: '5m',
+  },
+  {
+    label: '15 minutes',
+    value: '15m',
+  },
+];
+
+const ACTION_SCHEMA = [
+  {
+    name: 'tap_action',
+    label: 'Tap Action',
+    selector: {
+      ui_action: {},
+    },
+  },
+  {
+    name: 'hold_action',
+    label: 'Hold Action',
+    selector: {
+      ui_action: {},
+    },
+  },
+  {
+    name: 'double_tap_action',
+    label: 'Double Tap Action',
+    selector: {
+      ui_action: {},
+    },
+  },
+];
+
 const SCHEMA: HaFormSchema[] = [
   {
     name: 'device_id',
     selector: {
       device: {
-        filter: [
-          {
-            integration: 'pi_hole_v6',
-          },
-          {
-            integration: 'pi_hole',
-          },
-        ],
+        filter: PI_HOLE_INTEGRATION_FILTER,
         multiple: true,
       },
     },
@@ -66,36 +180,7 @@ const SCHEMA: HaFormSchema[] = [
           select: {
             multiple: true,
             mode: 'list' as const,
-            options: [
-              {
-                label: 'Actions',
-                value: 'actions',
-              },
-              {
-                label: 'Footer',
-                value: 'footer',
-              },
-              {
-                label: 'Header',
-                value: 'header',
-              },
-              {
-                label: 'Pause Buttons',
-                value: 'pause',
-              },
-              {
-                label: 'Statistics',
-                value: 'statistics',
-              },
-              {
-                label: 'Sensors',
-                value: 'sensors',
-              },
-              {
-                label: 'Switches',
-                value: 'switches',
-              },
-            ],
+            options: SECTION_EXCLUDE_OPTIONS,
           },
         },
       },
@@ -107,21 +192,7 @@ const SCHEMA: HaFormSchema[] = [
           select: {
             multiple: true,
             mode: 'list' as const,
-            options: [
-              {
-                label: 'Pause Buttons',
-                value: 'pause',
-              },
-              {
-                label: 'Switches',
-                value: 'switches',
-              },
-
-              {
-                label: 'Actions',
-                value: 'actions',
-              },
-            ],
+            options: COLLAPSED_SECTION_OPTIONS,
           },
         },
       },
@@ -133,20 +204,7 @@ const SCHEMA: HaFormSchema[] = [
           select: {
             multiple: false,
             mode: 'dropdown' as const,
-            options: [
-              {
-                label: 'Flex (default)',
-                value: 'flex',
-              },
-              {
-                label: 'Space Around',
-                value: 'space-around',
-              },
-              {
-                label: 'Space Between',
-                value: 'space-between',
-              },
-            ],
+            options: SWITCH_SPACING_OPTIONS,
           },
         },
       },
@@ -157,14 +215,7 @@ const SCHEMA: HaFormSchema[] = [
         selector: {
           entity: {
             multiple: true,
-            filter: [
-              {
-                integration: 'pi_hole_v6',
-              },
-              {
-                integration: 'pi_hole',
-              },
-            ],
+            filter: PI_HOLE_INTEGRATION_FILTER,
           },
         },
       },
@@ -175,17 +226,7 @@ const SCHEMA: HaFormSchema[] = [
         selector: {
           entity: {
             multiple: true,
-            filter: [
-              {
-                integration: 'pi_hole_v6',
-                domain: ['button', 'sensor', 'switch'],
-              },
-
-              {
-                integration: 'pi_hole',
-                domain: ['button', 'sensor', 'switch'],
-              },
-            ],
+            filter: PI_HOLE_ENTITY_FILTER,
           },
         },
       },
@@ -206,20 +247,7 @@ const SCHEMA: HaFormSchema[] = [
           select: {
             multiple: false,
             mode: 'dropdown' as const,
-            options: [
-              {
-                label: 'Flex (default)',
-                value: 'flex',
-              },
-              {
-                label: 'Space Around',
-                value: 'space-around',
-              },
-              {
-                label: 'Space Between',
-                value: 'space-between',
-              },
-            ],
+            options: SWITCH_SPACING_OPTIONS,
           },
         },
       },
@@ -241,20 +269,7 @@ const SCHEMA: HaFormSchema[] = [
             multiple: true,
             custom_value: true,
             mode: 'list' as const,
-            options: [
-              {
-                label: '60 seconds',
-                value: '60',
-              },
-              {
-                label: '5 minutes',
-                value: '300',
-              },
-              {
-                label: '15 minutes',
-                value: '900',
-              },
-            ],
+            options: PAUSE_DURATION_OPTIONS,
           },
         },
       },
@@ -263,116 +278,28 @@ const SCHEMA: HaFormSchema[] = [
         label: 'Badge',
         type: 'expandable',
         icon: 'mdi:badge-account-horizontal',
-        schema: [
-          {
-            name: 'tap_action',
-            label: 'Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'hold_action',
-            label: 'Hold Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'double_tap_action',
-            label: 'Double Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-        ],
+        schema: ACTION_SCHEMA,
       },
       {
         name: 'stats',
         label: 'Statistics',
         type: 'expandable',
         icon: 'mdi:counter',
-        schema: [
-          {
-            name: 'tap_action',
-            label: 'Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'hold_action',
-            label: 'Hold Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'double_tap_action',
-            label: 'Double Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-        ],
+        schema: ACTION_SCHEMA,
       },
       {
         name: 'info',
         label: 'Information',
         type: 'expandable',
         icon: 'mdi:information-outline',
-        schema: [
-          {
-            name: 'tap_action',
-            label: 'Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'hold_action',
-            label: 'Hold Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'double_tap_action',
-            label: 'Double Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-        ],
+        schema: ACTION_SCHEMA,
       },
       {
         name: 'controls',
         label: 'Controls',
         type: 'expandable',
         icon: 'mdi:remote',
-        schema: [
-          {
-            name: 'tap_action',
-            label: 'Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'hold_action',
-            label: 'Hold Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-          {
-            name: 'double_tap_action',
-            label: 'Double Tap Action',
-            selector: {
-              ui_action: {},
-            },
-          },
-        ],
+        schema: ACTION_SCHEMA,
       },
     ],
   },

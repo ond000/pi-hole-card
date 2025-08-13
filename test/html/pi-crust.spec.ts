@@ -10,7 +10,6 @@ import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('pi-crust.ts', () => {
     let mockHass: HomeAssistant;
     let mockSetup: PiHoleSetup;
@@ -405,4 +404,3 @@ export default () => {
       expect(multiStatusEl?.textContent?.trim()).to.equal('(1/2)');
     });
   });
-};

@@ -4,7 +4,6 @@ import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 
-export default () => {
   describe('version-item.ts', () => {
     it('should render a version item with label, value, and GitHub link from entity', async () => {
       // Create test entity
@@ -48,4 +47,3 @@ export default () => {
       expect(valueEl?.textContent).to.equal('v1.2.3');
     });
   });
-};

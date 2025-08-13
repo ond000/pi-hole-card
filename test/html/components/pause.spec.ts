@@ -1,4 +1,5 @@
 import * as collapsedStateModule from '@common/collapsed-state';
+import * as convertTimeModule from '@common/convert-time';
 import * as showSectionModule from '@common/show-section';
 import * as toggleSectionModule from '@common/toggle-section';
 import * as pauseHoleModule from '@delegates/utils/pause-hole';
@@ -11,7 +12,6 @@ import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('pause.ts', () => {
     let mockHass: HomeAssistant;
     let mockSetup: PiHoleSetup;
@@ -20,6 +20,8 @@ export default () => {
     let isCollapsedStub: sinon.SinonStub;
     let toggleSectionStub: sinon.SinonStub;
     let handlePauseClickStub: sinon.SinonStub;
+    let parseTimeToSecondsStub: sinon.SinonStub;
+    let formatSecondsToHumanStub: sinon.SinonStub;
 
     beforeEach(() => {
       // Create mock HomeAssistant instance
@@ -46,6 +48,29 @@ export default () => {
       handlePauseClickStub = stub(pauseHoleModule, 'handlePauseClick').returns(
         () => {},
       );
+
+      // Create stubs for convert-time functions
+      parseTimeToSecondsStub = stub(convertTimeModule, 'parseTimeToSeconds');
+      parseTimeToSecondsStub.callsFake((input) => {
+        if (typeof input === 'number') return input;
+        if (input === '60') return 60;
+        if (input === '5m') return 300;
+        if (input === '1h') return 3600;
+        return parseInt(String(input), 10) || 0;
+      });
+
+      formatSecondsToHumanStub = stub(
+        convertTimeModule,
+        'formatSecondsToHuman',
+      );
+      formatSecondsToHumanStub.callsFake((seconds) => {
+        if (seconds === 60) return '1 minute';
+        if (seconds === 300) return '5 minutes';
+        if (seconds === 900) return '15 minutes';
+        if (seconds === 1800) return '30 minutes';
+        if (seconds === 3600) return '1 hour';
+        return `${seconds} seconds`;
+      });
     });
 
     afterEach(() => {
@@ -54,6 +79,8 @@ export default () => {
       isCollapsedStub.restore();
       toggleSectionStub.restore();
       handlePauseClickStub.restore();
+      parseTimeToSecondsStub.restore();
+      formatSecondsToHumanStub.restore();
     });
 
     it('should return nothing when show returns false for pause section', async () => {
@@ -90,9 +117,13 @@ export default () => {
       // Check pause buttons - should have default values (60, 300, 900)
       const buttons = el.querySelectorAll('mwc-button');
       expect(buttons.length).to.equal(3);
-      expect(buttons[0]?.textContent?.trim()).to.equal('60 seconds');
-      expect(buttons[1]?.textContent?.trim()).to.equal('300 seconds');
-      expect(buttons[2]?.textContent?.trim()).to.equal('900 seconds');
+      expect(buttons[0]?.textContent?.trim()).to.equal('1 minute');
+      expect(buttons[1]?.textContent?.trim()).to.equal('5 minutes');
+      expect(buttons[2]?.textContent?.trim()).to.equal('15 minutes');
+
+      // Verify parsing and formatting functions were called
+      expect(parseTimeToSecondsStub.callCount).to.equal(3);
+      expect(formatSecondsToHumanStub.callCount).to.equal(3);
 
       // Verify handlePauseClick was called for each duration with correct parameters
       expect(handlePauseClickStub.callCount).to.equal(3);
@@ -111,15 +142,43 @@ export default () => {
       // Check pause buttons - should have custom values (60, 300, 1800)
       const buttons = el.querySelectorAll('mwc-button');
       expect(buttons.length).to.equal(3);
-      expect(buttons[0]?.textContent?.trim()).to.equal('60 seconds');
-      expect(buttons[1]?.textContent?.trim()).to.equal('300 seconds');
-      expect(buttons[2]?.textContent?.trim()).to.equal('1800 seconds');
+      expect(buttons[0]?.textContent?.trim()).to.equal('1 minute');
+      expect(buttons[1]?.textContent?.trim()).to.equal('5 minutes');
+      expect(buttons[2]?.textContent?.trim()).to.equal('30 minutes');
 
       // Verify handlePauseClick was called for each duration with correct parameters
       expect(handlePauseClickStub.callCount).to.equal(3);
       expect(handlePauseClickStub.firstCall.args[2]).to.equal(60);
       expect(handlePauseClickStub.secondCall.args[2]).to.equal(300);
       expect(handlePauseClickStub.thirdCall.args[2]).to.equal(1800);
+    });
+
+    it('should handle string time formats in pause durations', async () => {
+      // Update config with string formats
+      mockConfig.pause_durations = ['60', '5m', '1h'];
+
+      // Call pause component
+      const result = pause(mockHass, mockSetup, mockConfig);
+      const el = await fixture(result as TemplateResult);
+
+      // Check pause buttons display human-readable format
+      const buttons = el.querySelectorAll('mwc-button');
+      expect(buttons.length).to.equal(3);
+      expect(buttons[0]?.textContent?.trim()).to.equal('1 minute');
+      expect(buttons[1]?.textContent?.trim()).to.equal('5 minutes');
+      expect(buttons[2]?.textContent?.trim()).to.equal('1 hour');
+
+      // Verify parseTimeToSeconds was called with string inputs
+      expect(parseTimeToSecondsStub.callCount).to.equal(3);
+      expect(parseTimeToSecondsStub.getCall(0).args[0]).to.equal('60');
+      expect(parseTimeToSecondsStub.getCall(1).args[0]).to.equal('5m');
+      expect(parseTimeToSecondsStub.getCall(2).args[0]).to.equal('1h');
+
+      // Verify formatSecondsToHuman was called with parsed values
+      expect(formatSecondsToHumanStub.callCount).to.equal(3);
+      expect(formatSecondsToHumanStub.getCall(0).args[0]).to.equal(60);
+      expect(formatSecondsToHumanStub.getCall(1).args[0]).to.equal(300);
+      expect(formatSecondsToHumanStub.getCall(2).args[0]).to.equal(3600);
     });
 
     it('should apply hidden class when section is collapsed', async () => {
@@ -158,4 +217,3 @@ export default () => {
       expect(toggleSectionStub.firstCall.args[1]).to.equal('.pause');
     });
   });
-};

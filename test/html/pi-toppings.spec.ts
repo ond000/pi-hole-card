@@ -9,7 +9,6 @@ import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('pi-toppings.ts', () => {
     let mockDevice: PiHoleDevice;
     let mockElement: HTMLElement;
@@ -181,4 +180,3 @@ export default () => {
       expect(createAdditionalStatStub.firstCall.args[2]).to.be.undefined;
     });
   });
-};

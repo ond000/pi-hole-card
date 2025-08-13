@@ -10,7 +10,6 @@ import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('pi-footer.ts', () => {
     let mockHass: HomeAssistant;
     let mockDevice: PiHoleDevice;
@@ -192,4 +191,3 @@ export default () => {
       expect(refreshTimeStub.calledOnce).to.be.true;
     });
   });
-};

@@ -10,7 +10,6 @@ import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';
 
-export default () => {
   describe('pi-fillings.ts', () => {
     let mockElement: HTMLElement;
     let mockHass: HomeAssistant;
@@ -267,4 +266,3 @@ export default () => {
       });
     });
   });
-};

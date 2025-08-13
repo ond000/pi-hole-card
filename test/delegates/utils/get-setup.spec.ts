@@ -5,7 +5,6 @@ import type { Config } from '@type/config';
 import { expect } from 'chai';
 import { restore, stub } from 'sinon';
 
-export default () => {
   describe('get-pi-setup.ts', () => {
     let mockHass: HomeAssistant;
     let mockConfig: Config;
@@ -307,4 +306,3 @@ export default () => {
       expect(result?.holes[1]?.updates).to.be.an('array').with.lengthOf(0);
     });
   });
-};

@@ -1,7 +1,6 @@
 import { arrayLiteralIncludes } from '@hass/common/array/literal-includes';
 import { expect } from 'chai';
 
-export default () => {
   describe('literal-includes.ts', () => {
     describe('arrayLiteralIncludes', () => {
       it('should return true when the element exists in the array', () => {
@@ -106,4 +105,3 @@ export default () => {
       });
     });
   });
-};

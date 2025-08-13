@@ -9,7 +9,6 @@ import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';
 
-export default () => {
   describe('refresh-time.ts', () => {
     let mockHass: HomeAssistant;
     let mockDevice: PiHoleDevice;
@@ -212,4 +211,3 @@ export default () => {
       expect(stateDisplayStub.called).to.be.false;
     });
   });
-};

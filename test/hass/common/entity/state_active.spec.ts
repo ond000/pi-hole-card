@@ -2,7 +2,6 @@ import { stateActive } from '@hass/common/entity/state_active';
 import { OFF, UNAVAILABLE } from '@hass/data/entity';
 import { expect } from 'chai';
 
-export default () => {
   describe('state_active.ts', () => {
     // Helper function to create state objects for testing
     const createStateObj = (entityId: string, state: string) => ({
@@ -206,4 +205,3 @@ export default () => {
       });
     });
   });
-};

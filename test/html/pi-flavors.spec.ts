@@ -11,7 +11,6 @@ import { expect } from 'chai';
 import { html, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('pi-flavors.ts', () => {
     let mockHass: HomeAssistant;
     let mockSetup: PiHoleSetup;
@@ -276,4 +275,3 @@ export default () => {
       expect(createActionButtonStub.callCount).to.equal(0);
     });
   });
-};

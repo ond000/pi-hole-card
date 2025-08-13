@@ -3,7 +3,6 @@ import type { ConfigChangedEvent } from '@hass/panels/lovelace/editor/hui-elemen
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-export default () => {
   describe('fire-event.ts', () => {
     let element: HTMLElement;
     let dispatchStub: sinon.SinonStub;
@@ -102,4 +101,3 @@ export default () => {
       expect(event.composed).to.be.true;
     });
   });
-};

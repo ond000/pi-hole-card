@@ -9,7 +9,6 @@ import type { EntityInformation } from '@type/types';
 import { expect } from 'chai';
 import { restore, stub } from 'sinon';
 
-export default () => {
   describe('get-pihole.ts', () => {
     let mockHass: HomeAssistant;
     let mockConfig: Config;
@@ -197,7 +196,6 @@ export default () => {
       ).to.equal('switch.test_3');
     });
   });
-};
 
 // Helper to create entity objects with minimal required properties
 function createEntity(

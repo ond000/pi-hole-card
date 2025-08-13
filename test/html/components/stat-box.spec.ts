@@ -10,7 +10,6 @@ import { expect } from 'chai';
 import { nothing, type TemplateResult } from 'lit';
 import { restore, stub } from 'sinon';
 
-export default () => {
   describe('stat-box.ts', () => {
     let mockElement: HTMLElement;
     let mockHass: HomeAssistant;
@@ -299,4 +298,3 @@ export default () => {
       expect(iconEl?.getAttribute('icon')).to.equal('mdi:custom-test-icon');
     });
   });
-};

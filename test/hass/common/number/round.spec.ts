@@ -1,7 +1,6 @@
 import { round } from '@hass/common/number/round';
 import { expect } from 'chai';
 
-export default () => {
   describe('round.ts', () => {
     it('should round to 2 decimal places by default', () => {
       expect(round(3.14159)).to.equal(3.14);
@@ -68,4 +67,3 @@ export default () => {
       expect(round(54321, -4)).to.equal(50000.00000000001); //? lol
     });
   });
-};

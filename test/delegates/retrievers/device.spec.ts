@@ -3,7 +3,6 @@ import type { HomeAssistant } from '@hass/types';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
-export default () => {
   describe('device.ts', () => {
     let sandbox: sinon.SinonSandbox;
     let mockHass: HomeAssistant;
@@ -76,4 +75,3 @@ export default () => {
       });
     });
   });
-};

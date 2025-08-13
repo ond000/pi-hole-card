@@ -1,4 +1,5 @@
 import { isCollapsed } from '@common/collapsed-state';
+import { formatSecondsToHuman, parseTimeToSeconds } from '@common/convert-time';
 import { show } from '@common/show-section';
 import { toggleSection } from '@common/toggle-section';
 import { handlePauseClick } from '@delegates/utils/pause-hole';
@@ -42,9 +43,10 @@ export const pause = (
     </div>
     <div class="pause ${pauseCollapsed ? 'hidden' : ''}">
       ${pauseDuration.map((duration) => {
-        return html`<mwc-button
-          @click=${handlePauseClick(hass, setup, duration)}
-          >${duration} ${localize(hass, 'card.units.seconds')}</mwc-button
+        const seconds = parseTimeToSeconds(duration);
+        const displayText = formatSecondsToHuman(seconds);
+        return html`<mwc-button @click=${handlePauseClick(hass, setup, seconds)}
+          >${displayText}</mwc-button
         >`;
       })}
     </div>

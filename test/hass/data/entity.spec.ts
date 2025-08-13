@@ -10,7 +10,6 @@ import {
 } from '@hass/data/entity';
 import { expect } from 'chai';
 
-export default () => {
   describe('entity.ts', () => {
     describe('Constants', () => {
       it('should have the correct state constants', () => {
@@ -67,4 +66,3 @@ export default () => {
       });
     });
   });
-};

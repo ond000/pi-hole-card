@@ -1,7 +1,6 @@
 import { computeDomain } from '@hass/common/entity/compute_domain';
 import { expect } from 'chai';
 
-export default () => {
   describe('compute_domain.ts', () => {
     it('should extract domain from entity ID', () => {
       expect(computeDomain('light.living_room')).to.equal('light');
@@ -29,4 +28,3 @@ export default () => {
       expect(computeDomain('domain123.entity456')).to.equal('domain123');
     });
   });
-};

@@ -12,7 +12,6 @@ import { expect } from 'chai';
 import { html } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('bake-pi.ts', () => {
     let mockHass: HomeAssistant;
     let mockSetup: PiHoleSetup;
@@ -174,4 +173,3 @@ export default () => {
       expect(el.querySelector('.mocked-footer')).to.exist;
     });
   });
-};

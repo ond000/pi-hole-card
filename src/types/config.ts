@@ -39,8 +39,8 @@ export interface Config {
   /** Sections that should be collapsed by default */
   collapsed_sections?: CollapsibleSections[];
 
-  /** Custom pause durations in seconds (optional) */
-  pause_durations?: number[];
+  /** Custom pause durations (optional) - can be numbers in seconds or strings with time units */
+  pause_durations?: (number | string)[];
 
   /** Style for the switches */
   switch_spacing?: SwitchSpacing;

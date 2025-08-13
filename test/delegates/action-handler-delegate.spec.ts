@@ -11,7 +11,6 @@ import type { SectionConfig } from '@type/config';
 import { expect } from 'chai';
 import { restore, type SinonStub, stub } from 'sinon';
 
-export default () => {
   describe('action-handler-delegate.ts', () => {
     let fireEventStub: SinonStub;
     let hassActionHandlerStub: SinonStub;
@@ -367,4 +366,3 @@ export default () => {
       });
     });
   });
-};

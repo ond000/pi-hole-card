@@ -5,7 +5,6 @@ import type { EntityInformation, EntityState } from '@type/types';
 import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 
-export default () => {
   describe('stateDisplay.ts', () => {
     // Common test variables
     let mockHass: HomeAssistant;
@@ -89,4 +88,3 @@ export default () => {
       expect(el.classList.contains('second-class')).to.be.true;
     });
   });
-};

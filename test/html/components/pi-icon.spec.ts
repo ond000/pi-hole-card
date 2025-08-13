@@ -7,7 +7,6 @@ import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('icon.ts', () => {
     let mockConfig: Config;
     let mockSetup: PiHoleSetup;
@@ -434,4 +433,3 @@ export default () => {
       });
     });
   });
-};

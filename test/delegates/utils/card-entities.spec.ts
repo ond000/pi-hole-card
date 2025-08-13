@@ -4,7 +4,6 @@ import type { HomeAssistant } from '@hass/types';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-export default () => {
   describe('card-entities.ts', () => {
     let mockHass: HomeAssistant;
     let getStateStub: sinon.SinonStub;
@@ -206,4 +205,3 @@ export default () => {
       });
     });
   });
-};

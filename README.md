@@ -242,21 +242,21 @@ If you're unsure what your Pi-hole device ID is, here are several ways to find i
 
 ## Configuration Options
 
-| Name               | Type            | Default      | Description                                                   |
-| ------------------ | --------------- | ------------ | ------------------------------------------------------------- |
-| device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant         |
-| title              | string          | Pi-Hole      | Custom title for the card header                              |
-| icon               | string          | mdi:pi-hole  | Custom icon for the card header                               |
-| badge              | object          | _none_       | Configure actions for the card icon/badge                     |
-| pause_durations    | array           | [60,300,900] | Durations in seconds for the pause buttons                    |
-| stats              | object          | _none_       | Configure actions for statistics tiles                        |
-| info               | object          | _none_       | Configure actions for additional info items                   |
-| controls           | object          | _none_       | Configure actions for control buttons                         |
-| exclude_sections   | list            | _none_       | Sections of entities to exclude. See below.                   |
-| exclude_entities   | list            | _none_       | Entities to remove from the card.                             |
-| entity_order       | list            | _none_       | Custom order for switch, button, sensor entities or dividers. |
-| collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.                |
-| switch_spacing     | string          | flex         | Layout style for switches: flex, space-around, space-between  |
+| Name               | Type            | Default      | Description                                                        |
+| ------------------ | --------------- | ------------ | ------------------------------------------------------------------ |
+| device_id          | string or array | **Required** | The ID(s) of your Pi-hole device(s) in Home Assistant              |
+| title              | string          | Pi-Hole      | Custom title for the card header                                   |
+| icon               | string          | mdi:pi-hole  | Custom icon for the card header                                    |
+| badge              | object          | _none_       | Configure actions for the card icon/badge                          |
+| pause_durations    | array           | [60,300,900] | Durations for pause buttons (supports numbers, strings with units) |
+| stats              | object          | _none_       | Configure actions for statistics tiles                             |
+| info               | object          | _none_       | Configure actions for additional info items                        |
+| controls           | object          | _none_       | Configure actions for control buttons                              |
+| exclude_sections   | list            | _none_       | Sections of entities to exclude. See below.                        |
+| exclude_entities   | list            | _none_       | Entities to remove from the card.                                  |
+| entity_order       | list            | _none_       | Custom order for switch, button, sensor entities or dividers.      |
+| collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.                     |
+| switch_spacing     | string          | flex         | Layout style for switches: flex, space-around, space-between       |
 
 ### Action Configuration
 
@@ -344,15 +344,28 @@ icon: 'mdi:shield-check'
 
 ### With Custom Pause Durations
 
+The `pause_durations` configuration supports various formats for specifying time:
+
 ```yaml
 type: custom:pi-hole
 device_id: pi_hole_device_1
 pause_durations:
   - 60 # 1 minute
   - 300 # 5 minutes
-  - 1800 # 30 minutes
-  - 3600 # 1 hour
+  - 10s # 10 seconds
+  - 5m # 5 minutes
+  - 1h # 1 hour
+  - '4h:20m:69s' # 15669 seconds (complex format)
 ```
+
+**Supported time formats:**
+
+- **Numbers**: Interpreted as seconds (e.g., `300` = 5 minutes)
+- **Number strings**: Quoted numbers treated as seconds (e.g., `"60"` = 1 minute)
+- **Simple units**: Time with single unit (e.g., `"10s"`, `"5m"`, `"1h"`)
+- **Complex format**: Colon-separated with units (e.g., `"1h:30m:45s"`)
+
+The UI will automatically display these in human-readable format (e.g., "5 minutes", "1 hour").
 
 ![Pause Ad-Blocking](assets/custom-pause.png)
 
@@ -550,6 +563,7 @@ collapsed_sections:
 - [x] **`Diagnostics info indicator`**: show diagnostic messages count - thanks @WalterPepeka
 - [x] **`Greek translation`**: **⭐ Second contributor ⭐** added Greek language support - thanks @ChriZathens
 - [x] **`Customizable badge actions`**: configurable tap/hold/double-tap actions for card badge - thanks @moshoari
+- [x] **`Enhanced pause durations`**: flexible time formats and human-readable display for pause buttons - thanks @moshoari
 
 ## Contributing
 

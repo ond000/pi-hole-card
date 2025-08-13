@@ -5,7 +5,6 @@ import type { PiHoleSetup } from '@type/types';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-export default () => {
   describe('handle-pause-click.ts', () => {
     let mockHass: HomeAssistant;
     let mockSetup: PiHoleSetup;
@@ -100,4 +99,3 @@ export default () => {
       });
     });
   });
-};

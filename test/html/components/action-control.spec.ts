@@ -7,7 +7,6 @@ import { expect } from 'chai';
 import { type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-export default () => {
   describe('action-control.ts', () => {
     let actionHandlerStub: sinon.SinonStub;
     let handleClickActionStub: sinon.SinonStub;
@@ -180,4 +179,3 @@ export default () => {
       });
     });
   });
-};

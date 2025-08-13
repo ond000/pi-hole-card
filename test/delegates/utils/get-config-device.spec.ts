@@ -4,7 +4,6 @@ import type { HomeAssistant } from '@hass/types';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-export default () => {
   describe('get-config-device.ts', () => {
     let mockHass: HomeAssistant;
     let callWSStub: sinon.SinonStub;
@@ -124,4 +123,3 @@ export default () => {
       }
     });
   });
-};

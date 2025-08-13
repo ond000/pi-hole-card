@@ -2,7 +2,6 @@ import { actionHandlerBind } from '@hass/panels/lovelace/common/directives/actio
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
-export default () => {
   describe('action-handler-directive.ts', () => {
     let sandbox: sinon.SinonSandbox;
     let mockElement: HTMLElement & { actionHandler?: any };
@@ -112,4 +111,3 @@ export default () => {
       });
     });
   });
-};

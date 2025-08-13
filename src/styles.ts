@@ -309,6 +309,26 @@ export const styles = css`
     justify-content: space-around;
   }
 
+  .pause mwc-button {
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+    will-change: transform, filter;
+  }
+
+  .pause mwc-button:hover,
+  .pause mwc-button:focus-visible {
+    transform: translateY(-1px) scale(1.03);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--success-color);
+  }
+
   /* Warning badge styles */
   .warning-badge {
     display: flex;
@@ -324,6 +344,20 @@ export const styles = css`
     margin-right: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     min-width: 25px;
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+    will-change: transform, filter;
+  }
+
+  .warning-badge:hover,
+  .warning-badge:focus-visible {
+    transform: translateY(-1px) scale(1.06);
+    filter: brightness(1.05);
+    box-shadow:
+      0 6px 12px rgba(0, 0, 0, 0.25),
+      0 0 0 3px var(--warning-color, #ff9800);
   }
 
   .badge {
