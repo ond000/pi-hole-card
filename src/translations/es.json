@@ -16,7 +16,12 @@
       "actions": "Acciones"
     },
     "units": {
-      "seconds": "segundos"
+      "seconds": "segundos",
+      "second": "segundo",
+      "minutes": "minutos",
+      "minute": "minuto",
+      "hours": "horas",
+      "hour": "hora"
     }
   }
 }

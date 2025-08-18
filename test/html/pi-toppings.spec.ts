@@ -9,174 +9,174 @@ import { expect } from 'chai';
 import { html, nothing, type TemplateResult } from 'lit';
 import { stub } from 'sinon';
 
-  describe('pi-toppings.ts', () => {
-    let mockDevice: PiHoleDevice;
-    let mockElement: HTMLElement;
-    let mockHass: HomeAssistant;
-    let mockConfig: Config;
-    let createAdditionalStatStub: sinon.SinonStub;
-    let showSectionStub: sinon.SinonStub;
+describe('pi-toppings.ts', () => {
+  let mockDevice: PiHoleDevice;
+  let mockElement: HTMLElement;
+  let mockHass: HomeAssistant;
+  let mockConfig: Config;
+  let createAdditionalStatStub: sinon.SinonStub;
+  let showSectionStub: sinon.SinonStub;
 
-    beforeEach(() => {
-      mockElement = document.createElement('div');
-      mockHass = {} as HomeAssistant;
+  beforeEach(() => {
+    mockElement = document.createElement('div');
+    mockHass = {} as HomeAssistant;
 
-      // Create stub for show function
-      showSectionStub = stub(showSectionModule, 'show');
-      showSectionStub.returns(true); // Default to showing sections
+    // Create stub for show function
+    showSectionStub = stub(showSectionModule, 'show');
+    showSectionStub.returns(true); // Default to showing sections
 
-      // Create stub for createAdditionalStat
-      createAdditionalStatStub = stub(
-        createAdditionalStatModule,
-        'createAdditionalStat',
-      );
+    // Create stub for createAdditionalStat
+    createAdditionalStatStub = stub(
+      createAdditionalStatModule,
+      'createAdditionalStat',
+    );
 
-      // Mock return value with minimal data for testing
-      createAdditionalStatStub.callsFake((hass, element, config, sensor) => {
-        return html`<div class="mocked-additional-stat">
-          ${sensor.entity_id}
-        </div>`;
-      });
-
-      // Create mock device with minimal sensors array
-      const createSensor = (entity_id: string) => ({
-        entity_id,
-        state: '42',
-        attributes: {},
-        translation_key: 'test_key',
-      });
-
-      mockDevice = {
-        device_id: 'pi_hole_device',
-        sensors: [
-          createSensor('sensor.seen_clients'),
-          createSensor('sensor.dns_unique_domains'),
-          createSensor('sensor.dns_queries_cached'),
-        ],
-      } as PiHoleDevice;
-
-      // Mock config with info section
-      mockConfig = {
-        device_id: 'pi_hole_device',
-        info: {
-          tap_action: { action: 'more-info' },
-        },
-      };
+    // Mock return value with minimal data for testing
+    createAdditionalStatStub.callsFake((hass, element, config, sensor) => {
+      return html`<div class="mocked-additional-stat">
+        ${sensor.entity_id}
+      </div>`;
     });
 
-    afterEach(() => {
-      createAdditionalStatStub.restore();
-      showSectionStub.restore();
+    // Create mock device with minimal sensors array
+    const createSensor = (entity_id: string) => ({
+      entity_id,
+      state: '42',
+      attributes: {},
+      translation_key: 'test_key',
     });
 
-    it('should return nothing when show returns false for sensors section', async () => {
-      // Configure show to return false for sensors section
-      showSectionStub.withArgs(mockConfig, 'sensors').returns(false);
+    mockDevice = {
+      device_id: 'pi_hole_device',
+      sensors: [
+        createSensor('sensor.seen_clients'),
+        createSensor('sensor.dns_unique_domains'),
+        createSensor('sensor.dns_queries_cached'),
+      ],
+    } as PiHoleDevice;
 
-      // Call createAdditionalStats
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
+    // Mock config with info section
+    mockConfig = {
+      device_id: 'pi_hole_device',
+      info: {
+        tap_action: { action: 'more-info' },
+      },
+    };
+  });
 
-      // Assert that nothing is returned
-      expect(result).to.equal(nothing);
+  afterEach(() => {
+    createAdditionalStatStub.restore();
+    showSectionStub.restore();
+  });
 
-      // Verify that createAdditionalStat was not called
-      expect(createAdditionalStatStub.called).to.be.false;
-    });
+  it('should return nothing when show returns false for sensors section', async () => {
+    // Configure show to return false for sensors section
+    showSectionStub.withArgs(mockConfig, 'sensors').returns(false);
 
-    it('should call createAdditionalStat for each sensor in the device', async () => {
-      // Ensure show returns true for sensors section
-      showSectionStub.withArgs(mockConfig, 'sensors').returns(true);
+    // Call createAdditionalStats
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
 
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-      await fixture(result as TemplateResult);
+    // Assert that nothing is returned
+    expect(result).to.equal(nothing);
 
-      expect(createAdditionalStatStub.callCount).to.equal(
-        mockDevice.sensors.length,
-      );
+    // Verify that createAdditionalStat was not called
+    expect(createAdditionalStatStub.called).to.be.false;
+  });
 
-      // Verify each sensor was passed correctly
-      mockDevice.sensors.forEach((sensor, index) => {
-        const call = createAdditionalStatStub.getCall(index);
-        expect(call.args[0]).to.equal(mockHass);
-        expect(call.args[1]).to.equal(mockElement);
-        expect(call.args[2]).to.equal(mockConfig.info);
-        expect(call.args[3]).to.equal(sensor);
-      });
-    });
+  it('should call createAdditionalStat for each sensor in the device', async () => {
+    // Ensure show returns true for sensors section
+    showSectionStub.withArgs(mockConfig, 'sensors').returns(true);
 
-    it('should render container with all sensor items', async () => {
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-      const el = await fixture(result as TemplateResult);
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
+    await fixture(result as TemplateResult);
 
-      expect(el.tagName.toLowerCase()).to.equal('div');
-      expect(el.classList.contains('additional-stats')).to.be.true;
-      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(3);
-    });
+    expect(createAdditionalStatStub.callCount).to.equal(
+      mockDevice.sensors.length,
+    );
 
-    it('should handle empty sensors array', async () => {
-      mockDevice.sensors = [];
-
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-      const el = await fixture(result as TemplateResult);
-
-      expect(createAdditionalStatStub.callCount).to.equal(0);
-      expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(0);
-    });
-
-    it('should pass info section config to createAdditionalStat', async () => {
-      // Update config with specific info section
-      mockConfig.info = {
-        tap_action: { action: 'toggle' },
-        hold_action: { action: 'more-info' },
-      };
-
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-      await fixture(result as TemplateResult);
-
-      // Verify that first call used the info section config
-      expect(createAdditionalStatStub.firstCall.args[2]).to.deep.equal(
-        mockConfig.info,
-      );
-    });
-
-    it('should handle missing info config by passing undefined', async () => {
-      // Remove info section from config
-      delete mockConfig.info;
-
-      const result = createAdditionalStats(
-        mockElement,
-        mockHass,
-        mockDevice,
-        mockConfig,
-      );
-      await fixture(result as TemplateResult);
-
-      // Verify that undefined was passed for info config
-      expect(createAdditionalStatStub.firstCall.args[2]).to.be.undefined;
+    // Verify each sensor was passed correctly
+    mockDevice.sensors.forEach((sensor, index) => {
+      const call = createAdditionalStatStub.getCall(index);
+      expect(call.args[0]).to.equal(mockHass);
+      expect(call.args[1]).to.equal(mockElement);
+      expect(call.args[2]).to.equal(mockConfig.info);
+      expect(call.args[3]).to.equal(sensor);
     });
   });
+
+  it('should render container with all sensor items', async () => {
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
+    const el = await fixture(result as TemplateResult);
+
+    expect(el.tagName.toLowerCase()).to.equal('div');
+    expect(el.classList.contains('additional-stats')).to.be.true;
+    expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(3);
+  });
+
+  it('should handle empty sensors array', async () => {
+    mockDevice.sensors = [];
+
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
+    const el = await fixture(result as TemplateResult);
+
+    expect(createAdditionalStatStub.callCount).to.equal(0);
+    expect(el.querySelectorAll('.mocked-additional-stat').length).to.equal(0);
+  });
+
+  it('should pass info section config to createAdditionalStat', async () => {
+    // Update config with specific info section
+    mockConfig.info = {
+      tap_action: { action: 'toggle' },
+      hold_action: { action: 'more-info' },
+    };
+
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
+    await fixture(result as TemplateResult);
+
+    // Verify that first call used the info section config
+    expect(createAdditionalStatStub.firstCall.args[2]).to.deep.equal(
+      mockConfig.info,
+    );
+  });
+
+  it('should handle missing info config by passing undefined', async () => {
+    // Remove info section from config
+    delete mockConfig.info;
+
+    const result = createAdditionalStats(
+      mockElement,
+      mockHass,
+      mockDevice,
+      mockConfig,
+    );
+    await fixture(result as TemplateResult);
+
+    // Verify that undefined was passed for info config
+    expect(createAdditionalStatStub.firstCall.args[2]).to.be.undefined;
+  });
+});

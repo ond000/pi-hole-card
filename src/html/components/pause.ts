@@ -44,7 +44,7 @@ export const pause = (
     <div class="pause ${pauseCollapsed ? 'hidden' : ''}">
       ${pauseDuration.map((duration) => {
         const seconds = parseTimeToSeconds(duration);
-        const displayText = formatSecondsToHuman(seconds);
+        const displayText = formatSecondsToHuman(seconds, hass);
         return html`<mwc-button @click=${handlePauseClick(hass, setup, seconds)}
           >${displayText}</mwc-button
         >`;

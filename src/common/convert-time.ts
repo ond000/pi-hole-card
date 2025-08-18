@@ -1,3 +1,6 @@
+import type { HomeAssistant } from '@hass/types';
+import { localize } from '@localize/localize';
+
 /**
  * Converts a number of seconds into a string formatted as "HH:MM:SS".
  *
@@ -105,31 +108,47 @@ export const parseTimeToSeconds = (input: number | string): number => {
  * Uses the most appropriate unit and shows nice rounded values when possible.
  *
  * @param seconds - The number of seconds to format
+ * @param hass - The Home Assistant instance for translations
  * @returns A formatted string like "1 minute", "5 minutes", "1 hour", etc.
  *
  * @example
  * ```typescript
- * formatSecondsToHuman(60); // Returns "1 minute"
- * formatSecondsToHuman(300); // Returns "5 minutes"
- * formatSecondsToHuman(3600); // Returns "1 hour"
- * formatSecondsToHuman(90); // Returns "90 seconds"
+ * formatSecondsToHuman(60, hass); // Returns "1 minute"
+ * formatSecondsToHuman(300, hass); // Returns "5 minutes"
+ * formatSecondsToHuman(3600, hass); // Returns "1 hour"
+ * formatSecondsToHuman(90, hass); // Returns "90 seconds"
  * ```
  */
-export const formatSecondsToHuman = (seconds: number): string => {
-  if (seconds === 0) return '0 seconds';
+export const formatSecondsToHuman = (
+  seconds: number,
+  hass: HomeAssistant,
+): string => {
+  if (seconds === 0) return `0 ${localize(hass, 'card.units.seconds')}`;
 
   // Hours - only if it divides evenly
   if (seconds >= 3600 && seconds % 3600 === 0) {
     const hours = seconds / 3600;
-    return hours === 1 ? '1 hour' : `${hours} hours`;
+    const unit =
+      hours === 1
+        ? localize(hass, 'card.units.hour')
+        : localize(hass, 'card.units.hours');
+    return hours === 1 ? `1 ${unit}` : `${hours} ${unit}`;
   }
 
   // Minutes - only if it divides evenly AND less than an hour, OR if it divides evenly and is a reasonable number of minutes
   if (seconds >= 60 && seconds % 60 === 0 && seconds < 3600) {
     const minutes = seconds / 60;
-    return minutes === 1 ? '1 minute' : `${minutes} minutes`;
+    const unit =
+      minutes === 1
+        ? localize(hass, 'card.units.minute')
+        : localize(hass, 'card.units.minutes');
+    return minutes === 1 ? `1 ${unit}` : `${minutes} ${unit}`;
   }
 
   // Seconds - for everything else (including times that are many minutes but not whole hours)
-  return seconds === 1 ? '1 second' : `${seconds} seconds`;
+  const unit =
+    seconds === 1
+      ? localize(hass, 'card.units.second')
+      : localize(hass, 'card.units.seconds');
+  return seconds === 1 ? `1 ${unit}` : `${seconds} ${unit}`;
 };

@@ -4,6 +4,24 @@ import {
   parseTimeToSeconds,
 } from '@common/convert-time';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
+
+// Mock the localize function
+const mockLocalize = sinon.stub();
+mockLocalize.withArgs(sinon.match.any, 'card.units.seconds').returns('seconds');
+mockLocalize.withArgs(sinon.match.any, 'card.units.second').returns('second');
+mockLocalize.withArgs(sinon.match.any, 'card.units.minutes').returns('minutes');
+mockLocalize.withArgs(sinon.match.any, 'card.units.minute').returns('minute');
+mockLocalize.withArgs(sinon.match.any, 'card.units.hours').returns('hours');
+mockLocalize.withArgs(sinon.match.any, 'card.units.hour').returns('hour');
+
+// Mock the localize module
+sinon.stub(require('@localize/localize'), 'localize').callsFake(mockLocalize);
+
+// Mock hass object
+const mockHass = {
+  language: 'en',
+} as any;
 
 describe('convert-time.ts', () => {
   describe('formatSecondsToHHMMSS', () => {
@@ -69,28 +87,28 @@ describe('convert-time.ts', () => {
 
   describe('formatSecondsToHuman', () => {
     it('should format zero seconds', () => {
-      expect(formatSecondsToHuman(0)).to.equal('0 seconds');
+      expect(formatSecondsToHuman(0, mockHass)).to.equal('0 seconds');
     });
 
     it('should format single units', () => {
-      expect(formatSecondsToHuman(1)).to.equal('1 second');
-      expect(formatSecondsToHuman(5)).to.equal('5 seconds');
-      expect(formatSecondsToHuman(60)).to.equal('1 minute');
-      expect(formatSecondsToHuman(120)).to.equal('2 minutes');
-      expect(formatSecondsToHuman(3600)).to.equal('1 hour');
-      expect(formatSecondsToHuman(7200)).to.equal('2 hours');
+      expect(formatSecondsToHuman(1, mockHass)).to.equal('1 second');
+      expect(formatSecondsToHuman(5, mockHass)).to.equal('5 seconds');
+      expect(formatSecondsToHuman(60, mockHass)).to.equal('1 minute');
+      expect(formatSecondsToHuman(120, mockHass)).to.equal('2 minutes');
+      expect(formatSecondsToHuman(3600, mockHass)).to.equal('1 hour');
+      expect(formatSecondsToHuman(7200, mockHass)).to.equal('2 hours');
     });
 
     it('should prefer larger units when they divide evenly', () => {
-      expect(formatSecondsToHuman(300)).to.equal('5 minutes'); // not "300 seconds"
-      expect(formatSecondsToHuman(1800)).to.equal('30 minutes'); // not "1800 seconds"
-      expect(formatSecondsToHuman(10800)).to.equal('3 hours'); // not "180 minutes"
+      expect(formatSecondsToHuman(300, mockHass)).to.equal('5 minutes'); // not "300 seconds"
+      expect(formatSecondsToHuman(1800, mockHass)).to.equal('30 minutes'); // not "1800 seconds"
+      expect(formatSecondsToHuman(10800, mockHass)).to.equal('3 hours'); // not "180 minutes"
     });
 
     it('should use seconds for non-divisible values', () => {
-      expect(formatSecondsToHuman(90)).to.equal('90 seconds'); // 1.5 minutes
-      expect(formatSecondsToHuman(150)).to.equal('150 seconds'); // 2.5 minutes
-      expect(formatSecondsToHuman(4500)).to.equal('4500 seconds'); // 1.25 hours
+      expect(formatSecondsToHuman(90, mockHass)).to.equal('90 seconds'); // 1.5 minutes
+      expect(formatSecondsToHuman(150, mockHass)).to.equal('150 seconds'); // 2.5 minutes
+      expect(formatSecondsToHuman(4500, mockHass)).to.equal('4500 seconds'); // 1.25 hours
     });
   });
 });

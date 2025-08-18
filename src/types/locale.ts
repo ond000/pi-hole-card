@@ -13,7 +13,12 @@ export type TranslationKey =
   | 'card.sections.pause'
   | 'card.sections.switches'
   | 'card.sections.actions'
-  | 'card.units.seconds';
+  | 'card.units.seconds'
+  | 'card.units.second'
+  | 'card.units.minutes'
+  | 'card.units.minute'
+  | 'card.units.hours'
+  | 'card.units.hour';
 
 export interface Translation {
   /** The translation key */
