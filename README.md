@@ -564,6 +564,7 @@ collapsed_sections:
 - [x] **`Greek translation`**: **⭐ Second contributor ⭐** added Greek language support - thanks @ChriZathens
 - [x] **`Customizable badge actions`**: configurable tap/hold/double-tap actions for card badge - thanks @moshoari
 - [x] **`Enhanced pause durations`**: flexible time formats and human-readable display for pause buttons - thanks @moshoari
+- [x] **`Backwards compatibility`**: maintained Home Assistant integration backwards compatibility - thanks @ccheath
 
 ## Contributing
 
