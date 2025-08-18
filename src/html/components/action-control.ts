@@ -50,6 +50,7 @@ export const createActionButton = (
   const icon = actionIcon(entity);
   const label = entity?.attributes.friendly_name
     .replace('Pihole- ', '')
+    .replace('pihole-', '')
     .replace(' the ', ' ');
 
   return html`

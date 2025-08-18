@@ -147,10 +147,10 @@ export const styles = css`
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    cursor: pointer;
   }
 
   .additional-stat {
+    cursor: pointer;
     display: flex;
     align-items: center;
     font-size: 0.9rem;
@@ -189,14 +189,16 @@ export const styles = css`
   .switches,
   .actions {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
-    transition:
-      max-height 0.3s ease,
-      opacity 0.3s ease;
     overflow: hidden;
-    max-height: 500px; /* Adjust as needed */
-    opacity: 1;
+  }
+
+  .actions {
+    justify-content: space-around;
+  }
+
+  .switches {
+    justify-content: space-between;
   }
 
   .hidden {
@@ -239,6 +241,7 @@ export const styles = css`
   /* Click action button styles */
   mwc-button {
     margin: 4px;
+    cursor: pointer;
   }
 
   mwc-button.primary {
@@ -251,6 +254,26 @@ export const styles = css`
 
   mwc-button ha-icon {
     margin-right: 3px;
+  }
+
+  /* Actions button hover effects */
+  .actions mwc-button {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    transition:
+      transform 0.2s ease,
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+    will-change: transform, filter;
+  }
+
+  .actions mwc-button:hover,
+  .actions mwc-button:focus-visible {
+    transform: translateY(-1px) scale(1.03);
+    filter: brightness(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--success-color);
   }
 
   /* Switch styles */
@@ -310,7 +333,6 @@ export const styles = css`
   }
 
   .pause mwc-button {
-    cursor: pointer;
     padding: 5px;
     border-radius: 5px;
     border: 1px solid transparent;
