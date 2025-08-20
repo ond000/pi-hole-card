@@ -7,7 +7,6 @@ import type { PiHoleDevice, PiHoleSetup } from '@type/types';
 import { html, nothing, type TemplateResult } from 'lit';
 import { toggleSection } from '../common/toggle-section';
 import { createActionButton } from './components/action-control';
-import { pause } from './components/pause';
 import { stateContent } from './components/state-content';
 
 /**
@@ -123,7 +122,12 @@ export const createCardActions = (
 ): TemplateResult => {
   return html`
     <div>
-      ${pause(hass, setup, config)}${controls(element, hass, device, config)}
+      <pause-component
+        .hass=${hass}
+        .setup=${setup}
+        .config=${config}
+      ></pause-component>
+      ${controls(element, hass, device, config)}
     </div>
   `;
 };

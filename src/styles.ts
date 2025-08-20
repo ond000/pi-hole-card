@@ -1,10 +1,45 @@
 import { css } from 'lit';
 
 /**
+ * Shared collapsible section styles
+ */
+export const collapsibleStyles = css`
+  .collapsible-section {
+    margin: 0;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .section-header span {
+    font-weight: 500;
+  }
+
+  .caret-icon {
+    transition: transform 0.3s ease;
+  }
+
+  .hidden {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+  }
+`;
+
+/**
  * Static CSS styles for the Pi-hole Card
  * Modified to support grouped pairs of elements and background icons
  */
 export const styles = css`
+  ${collapsibleStyles}
+
   ha-card {
     overflow: hidden;
   }
@@ -168,24 +203,6 @@ export const styles = css`
     color: var(--secondary-text-color);
   }
 
-  /* Collapsible section styles */
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .section-header span {
-    font-weight: 500;
-  }
-
-  .caret-icon {
-    transition: transform 0.3s ease;
-  }
-
   .switches,
   .actions {
     display: flex;
@@ -199,13 +216,6 @@ export const styles = css`
 
   .switches {
     justify-content: space-between;
-  }
-
-  .hidden {
-    max-height: 0;
-    opacity: 0;
-    margin: 0;
-    padding: 0;
   }
 
   /* Version information styles */
@@ -322,33 +332,6 @@ export const styles = css`
     background-color: var(--secondary-text-color);
     width: 100%;
     margin: 10px 16px;
-  }
-
-  /* Pause buttons */
-  .pause {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-  }
-
-  .pause mwc-button {
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid transparent;
-    transition:
-      transform 0.2s ease,
-      filter 0.2s ease,
-      box-shadow 0.2s ease;
-    will-change: transform, filter;
-  }
-
-  .pause mwc-button:hover,
-  .pause mwc-button:focus-visible {
-    transform: translateY(-1px) scale(1.03);
-    filter: brightness(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border-color: var(--success-color);
   }
 
   /* Warning badge styles */

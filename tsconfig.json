@@ -23,6 +23,7 @@
       "@type/*": ["./src/types/*"],
       "@hass/*": ["./src/hass/*"],
       "@common/*": ["./src/common/*"],
+      "@config/*": ["./src/config/*"],
       "@util/*": ["./src/util/*"],
       "@test/*": ["./test/*"],
       "@html/*": ["./src/html/*"],

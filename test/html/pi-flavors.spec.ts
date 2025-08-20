@@ -254,4 +254,24 @@ describe('pi-flavors.ts', () => {
     expect(stateContentStub.callCount).to.equal(0);
     expect(createActionButtonStub.callCount).to.equal(0);
   });
+
+  it('should render pause-component with correct properties', async () => {
+    const result = createCardActions(
+      mockElement,
+      mockHass,
+      mockSetup,
+      mockDevice,
+      mockConfig,
+    );
+    const el = await fixture(result as TemplateResult);
+
+    // Check that pause-component is rendered
+    const pauseComponent: any = el.querySelector('pause-component');
+    expect(pauseComponent).to.exist;
+
+    // Check that pause-component has the correct properties set
+    expect(pauseComponent!.hass).to.not.be.null;
+    expect(pauseComponent!.setup).to.not.be.null;
+    expect(pauseComponent!.config).to.not.be.null;
+  });
 });

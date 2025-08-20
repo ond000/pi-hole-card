@@ -90,7 +90,6 @@ describe('editor.ts', () => {
                   integration: 'pi_hole',
                 },
               ],
-              multiple: true,
             },
           },
           required: true,
@@ -445,6 +444,33 @@ describe('editor.ts', () => {
                   },
                 },
               ],
+            },
+          ],
+        },
+
+        {
+          name: 'features',
+          label: 'Features',
+          type: 'expandable' as const,
+          flatten: true,
+          icon: 'mdi:list-box',
+          schema: [
+            {
+              name: 'features',
+              label: 'Features',
+              required: false,
+              selector: {
+                select: {
+                  multiple: true,
+                  mode: 'list' as const,
+                  options: [
+                    {
+                      label: 'Disable group pausing',
+                      value: 'disable_group_pausing',
+                    },
+                  ],
+                },
+              },
             },
           ],
         },

@@ -257,6 +257,7 @@ If you're unsure what your Pi-hole device ID is, here are several ways to find i
 | entity_order       | list            | _none_       | Custom order for switch, button, sensor entities or dividers.      |
 | collapsed_sections | list            | _none_       | Sections to be initially collapsed. See below.                     |
 | switch_spacing     | string          | flex         | Layout style for switches: flex, space-around, space-between       |
+| features           | list            | See below    | Optional flags to toggle different features                        |
 
 ### Action Configuration
 
@@ -368,6 +369,44 @@ pause_durations:
 The UI will automatically display these in human-readable format (e.g., "5 minutes", "1 hour").
 
 ![Pause Ad-Blocking](assets/custom-pause.png)
+
+## Feature Flags
+
+Use feature flags to customize card behavior:
+
+```yaml
+features:
+  - disable_group_pausing
+```
+
+| Feature               | Description                   |
+| --------------------- | ----------------------------- |
+| disable_group_pausing | Disable group pausing feature |
+
+### Group Pausing Feature
+
+The group pausing feature is **enabled by default**. When enabled, the pause section will show a dropdown to select which pi or client group to pause, allowing you to pause individual instances or client groups. This is useful for targeting specific Pi-hole instances or client groups.
+
+![group-pause](assets/group-pause.gif)
+
+When enabled you can pause the Pi instance as well
+
+![pi-pause](assets/pi-pause.gif)
+
+> [!NOTE]  
+> **Prerequisites**: This feature requires the [Pi-hole v6 integration](https://github.com/bastgau/ha-pi-hole-v6) to be installed in your Home Assistant instance.
+
+> [!WARNING]  
+> **HA Core Integration**: This feature has not been tested with the Home Assistant Core Pi-hole integration and may not work as expected.
+
+To disable the group pausing feature and use the legacy device-based service call (which pauses all Pi-hole devices). This is reccomended for multi-pi situations:
+
+```yaml
+type: custom:pi-hole
+device_id: pi_hole_device_1
+features:
+  - disable_group_pausing
+```
 
 ### Excluding Sections & Entities
 
@@ -565,6 +604,7 @@ collapsed_sections:
 - [x] **`Customizable badge actions`**: configurable tap/hold/double-tap actions for card badge - thanks @moshoari
 - [x] **`Enhanced pause durations`**: flexible time formats and human-readable display for pause buttons - thanks @moshoari
 - [x] **`Backwards compatibility`**: maintained Home Assistant integration backwards compatibility - thanks @ccheath
+- [x] **`Group pause feature`**: enhanced pause functionality with group support - thanks @bastgau
 
 ## Contributing
 

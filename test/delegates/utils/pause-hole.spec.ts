@@ -38,28 +38,34 @@ describe('handle-pause-click.ts', () => {
     formatTimeStub.reset();
   });
 
-  it('should return a function that can be called later', () => {
+  it('should call service immediately when invoked', () => {
+    // Arrange
+    const duration = 60;
+    const formattedTime = '00:01:00';
+    formatTimeStub.withArgs(duration).returns(formattedTime);
+
     // Act
-    const result = handlePauseClick(mockHass, mockSetup, 60);
+    handlePauseClick(mockHass, mockSetup, duration);
 
     // Assert
-    expect(result).to.be.a('function');
-
-    // Verify that callService wasn't called yet
-    expect(callServiceStub.called).to.be.false;
+    expect(formatTimeStub.calledOnceWith(duration)).to.be.true;
+    expect(callServiceStub.calledOnce).to.be.true;
+    expect(callServiceStub.firstCall.args[0]).to.equal('pi_hole_v6');
+    expect(callServiceStub.firstCall.args[1]).to.equal('disable');
+    expect(callServiceStub.firstCall.args[2]).to.deep.equal({
+      device_id: 'pi_hole_device_1',
+      duration: formattedTime,
+    });
   });
 
-  it('should call callService with correct parameters when the returned function is invoked', () => {
+  it('should call callService with correct parameters when invoked', () => {
     // Arrange
     const duration = 300; // 5 minutes
     const formattedTime = '00:05:00';
     formatTimeStub.withArgs(duration).returns(formattedTime);
 
     // Act
-    const pauseFunction = handlePauseClick(mockHass, mockSetup, duration);
-
-    // Invoking the returned function should call the service
-    pauseFunction();
+    handlePauseClick(mockHass, mockSetup, duration);
 
     // Assert
     expect(formatTimeStub.calledOnceWith(duration)).to.be.true;
@@ -89,13 +95,33 @@ describe('handle-pause-click.ts', () => {
       formatTimeStub.withArgs(seconds).returns(formatted);
 
       // Act
-      const pauseFunction = handlePauseClick(mockHass, mockSetup, seconds);
-      pauseFunction();
+      handlePauseClick(mockHass, mockSetup, seconds);
 
       // Assert
       expect(formatTimeStub.calledOnceWith(seconds)).to.be.true;
       expect(callServiceStub.calledOnce).to.be.true;
       expect(callServiceStub.firstCall.args[2].duration).to.equal(formatted);
+    });
+  });
+
+  it('should call service with entity-based parameters when entityId is provided', () => {
+    // Arrange
+    const duration = 300; // 5 minutes
+    const formattedTime = '00:05:00';
+    const entityId = 'switch.pi_hole_switch';
+    formatTimeStub.withArgs(duration).returns(formattedTime);
+
+    // Act
+    handlePauseClick(mockHass, mockSetup, duration, entityId);
+
+    // Assert
+    expect(formatTimeStub.calledOnceWith(duration)).to.be.true;
+    expect(callServiceStub.calledOnce).to.be.true;
+    expect(callServiceStub.firstCall.args[0]).to.equal('pi_hole_v6');
+    expect(callServiceStub.firstCall.args[1]).to.equal('disable');
+    expect(callServiceStub.firstCall.args[2]).to.deep.equal({
+      duration: formattedTime,
+      entity_id: [entityId],
     });
   });
 });
