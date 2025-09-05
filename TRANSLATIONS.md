@@ -6,6 +6,7 @@ Thank you for your interest in helping translate the Pi-hole Card! Translations 
 
 - English (en)
 - Spanish (es)
+- Greek (el)
 - _Your language could be next!_
 
 ## How to Add a Translation
@@ -88,6 +89,8 @@ Thank you for helping make the Pi-hole Card more accessible to everyone!
 | Language             | Code   | Status     | Maintainer   |
 | -------------------- | ------ | ---------- | ------------ |
 | English              | en     | 100%       | @warmfire540 |
+| Spanish              | es     | 100%       | @ajavibp     |
+| Greek                | el     | 100%       | @ChriZathens |
 | _Your language here_ | _code_ | _progress_ | _your name_  |
 
 # Explanation of Files to Update
