@@ -1,0 +1,68 @@
+{
+  "card": {
+    "stats": {
+      "total_queries": "Celkový počet dotazů",
+      "active_clients": "{number} aktivních klientů",
+      "queries_blocked": "Zablokovaných dotazů",
+      "list_blocked_queries": "Seznam zablokovaných dotazů",
+      "percentage_blocked": "Procento zablokovaných",
+      "list_all_queries": "Seznam všech dotazů",
+      "domains_on_lists": "Domény na seznamech",
+      "manage_lists": "Spravovat seznamy"
+    },
+    "sections": {
+      "pause": "Pozastavit Ad-Blocking",
+      "switches": "Přepínače",
+      "actions": "Akce"
+    },
+    "units": {
+      "seconds": "vteřiny",
+      "second": "vteřina",
+      "minutes": "minuty",
+      "minute": "minuta",
+      "hours": "hodiny",
+      "hour": "hodina"
+    },
+    "ui": {
+      "select_pi_or_group": "Vyber Pi nebo Skupinu",
+      "partial": "Částečný"
+    }
+  },
+  "editor": {
+    "space_around": "Prostor kolem",
+    "space_between": "Prostor mezi",
+    "actions": "Akce",
+    "footer": "Zápatí",
+    "header": "Hlavička",
+    "pause_buttons": "Tlačítka pozastavení",
+    "statistics": "Statistiky",
+    "sensors": "Senzory",
+    "switches": "Přepínače",
+    "tap_action": "Akce kliknutí",
+    "hold_action": "Akce podržení",
+    "double_tap_action": "Akce dvojkliku",
+    "content": "Obsah",
+    "card_title": "Název karty",
+    "card_icon": "Ikona karty",
+    "layout": "Rozvržení",
+    "sections_to_exclude": "Sekce k vyloučení",
+    "sections_collapsed_by_default": "Sekce sbalené ve výchozím nastavení",
+    "style_for_switches": "Styl pro přepínače",
+    "entities_to_exclude": "Entity na vyloučení",
+    "styles": "Styly",
+    "switch_spacing": "Rozteč přepínačů",
+    "interactions": "Interakce",
+    "pause_durations": "Délky pozastavení",
+    "badge": "Odznak",
+    "information": "Informace",
+    "controls": "Ovládací prvky",
+    "features": "Funkce",
+    "disable_group_pausing": "Zakázat pozastavení skupiny",
+    "pause_60_seconds": "60 vteřin",
+    "pause_5_minutes": "5 minut",
+    "pause_15_minutes": "15 minut",
+    "pi_hole_device": "Zařízení Pi-hole",
+    "entity_display_order": "Pořadí zobrazení entit (klikněte v pořadí)",
+    "flex_default": "Flexibilní (výchozí)"
+  }
+}
